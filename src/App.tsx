@@ -282,7 +282,7 @@ function App() {
                   <div
                     key={block.id}
                     onClick={() => setSelectedBlockId(block.id)}
-                    className={`relative group transition-all ${
+                    className={`relative group transition-all ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'} ${
                       !isPreview && selectedBlockId === block.id 
                         ? 'ring-2 ring-indigo-500 ring-offset-2 shadow-md' 
                         : 'hover:ring-1 hover:ring-slate-300'

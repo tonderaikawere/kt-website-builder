@@ -85,6 +85,74 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
               />
             ))}
           </div>
+        {/* Spacing Controls */}
+        <div className="space-y-3 pt-2 border-t border-slate-100">
+          <label className="text-xs font-semibold text-slate-600 block">Spacing (Padding & Margin)</label>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Padding Top</label>
+              <select
+                value={styles.paddingTop || 'py-16'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { paddingTop: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="py-0">None (0px)</option>
+                <option value="py-4">Tiny (16px)</option>
+                <option value="py-8">Small (32px)</option>
+                <option value="py-12">Medium (48px)</option>
+                <option value="py-16">Default (64px)</option>
+                <option value="py-20">Large (80px)</option>
+                <option value="py-24">Extra Large (96px)</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Padding Bottom</label>
+              <select
+                value={styles.paddingBottom || 'py-16'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { paddingBottom: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="py-0">None (0px)</option>
+                <option value="py-4">Tiny (16px)</option>
+                <option value="py-8">Small (32px)</option>
+                <option value="py-12">Medium (48px)</option>
+                <option value="py-16">Default (64px)</option>
+                <option value="py-20">Large (80px)</option>
+                <option value="py-24">Extra Large (96px)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Margin Top</label>
+              <select
+                value={styles.marginTop || 'mt-0'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { marginTop: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="mt-0">None (0px)</option>
+                <option value="mt-2">Small (8px)</option>
+                <option value="mt-4">Medium (16px)</option>
+                <option value="mt-8">Large (32px)</option>
+                <option value="mt-12">Extra Large (48px)</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Margin Bottom</label>
+              <select
+                value={styles.marginBottom || 'mb-0'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { marginBottom: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="mb-0">None (0px)</option>
+                <option value="mb-2">Small (8px)</option>
+                <option value="mb-4">Medium (16px)</option>
+                <option value="mb-8">Large (32px)</option>
+                <option value="mb-12">Extra Large (48px)</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
