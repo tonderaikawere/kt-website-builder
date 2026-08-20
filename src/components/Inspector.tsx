@@ -25,9 +25,36 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
       </div>
 
       <div className="border-t border-slate-100 pt-4 space-y-4">
-        {/* Placeholder for controls - to be populated in upcoming commits */}
-        <div className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100">
-          Select individual tabs below or modify styles using the panel controls.
+        {/* Background Color */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-slate-600 block">Background Color</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={styles.bgColor || '#ffffff'}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgColor: e.target.value })}
+              className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0 overflow-hidden bg-transparent shrink-0"
+            />
+            <input
+              type="text"
+              value={styles.bgColor || '#ffffff'}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgColor: e.target.value })}
+              className="flex-1 text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-slate-700"
+            />
+          </div>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            {['#ffffff', '#f8fafc', '#f1f5f9', '#4f46e5', '#1e1b4b', '#0f172a'].map((color) => (
+              <button
+                key={color}
+                onClick={() => onUpdateStyles(selectedBlock.id, { bgColor: color })}
+                style={{ backgroundColor: color }}
+                className={`w-5 h-5 rounded-full border border-slate-200 shadow-sm transition-transform hover:scale-110 ${
+                  styles.bgColor === color ? 'ring-2 ring-indigo-500 ring-offset-1' : ''
+                }`}
+                title={color}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
