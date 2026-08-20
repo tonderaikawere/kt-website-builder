@@ -1,5 +1,6 @@
 import React from 'react';
 import { Block, BlockStyles } from '../types';
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 
 interface InspectorProps {
   selectedBlock: Block | undefined;
@@ -168,6 +169,41 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
             <option value="rounded-xl">Rounded Extra Large (rounded-xl)</option>
             <option value="rounded-full">Pill / Circle (rounded-full)</option>
           </select>
+        </div>
+
+        {/* Text Alignment */}
+        <div className="space-y-2 pt-2 border-t border-slate-100">
+          <label className="text-xs font-semibold text-slate-600 block">Text Alignment</label>
+          <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-200 w-fit">
+            <button
+              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'left' })}
+              className={`p-1.5 rounded transition-colors ${styles.textAlign === 'left' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              title="Align Left"
+            >
+              <AlignLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'center' })}
+              className={`p-1.5 rounded transition-colors ${styles.textAlign === 'center' || !styles.textAlign ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              title="Align Center"
+            >
+              <AlignCenter className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'right' })}
+              className={`p-1.5 rounded transition-colors ${styles.textAlign === 'right' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              title="Align Right"
+            >
+              <AlignRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'justify' })}
+              className={`p-1.5 rounded transition-colors ${styles.textAlign === 'justify' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              title="Align Justify"
+            >
+              <AlignJustify className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
