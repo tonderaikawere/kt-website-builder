@@ -121,6 +121,9 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-50 text-slate-800 select-none overflow-hidden">
+      {/* Dynamic Custom Global CSS stylesheet */}
+      <style>{settings.customGlobalCss}</style>
+
       {/* Top Toolbar */}
       {!isPreview && (
         <header className="flex items-center justify-between px-6 h-16 bg-white border-b border-slate-200 z-10 shrink-0">
@@ -343,8 +346,17 @@ function App() {
                 </div>
               )}
               {activeTab === 'css' && (
-                <div className="text-center py-8 text-slate-400 text-sm">
-                  Custom CSS configurations will show here.
+                <div className="space-y-4 h-full flex flex-col">
+                  <div>
+                    <h3 className="font-semibold text-slate-900 text-sm">Custom Global CSS</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Write custom stylesheets to style your canvas pages.</p>
+                  </div>
+                  <textarea
+                    value={settings.customGlobalCss}
+                    onChange={(e) => updateSettings({ customGlobalCss: e.target.value })}
+                    placeholder="/* Write custom CSS here */&#10;body {&#10;  font-family: sans-serif;&#10;}&#10;.my-class {&#10;  border: 2px solid red;&#10;}"
+                    className="w-full flex-1 min-h-[300px] text-xs font-mono p-3 bg-slate-900 text-slate-300 rounded-xl border border-slate-800 focus:outline-none resize-none"
+                  />
                 </div>
               )}
               {activeTab === 'seo' && (
