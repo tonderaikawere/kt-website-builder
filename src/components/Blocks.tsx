@@ -125,12 +125,27 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
         </div>
       </div>
       {imageSrc && (
-        <div className="flex-1 w-full max-w-md md:max-w-none">
+        <div className="flex-1 w-full max-w-md md:max-w-none relative group/img">
           <img 
             src={imageSrc} 
             alt="Hero Banner" 
             className={`w-full h-auto object-cover shadow-lg ${styles.borderRadius || 'rounded-lg'}`} 
           />
+          {isEditing && (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+              <button
+                onClick={() => {
+                  const newUrl = window.prompt('Enter image URL:', imageSrc);
+                  if (newUrl !== null && onContentChange) {
+                    onContentChange(block.id, { imageSrc: newUrl });
+                  }
+                }}
+                className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow transition-colors"
+              >
+                Change Image
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>
