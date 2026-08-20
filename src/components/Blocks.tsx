@@ -137,6 +137,125 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
   );
 };
 
+// Import icons for dynamic rendering
+import * as Icons from 'lucide-react';
+
+const IconRenderer = ({ name, className }: { name: string; className?: string }) => {
+  // Map standard icons we use in templates
+  switch (name) {
+    case 'Layout':
+      return <Icons.Layout className={className} />;
+    case 'Palette':
+      return <Icons.Palette className={className} />;
+    case 'FileCode':
+      return <Icons.FileCode className={className} />;
+    case 'Zap':
+      return <Icons.Zap className={className} />;
+    case 'Shield':
+      return <Icons.Shield className={className} />;
+    case 'Share2':
+      return <Icons.Share2 className={className} />;
+    case 'DollarSign':
+      return <Icons.DollarSign className={className} />;
+    case 'Phone':
+      return <Icons.Phone className={className} />;
+    default:
+      return <Icons.HelpCircle className={className} />;
+  }
+};
+
+export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Features', subtitle = 'Subtitle', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleItemTitleChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, title: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const handleItemDescChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, description: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#f8fafc',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-12">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        {items.map((item) => (
+          <div 
+            key={item.id} 
+            className={`p-6 bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col ${styles.textAlign === 'left' ? 'items-start text-left' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
+          >
+            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg mb-4">
+              <IconRenderer name={item.icon || 'Layout'} className="w-6 h-6" />
+            </div>
+            <h3 
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleItemTitleChange(item.id, e.target.innerText)}
+              className={`text-lg font-bold mb-2 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+            >
+              {item.title}
+            </h3>
+            <p 
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleItemDescChange(item.id, e.target.innerText)}
+              className={`text-sm text-slate-500 leading-relaxed ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+            >
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -147,6 +266,8 @@ export const BlockRenderer: React.FC<{
       return <HeaderBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'hero':
       return <HeroBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'features':
+      return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:
       return (
         <div className="p-8 text-center text-slate-400 bg-slate-50 border border-dashed border-slate-200">
