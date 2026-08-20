@@ -26,6 +26,7 @@ import { BLOCK_TEMPLATES } from './blockTemplates';
 import { BlockRenderer } from './components/Blocks';
 import { Inspector } from './components/Inspector';
 import { ExportModal } from './components/ExportModal';
+import { RichTextToolbar } from './components/RichTextToolbar';
 import { BlockType } from './types';
 
 const PAGE_TEMPLATES = [
@@ -544,6 +545,9 @@ function App() {
         blocks={blocks}
         settings={settings}
       />
+
+      {/* Rich Text Inline Toolbar */}
+      {!isPreview && <RichTextToolbar />}
     </div>
   );
 }
