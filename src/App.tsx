@@ -395,17 +395,30 @@ function App() {
 
         {/* Central Canvas Workspace */}
         <main 
-          className={`flex-1 flex justify-center items-start overflow-y-auto bg-slate-100 transition-all duration-300 p-8 ${isPreview ? 'p-0' : ''}`}
+          className={`flex-1 flex justify-center items-start overflow-y-auto transition-all duration-300 ${
+            isPreview && deviceMode === 'desktop' ? 'bg-slate-50 p-0' :
+            isPreview ? 'bg-slate-900 p-12' : 'bg-slate-100 p-8'
+          }`}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
+          {/* Device Simulator Bezel Wrapper */}
           <div 
-            className={`bg-white shadow-sm border border-slate-200 min-h-[500px] w-full transition-all duration-300 ${
-              isPreview ? 'max-w-full min-h-full border-none shadow-none' : 
-              deviceMode === 'mobile' ? 'max-w-[375px]' : 
-              deviceMode === 'tablet' ? 'max-w-[768px]' : 'max-w-full'
+            className={`bg-white transition-all duration-300 relative ${
+              deviceMode === 'mobile' 
+                ? 'w-[375px] min-h-[667px] border-[12px] border-slate-950 rounded-[40px] shadow-2xl my-8 mx-auto overflow-hidden' 
+                : deviceMode === 'tablet' 
+                ? 'w-[768px] min-h-[1024px] border-[16px] border-slate-950 rounded-[32px] shadow-2xl my-8 mx-auto overflow-hidden' 
+                : 'w-full min-h-full shadow-sm border border-slate-200'
             }`}
           >
+            {/* Phone Notch Simulator */}
+            {deviceMode === 'mobile' && (
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-950 rounded-full z-40 flex items-center justify-center gap-1.5 px-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                <div className="w-8 h-1 bg-slate-800 rounded-full"></div>
+              </div>
+            )}
             {blocks.length === 0 ? (
               /* Empty Canvas Container */
               <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px]">
