@@ -187,6 +187,23 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'video',
+    name: 'Video Player',
+    description: 'Embed a YouTube video player inside a section with text headers.',
+    defaultContent: {
+      title: 'Watch Our Presentation',
+      subtitle: 'See how KT Website Builder helps you deploy projects faster.',
+      youtubeId: 'dQw4w9WgXcQ'
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#1e293b',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',

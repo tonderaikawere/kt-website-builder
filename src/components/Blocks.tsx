@@ -938,6 +938,75 @@ export const LinkButtonBlock: React.FC<BlockComponentProps> = ({ block, isEditin
         </div>
       </div>
     </section>
+};
+
+export const VideoBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Video Player', subtitle = 'Subtitle', youtubeId = 'dQw4w9WgXcQ' } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#ffffff',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-8">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="max-w-3xl mx-auto relative group/video">
+        <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-slate-900 border border-slate-200">
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}`}
+            title="Embedded Video"
+            className="w-full h-full border-none"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
+        {isEditing && (
+          <button
+            onClick={() => {
+              const newUrl = window.prompt('Enter YouTube Video ID (e.g. dQw4w9WgXcQ):', youtubeId);
+              if (newUrl !== null && onContentChange) {
+                onContentChange(block.id, { youtubeId: newUrl.trim() });
+              }
+            }}
+            className="absolute top-4 right-4 bg-white/90 hover:bg-white text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            Change Video ID
+          </button>
+        )}
+      </div>
+    </section>
   );
 };
 
@@ -965,6 +1034,8 @@ export const BlockRenderer: React.FC<{
       return <SocialBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'linkButton':
       return <LinkButtonBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'video':
+      return <VideoBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:

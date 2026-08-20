@@ -204,6 +204,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'video': {
+          const title = block.content.title || 'Watch Our Presentation';
+          const subtitle = block.content.subtitle || 'See how KT Website Builder helps you deploy projects faster.';
+          const youtubeId = block.content.youtubeId || 'dQw4w9WgXcQ';
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#ffffff'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-16'} ${block.styles.paddingBottom || 'py-16'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto mb-8">
+        <h2 class="text-3xl font-extrabold mb-3 tracking-tight">${title}</h2>
+        <p class="text-slate-600 opacity-90 max-w-2xl mx-auto">${subtitle}</p>
+      </div>
+      <div class="max-w-3xl mx-auto">
+        <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-slate-900 border border-slate-200">
+          <iframe src="https://www.youtube.com/embed/${youtubeId}" title="Embedded Video" class="w-full h-full border-none" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];
