@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Layout, 
   Settings, 
@@ -74,6 +74,11 @@ function App() {
     canUndo,
     canRedo
   } = useBuilderState();
+
+  // Dynamically update document title for editor tab preview
+  useEffect(() => {
+    document.title = settings.title || 'KT Website Builder';
+  }, [settings.title]);
 
   // Handle HTML5 drag start
   const handleDragStart = (e: React.DragEvent, type: BlockType) => {
@@ -423,6 +428,41 @@ function App() {
                       <option value="Lora, serif">Lora (Serif)</option>
                       <option value="JetBrains Mono, monospace">JetBrains Mono (Monospace)</option>
                     </select>
+                  </div>
+
+                  <div className="w-full h-px bg-slate-200 dark:bg-slate-800 my-4"></div>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-slate-800 dark:text-slate-200 text-xs">Google Snippet Preview</h4>
+                      <p className="text-[10px] text-slate-400 mt-0.5">How your page will display in search engines.</p>
+                    </div>
+                    <div className="p-3.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+                      <div className="text-[10px] text-slate-500 truncate">https://kt-website.builder</div>
+                      <div className="text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline cursor-pointer truncate">{settings.title || 'My Custom Website'}</div>
+                      <div className="text-[10px] text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">{settings.description || 'Add a meta description to see how your snippet preview renders here.'}</div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">SEO Title</label>
+                        <input
+                          type="text"
+                          value={settings.title}
+                          onChange={(e) => updateSettings({ title: e.target.value })}
+                          className="w-full text-xs p-2.5 bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
+                          placeholder="Page Title"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Meta Description</label>
+                        <textarea
+                          rows={3}
+                          value={settings.description}
+                          onChange={(e) => updateSettings({ description: e.target.value })}
+                          className="w-full text-xs p-2.5 bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100 resize-none"
+                          placeholder="Type page description here..."
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
