@@ -21,6 +21,7 @@ import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
 import { BlockRenderer } from './components/Blocks';
 import { Inspector } from './components/Inspector';
+import { ExportModal } from './components/ExportModal';
 import { BlockType } from './types';
 
 const PAGE_TEMPLATES = [
@@ -43,6 +44,7 @@ const PAGE_TEMPLATES = [
 
 function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
+  const [isExportOpen, setIsExportOpen] = useState(false);
   
   const {
     blocks,
@@ -139,7 +141,10 @@ function App() {
               <Upload className="w-4 h-4" />
               Import
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+            <button 
+              onClick={() => setIsExportOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+            >
               <Download className="w-4 h-4" />
               Export
             </button>
@@ -392,6 +397,14 @@ function App() {
           Exit Preview
         </button>
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+        blocks={blocks}
+        settings={settings}
+      />
     </div>
   );
 }
