@@ -523,6 +523,148 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
   );
 };
 
+export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Pricing Plans', subtitle = 'Subtitle', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleItemTitleChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, title: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const handleItemPriceChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, price: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const handleItemDescChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, description: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const handleItemButtonChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, buttonText: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#f8fafc',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-12">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {items.map((item) => (
+          <div 
+            key={item.id} 
+            className="p-8 bg-white border border-slate-200 rounded-2xl flex flex-col shadow-md relative hover:shadow-lg transition-shadow"
+          >
+            <h3 
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleItemTitleChange(item.id, e.target.innerText)}
+              className={`text-xl font-bold mb-2 text-slate-800 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+            >
+              {item.title}
+            </h3>
+            <p 
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleItemDescChange(item.id, e.target.innerText)}
+              className={`text-xs text-slate-400 mb-6 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+            >
+              {item.description}
+            </p>
+            <div className="flex items-baseline justify-center gap-1 mb-6 text-slate-900">
+              <span 
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleItemPriceChange(item.id, e.target.innerText)}
+                className={`text-4xl font-extrabold tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              >
+                {item.price}
+              </span>
+              <span className="text-sm font-semibold text-slate-500">{item.period || '/mo'}</span>
+            </div>
+            
+            <ul className="space-y-3 mb-8 text-left text-sm text-slate-600 max-w-[240px] mx-auto w-full">
+              {item.features?.map((feat, fidx) => (
+                <li key={fidx} className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+            
+            <div className="mt-auto pt-4">
+              <span 
+                className={`block w-full py-2.5 px-4 text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm ${styles.borderRadius || 'rounded-lg'}`}
+              >
+                <span
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleItemButtonChange(item.id, e.target.innerText)}
+                  className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50/20 cursor-text text-white' : ''}
+                >
+                  {item.buttonText}
+                </span>
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -539,6 +681,8 @@ export const BlockRenderer: React.FC<{
       return <CtaBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'testimonials':
       return <TestimonialsBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'pricing':
+      return <PricingBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:

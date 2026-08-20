@@ -109,6 +109,39 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'pricing': {
+          const title = block.content.title || 'Pricing Plans';
+          const subtitle = block.content.subtitle || 'Subtitle';
+          const items = block.content.items || [];
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#f8fafc'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-16'} ${block.styles.paddingBottom || 'py-16'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto mb-12">
+        <h2 class="text-3xl font-extrabold mb-3 tracking-tight">${title}</h2>
+        <p class="text-slate-600 opacity-90 max-w-2xl mx-auto">${subtitle}</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        ${items.map(item => `
+        <div class="p-8 bg-white border border-slate-200 rounded-2xl flex flex-col shadow-md hover:shadow-lg transition-shadow">
+          <h3 class="text-xl font-bold mb-2 text-slate-800">${item.title}</h3>
+          <p class="text-xs text-slate-400 mb-6">${item.description}</p>
+          <div class="flex items-baseline justify-center gap-1 mb-6 text-slate-900">
+            <span class="text-4xl font-extrabold tracking-tight">${item.price}</span>
+            <span class="text-sm font-semibold text-slate-500">${item.period || '/mo'}</span>
+          </div>
+          <ul class="space-y-3 mb-8 text-left text-sm text-slate-600 max-w-[240px] mx-auto w-full">
+            ${(item.features || []).map(feat => `
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              <span>${feat}</span>
+            </li>`).join('\n            ')}
+          </ul>
+          <div class="mt-auto pt-4">
+            <a href="#" class="block w-full py-2.5 px-4 text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm ${block.styles.borderRadius || 'rounded-lg'}">${item.buttonText}</a>
+          </div>
+        </div>`).join('\n        ')}
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

@@ -109,6 +109,26 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'pricing',
+    name: 'Pricing Tables',
+    description: 'Comparison pricing cards detailing subscription plans.',
+    defaultContent: {
+      title: 'Simple, Transparent Pricing',
+      subtitle: 'Choose the plan that fits your business needs. Cancel anytime.',
+      items: [
+        { id: '1', title: 'Starter', price: '$9', period: '/mo', description: 'Perfect for testing and personal landing pages.', features: ['1 Project', 'Basic Templates', 'Standard Support'], buttonText: 'Choose Starter' },
+        { id: '2', title: 'Professional', price: '$29', period: '/mo', description: 'Best choice for small businesses and creators.', features: ['Unlimited Projects', 'Premium Templates', 'Priority Email Support'], buttonText: 'Choose Pro' }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#f8fafc',
+      textColor: '#1e293b',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',
