@@ -8,3 +8,27 @@ html, body, #root {
   height: 100%;
   width: 100%;
 }
+
+/* Inline text editing global styles */
+[contenteditable="true"] {
+  outline: none;
+  cursor: text;
+  transition: all 0.15s ease-in-out;
+  display: inline-block;
+  min-width: 10px;
+}
+
+[contenteditable="true"]:hover {
+  background-color: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+  border-radius: 0.25rem;
+}
+
+[contenteditable="true"]:focus {
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(30, 41, 59) !important;
+  box-shadow: 0 0 0 3px rgb(99, 102, 241) !important;
+  border-radius: 0.25rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
