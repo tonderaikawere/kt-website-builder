@@ -55,6 +55,36 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
               />
             ))}
           </div>
+        {/* Text Color */}
+        <div className="space-y-2 pt-2 border-t border-slate-100">
+          <label className="text-xs font-semibold text-slate-600 block">Text Color</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={styles.textColor || '#1e293b'}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { textColor: e.target.value })}
+              className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0 overflow-hidden bg-transparent shrink-0"
+            />
+            <input
+              type="text"
+              value={styles.textColor || '#1e293b'}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { textColor: e.target.value })}
+              className="flex-1 text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-slate-700"
+            />
+          </div>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            {['#1e293b', '#64748b', '#94a3b8', '#ffffff', '#4f46e5', '#ef4444'].map((color) => (
+              <button
+                key={color}
+                onClick={() => onUpdateStyles(selectedBlock.id, { textColor: color })}
+                style={{ backgroundColor: color }}
+                className={`w-5 h-5 rounded-full border border-slate-200 shadow-sm transition-transform hover:scale-110 ${
+                  styles.textColor === color ? 'ring-2 ring-indigo-500 ring-offset-1' : ''
+                }`}
+                title={color}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
