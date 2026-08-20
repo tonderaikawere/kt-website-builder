@@ -86,6 +86,37 @@ function App() {
     if (template) {
       addBlock(type, template.defaultContent, template.defaultStyles);
     }
+  // Export project layout to JSON
+  const exportProjectJson = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ blocks, settings }, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "kt-project.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.removeChild(downloadAnchor);
+  };
+
+  // Import project layout from JSON
+  const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target?.result as string);
+        if (Array.isArray(data.blocks)) {
+          setBlocks(data.blocks);
+        }
+        if (data.settings) {
+          updateSettings(data.settings);
+        }
+        alert('Project loaded successfully!');
+      } catch (err) {
+        alert('Invalid project JSON file!');
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -137,16 +168,37 @@ function App() {
               <RotateCcw className="w-4 h-4" />
               Reset
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            <input 
+              type="file" 
+              id="import-json" 
+              accept=".json" 
+              onChange={handleJsonImport} 
+              className="hidden" 
+            />
+            <button 
+              onClick={() => document.getElementById('import-json')?.click()}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              title="Import layout from JSON file"
+            >
               <Upload className="w-4 h-4" />
-              Import
+              Import JSON
             </button>
+            <button 
+              onClick={exportProjectJson}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              title="Download layout configuration as JSON"
+            >
+              <Download className="w-4 h-4" />
+              Export JSON
+            </button>
+            <div className="w-px h-6 bg-slate-200 mx-1"></div>
             <button 
               onClick={() => setIsExportOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+              title="Export HTML and CSS code"
             >
-              <Download className="w-4 h-4" />
-              Export
+              <FileCode className="w-4 h-4" />
+              Get Code
             </button>
             <div className="w-px h-6 bg-slate-200 mx-1"></div>
             <button
