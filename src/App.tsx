@@ -89,19 +89,19 @@ function App() {
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-50 text-slate-800 select-none overflow-hidden">
       {/* Top Toolbar */}
-      <header className="flex items-center justify-between px-6 h-16 bg-white border-b border-slate-200 z-10 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="bg-indigo-600 text-white p-2 rounded-lg shadow-sm">
-            <Layout className="w-5 h-5" />
+      {!isPreview && (
+        <header className="flex items-center justify-between px-6 h-16 bg-white border-b border-slate-200 z-10 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 text-white p-2 rounded-lg shadow-sm">
+              <Layout className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="font-bold text-slate-900 leading-none">KT Website Builder</h1>
+              <span className="text-xs text-slate-500 font-medium">Design & Drag Editor</span>
+            </div>
           </div>
-          <div>
-            <h1 className="font-bold text-slate-900 leading-none">KT Website Builder</h1>
-            <span className="text-xs text-slate-500 font-medium">Design & Drag Editor</span>
-          </div>
-        </div>
 
-        {/* Viewport Toggles */}
-        {!isPreview && (
+          {/* Viewport Toggles */}
           <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
             <button
               onClick={() => setDeviceMode('desktop')}
@@ -125,39 +125,35 @@ function App() {
               <Smartphone className="w-4 h-4" />
             </button>
           </div>
-        )}
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={resetProject}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-            <Upload className="w-4 h-4" />
-            Import
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
-          <div className="w-px h-6 bg-slate-200 mx-1"></div>
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
-              isPreview
-                ? 'bg-slate-800 hover:bg-slate-900 text-white'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-            }`}
-          >
-            <Eye className="w-4 h-4" />
-            {isPreview ? 'Back to Edit' : 'Preview Site'}
-          </button>
-        </div>
-      </header>
+          {/* Action Controls */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={resetProject}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+              <Upload className="w-4 h-4" />
+              Import
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              <Download className="w-4 h-4" />
+              Export
+            </button>
+            <div className="w-px h-6 bg-slate-200 mx-1"></div>
+            <button
+              onClick={() => setIsPreview(true)}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-colors bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              <Eye className="w-4 h-4" />
+              Preview Site
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main Workspace Body */}
       <div className="flex flex-1 overflow-hidden relative">
@@ -384,6 +380,18 @@ function App() {
           </div>
         </main>
       </div>
+      
+      {/* Floating Exit Preview Control */}
+      {isPreview && (
+        <button
+          onClick={() => setIsPreview(false)}
+          className="fixed bottom-6 right-6 bg-slate-900 hover:bg-slate-850 text-white px-4 py-2.5 rounded-full shadow-xl z-50 flex items-center gap-2 text-xs font-semibold tracking-wider transition-all transform hover:scale-105 active:scale-95 border border-slate-700"
+          title="Exit Preview"
+        >
+          <Eye className="w-4 h-4" />
+          Exit Preview
+        </button>
+      )}
     </div>
   );
 }
