@@ -51,6 +51,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
   
   const {
     blocks,
@@ -476,8 +477,16 @@ function App() {
             isPreview && deviceMode === 'desktop' ? 'bg-slate-50 p-0' :
             isPreview ? 'bg-slate-900 p-12' : 'bg-slate-100 p-8'
           }`}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDraggingOver(true);
+          }}
+          onDragEnter={() => setIsDraggingOver(true)}
+          onDragLeave={() => setIsDraggingOver(false)}
+          onDrop={(e) => {
+            handleDrop(e);
+            setIsDraggingOver(false);
+          }}
         >
           {/* Device Simulator Bezel Wrapper */}
           <div 
@@ -499,7 +508,7 @@ function App() {
             )}
             {blocks.length === 0 ? (
               /* Empty Canvas Container */
-              <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px]">
+              <div className={`p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-transparent transition-all duration-300 ${isDraggingOver ? 'drag-over-pulse border-indigo-400 rounded-xl' : ''}`}>
                 <Layout className="w-12 h-12 text-slate-300 mb-3" />
                 <p className="font-semibold text-slate-600 text-sm">Your Canvas is Empty</p>
                 <p className="text-xs max-w-xs mt-1">Drag and drop sections from the sidebar, or select presets to populate the builder canvas.</p>
@@ -511,10 +520,10 @@ function App() {
                   <div
                     key={block.id}
                     onClick={() => setSelectedBlockId(block.id)}
-                    className={`relative group transition-all ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'} ${
+                    className={`relative group transition-all duration-300 ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'} ${
                       !isPreview && selectedBlockId === block.id 
-                        ? 'ring-2 ring-indigo-500 ring-offset-2 shadow-md' 
-                        : 'hover:ring-1 hover:ring-slate-300'
+                        ? 'ring-2 ring-indigo-500 ring-offset-2 shadow-lg scale-[1.002] z-10' 
+                        : 'hover:shadow-sm hover:ring-1 hover:ring-indigo-300/50'
                     }`}
                   >
                     {/* Floating Controls */}
