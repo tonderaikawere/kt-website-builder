@@ -23,11 +23,30 @@ import { BlockRenderer } from './components/Blocks';
 import { Inspector } from './components/Inspector';
 import { BlockType } from './types';
 
+const PAGE_TEMPLATES = [
+  {
+    name: 'Standard Landing Page',
+    description: 'Clean header, hero banner, detailed feature list, CTA banner, and footer.',
+    blockTypes: ['header', 'hero', 'features', 'cta', 'footer'] as BlockType[]
+  },
+  {
+    name: 'Minimalist Landing Page',
+    description: 'Engaging hero banner, quick CTA panel, and copyright footer.',
+    blockTypes: ['hero', 'cta', 'footer'] as BlockType[]
+  },
+  {
+    name: 'Business Home Page',
+    description: 'Logo navigation header, structured feature grid, and page footer.',
+    blockTypes: ['header', 'features', 'footer'] as BlockType[]
+  }
+];
+
 function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
   
   const {
     blocks,
+    setBlocks,
     selectedBlockId,
     setSelectedBlockId,
     settings,
@@ -237,8 +256,37 @@ function App() {
                 />
               )}
               {activeTab === 'templates' && (
-                <div className="text-center py-8 text-slate-400 text-sm">
-                  Pre-configured layout templates will show here.
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-slate-900 text-sm">Preset Page Templates</h3>
+                  <p className="text-xs text-slate-500 mb-4">Select a layout preset to automatically populate your website page canvas.</p>
+                  
+                  <div className="space-y-3">
+                    {PAGE_TEMPLATES.map((tpl, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          if (window.confirm(`Loading "${tpl.name}" will overwrite your current layout. Proceed?`)) {
+                            const newBlocks = tpl.blockTypes.map(type => {
+                              const blockTpl = BLOCK_TEMPLATES.find(t => t.type === type);
+                              return {
+                                id: Math.random().toString(36).substring(2, 9),
+                                type,
+                                name: type.charAt(0).toUpperCase() + type.slice(1) + ' Section',
+                                content: blockTpl ? { ...blockTpl.defaultContent } : {},
+                                styles: blockTpl ? { ...blockTpl.defaultStyles } : { bgColor: '#ffffff', textColor: '#1e293b' }
+                              };
+                            });
+                            setBlocks(newBlocks);
+                            setSelectedBlockId(newBlocks[0]?.id || null);
+                          }
+                        }}
+                        className="w-full text-left p-3.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-indigo-300 rounded-xl transition-all flex flex-col gap-1 shadow-sm"
+                      >
+                        <span className="text-xs font-bold text-slate-800">{tpl.name}</span>
+                        <span className="text-[10px] text-slate-500 leading-normal">{tpl.description}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
               {activeTab === 'css' && (
