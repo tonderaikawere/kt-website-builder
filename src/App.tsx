@@ -12,14 +12,56 @@ import {
   Download, 
   Upload, 
   RotateCcw, 
-  Check, 
   Plus
 } from 'lucide-react';
+import { useBuilderState } from './useBuilderState';
+import { BLOCK_TEMPLATES } from './blockTemplates';
+import { BlockRenderer } from './components/Blocks';
+import { BlockType } from './types';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
-  const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const [isPreview, setIsPreview] = useState(false);
+  
+  const {
+    blocks,
+    selectedBlockId,
+    setSelectedBlockId,
+    settings,
+    updateSettings,
+    deviceMode,
+    setDeviceMode,
+    isPreview,
+    setIsPreview,
+    addBlock,
+    deleteBlock,
+    moveBlock,
+    updateBlockContent,
+    updateBlockStyles,
+    resetProject
+  } = useBuilderState();
+
+  // Handle HTML5 drag start
+  const handleDragStart = (e: React.DragEvent, type: BlockType) => {
+    e.dataTransfer.setData('text/plain', type);
+  };
+
+  // Handle drop on canvas
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const type = e.dataTransfer.getData('text/plain') as BlockType;
+    const template = BLOCK_TEMPLATES.find(t => t.type === type);
+    if (template) {
+      addBlock(type, template.defaultContent, template.defaultStyles);
+    }
+  };
+
+  // Handle click to add block
+  const handleBlockClick = (type: BlockType) => {
+    const template = BLOCK_TEMPLATES.find(t => t.type === type);
+    if (template) {
+      addBlock(type, template.defaultContent, template.defaultStyles);
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-50 text-slate-800 select-none overflow-hidden">
@@ -64,7 +106,10 @@ function App() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+          <button 
+            onClick={resetProject}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          >
             <RotateCcw className="w-4 h-4" />
             Reset
           </button>
@@ -160,22 +205,33 @@ function App() {
               {activeTab === 'blocks' && (
                 <div className="space-y-4">
                   <h3 className="font-semibold text-slate-900 text-sm">Drag & Drop Elements</h3>
-                  <p className="text-xs text-slate-500">Drag these sections on the canvas or click to add them.</p>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 border-dashed hover:border-indigo-300 transition-all cursor-grab flex flex-col items-center gap-1">
-                      <Plus className="w-4 h-4 text-indigo-600" />
-                      <span className="text-xs font-medium">Header</span>
-                    </div>
-                    <div className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 border-dashed hover:border-indigo-300 transition-all cursor-grab flex flex-col items-center gap-1">
-                      <Plus className="w-4 h-4 text-indigo-600" />
-                      <span className="text-xs font-medium">Hero</span>
-                    </div>
+                  <p className="text-xs text-slate-500 mb-4">Drag these sections on the canvas or click to add them.</p>
+                  
+                  <div className="space-y-2">
+                    {BLOCK_TEMPLATES.map((tpl) => (
+                      <div
+                        key={tpl.type}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, tpl.type)}
+                        onClick={() => handleBlockClick(tpl.type)}
+                        className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 border-dashed hover:border-indigo-300 transition-all cursor-grab flex items-center justify-between group"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs font-semibold text-slate-700">{tpl.name}</span>
+                          <span className="text-[10px] text-slate-400 max-w-[200px] mt-0.5 line-clamp-1">{tpl.description}</span>
+                        </div>
+                        <Plus className="w-4 h-4 text-indigo-600 opacity-50 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
               {activeTab === 'inspector' && (
                 <div className="text-center py-8 text-slate-400 text-sm">
-                  Select a section on the canvas to customize its style parameters.
+                  {selectedBlockId 
+                    ? `Selected section ID: ${selectedBlockId}. Style parameters will be configurable here.`
+                    : 'Select a section on the canvas to customize its style parameters.'
+                  }
                 </div>
               )}
               {activeTab === 'templates' && (
@@ -198,7 +254,11 @@ function App() {
         )}
 
         {/* Central Canvas Workspace */}
-        <main className={`flex-1 flex justify-center items-start overflow-y-auto bg-slate-100 transition-all duration-300 p-8 ${isPreview ? 'p-0' : ''}`}>
+        <main 
+          className={`flex-1 flex justify-center items-start overflow-y-auto bg-slate-100 transition-all duration-300 p-8 ${isPreview ? 'p-0' : ''}`}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+        >
           <div 
             className={`bg-white shadow-sm border border-slate-200 min-h-[500px] w-full transition-all duration-300 ${
               isPreview ? 'max-w-full min-h-full border-none shadow-none' : 
@@ -206,12 +266,35 @@ function App() {
               deviceMode === 'tablet' ? 'max-w-[768px]' : 'max-w-full'
             }`}
           >
-            {/* Inside Canvas Container */}
-            <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px]">
-              <Layout className="w-12 h-12 text-slate-300 mb-3" />
-              <p className="font-semibold text-slate-600 text-sm">Your Canvas is Empty</p>
-              <p className="text-xs max-w-xs mt-1">Drag and drop sections from the sidebar, or select presets to populate the builder canvas.</p>
-            </div>
+            {blocks.length === 0 ? (
+              /* Empty Canvas Container */
+              <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px]">
+                <Layout className="w-12 h-12 text-slate-300 mb-3" />
+                <p className="font-semibold text-slate-600 text-sm">Your Canvas is Empty</p>
+                <p className="text-xs max-w-xs mt-1">Drag and drop sections from the sidebar, or select presets to populate the builder canvas.</p>
+              </div>
+            ) : (
+              /* Canvas Blocks List */
+              <div className="flex flex-col w-full h-full">
+                {blocks.map((block) => (
+                  <div
+                    key={block.id}
+                    onClick={() => setSelectedBlockId(block.id)}
+                    className={`relative group transition-all ${
+                      !isPreview && selectedBlockId === block.id 
+                        ? 'ring-2 ring-indigo-500 ring-offset-2' 
+                        : 'hover:ring-1 hover:ring-slate-300'
+                    }`}
+                  >
+                    <BlockRenderer 
+                      block={block} 
+                      isEditing={!isPreview} 
+                      onContentChange={updateBlockContent}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </main>
       </div>
