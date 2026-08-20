@@ -319,6 +319,62 @@ export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onCo
   );
 };
 
+export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { copyrightText = '© Copyright text', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleCopyrightChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { copyrightText: e.target.innerText });
+  };
+
+  const handleLinkTextChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, title: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#0f172a',
+    color: styles.textColor || '#94a3b8',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <footer 
+      style={inlineStyles} 
+      className={`px-8 py-12 ${styles.paddingTop || 'py-8'} ${styles.paddingBottom || 'py-8'} border-t border-slate-800`}
+    >
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleCopyrightChange}
+          className={`text-sm ${isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-white/5' : ''}`}
+        >
+          {copyrightText}
+        </p>
+        <div className="flex gap-6">
+          {items.map((item) => (
+            <span key={item.id} className="text-sm font-medium hover:text-white transition-colors">
+              <span
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleLinkTextChange(item.id, e.target.innerText)}
+                className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-white/5 cursor-text' : ''}
+              >
+                {item.title}
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </footer>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -333,6 +389,8 @@ export const BlockRenderer: React.FC<{
       return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'cta':
       return <CtaBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'footer':
+      return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:
       return (
         <div className="p-8 text-center text-slate-400 bg-slate-50 border border-dashed border-slate-200">
