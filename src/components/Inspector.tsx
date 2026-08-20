@@ -153,6 +153,21 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
               </select>
             </div>
           </div>
+        {/* Border Radius */}
+        <div className="space-y-2 pt-2 border-t border-slate-100">
+          <label className="text-xs font-semibold text-slate-600 block">Button & Image Rounding</label>
+          <select
+            value={styles.borderRadius || 'rounded-md'}
+            onChange={(e) => onUpdateStyles(selectedBlock.id, { borderRadius: e.target.value })}
+            className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          >
+            <option value="rounded-none">Sharp Corners (rounded-none)</option>
+            <option value="rounded-sm">Rounded Small (rounded-sm)</option>
+            <option value="rounded-md">Rounded Medium (rounded-md)</option>
+            <option value="rounded-lg">Rounded Large (rounded-lg)</option>
+            <option value="rounded-xl">Rounded Extra Large (rounded-xl)</option>
+            <option value="rounded-full">Pill / Circle (rounded-full)</option>
+          </select>
         </div>
       </div>
     </div>
