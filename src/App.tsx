@@ -15,7 +15,9 @@ import {
   Plus,
   Trash2,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Undo,
+  Redo
 } from 'lucide-react';
 import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
@@ -62,7 +64,11 @@ function App() {
     moveBlock,
     updateBlockContent,
     updateBlockStyles,
-    resetProject
+    resetProject,
+    undo,
+    redo,
+    canUndo,
+    canRedo
   } = useBuilderState();
 
   // Handle HTML5 drag start
@@ -171,6 +177,25 @@ function App() {
               <RotateCcw className="w-4 h-4" />
               Reset
             </button>
+            <button 
+              onClick={undo}
+              disabled={!canUndo}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${canUndo ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed'}`}
+              title="Undo last change"
+            >
+              <Undo className="w-4 h-4" />
+              Undo
+            </button>
+            <button 
+              onClick={redo}
+              disabled={!canRedo}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${canRedo ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed'}`}
+              title="Redo next change"
+            >
+              <Redo className="w-4 h-4" />
+              Redo
+            </button>
+            <div className="w-px h-6 bg-slate-200 mx-1"></div>
             <input 
               type="file" 
               id="import-json" 

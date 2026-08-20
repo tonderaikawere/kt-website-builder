@@ -8,12 +8,61 @@ const DEFAULT_SETTINGS: ProjectSettings = {
   fontFamily: 'Inter, sans-serif'
 };
 
+interface HistoryState {
+  blocks: Block[];
+  settings: ProjectSettings;
+}
+
 export function useBuilderState() {
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [blocks, setBlocksState] = useState<Block[]>([]);
+  const [settings, setSettingsState] = useState<ProjectSettings>(DEFAULT_SETTINGS);
+  
+  // History tracking state
+  const [history, setHistory] = useState<HistoryState[]>([
+    { blocks: [], settings: DEFAULT_SETTINGS }
+  ]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
-  const [settings, setSettings] = useState<ProjectSettings>(DEFAULT_SETTINGS);
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isPreview, setIsPreview] = useState(false);
+
+  // Helper to push new state to history
+  const pushToHistory = useCallback((newBlocks: Block[], newSettings: ProjectSettings) => {
+    setHistory(prev => {
+      const cleanHistory = prev.slice(0, historyIndex + 1);
+      return [...cleanHistory, { blocks: newBlocks, settings: newSettings }];
+    });
+    setHistoryIndex(prev => prev + 1);
+  }, [historyIndex]);
+
+  // Undo action
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const prevIdx = historyIndex - 1;
+      const prevState = history[prevIdx];
+      setBlocksState(prevState.blocks);
+      setSettingsState(prevState.settings);
+      setHistoryIndex(prevIdx);
+    }
+  }, [history, historyIndex]);
+
+  // Redo action
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const nextIdx = historyIndex + 1;
+      const nextState = history[nextIdx];
+      setBlocksState(nextState.blocks);
+      setSettingsState(nextState.settings);
+      setHistoryIndex(nextIdx);
+    }
+  }, [history, historyIndex]);
+
+  // Wrapper setter for loading external projects or templates directly
+  const setBlocks = useCallback((newBlocks: Block[]) => {
+    setBlocksState(newBlocks);
+    pushToHistory(newBlocks, settings);
+  }, [pushToHistory, settings]);
 
   // Generate unique IDs
   const generateId = useCallback(() => {
@@ -23,16 +72,23 @@ export function useBuilderState() {
   // Reset Project
   const resetProject = useCallback(() => {
     if (window.confirm('Are you sure you want to clear all blocks and start over?')) {
-      setBlocks([]);
+      const newBlocks: Block[] = [];
+      const newSettings = DEFAULT_SETTINGS;
+      setBlocksState(newBlocks);
+      setSettingsState(newSettings);
       setSelectedBlockId(null);
-      setSettings(DEFAULT_SETTINGS);
+      pushToHistory(newBlocks, newSettings);
     }
-  }, []);
+  }, [pushToHistory]);
 
   // Update Settings
   const updateSettings = useCallback((newSettings: Partial<ProjectSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
+    setSettingsState(prev => {
+      const updated = { ...prev, ...newSettings };
+      pushToHistory(blocks, updated);
+      return updated;
+    });
+  }, [blocks, pushToHistory]);
 
   // Add block to canvas
   const addBlock = useCallback((type: BlockType, content: Block['content'] = {}, styles: BlockStyles = {}) => {
@@ -51,21 +107,29 @@ export function useBuilderState() {
         ...styles
       }
     };
-    setBlocks(prev => [...prev, newBlock]);
+    setBlocksState(prev => {
+      const updated = [...prev, newBlock];
+      pushToHistory(updated, settings);
+      return updated;
+    });
     setSelectedBlockId(newBlock.id);
-  }, [generateId]);
+  }, [generateId, pushToHistory, settings]);
 
   // Delete block
   const deleteBlock = useCallback((id: string) => {
-    setBlocks(prev => prev.filter(b => b.id !== id));
+    setBlocksState(prev => {
+      const updated = prev.filter(b => b.id !== id);
+      pushToHistory(updated, settings);
+      return updated;
+    });
     if (selectedBlockId === id) {
       setSelectedBlockId(null);
     }
-  }, [selectedBlockId]);
+  }, [selectedBlockId, pushToHistory, settings]);
 
   // Move block up or down
   const moveBlock = useCallback((id: string, direction: 'up' | 'down') => {
-    setBlocks(prev => {
+    setBlocksState(prev => {
       const idx = prev.findIndex(b => b.id === id);
       if (idx === -1) return prev;
       
@@ -75,23 +139,28 @@ export function useBuilderState() {
       const result = [...prev];
       const [temp] = result.splice(idx, 1);
       result.splice(newIdx, 0, temp);
+      pushToHistory(result, settings);
       return result;
     });
-  }, []);
+  }, [pushToHistory, settings]);
 
   // Update block content
   const updateBlockContent = useCallback((id: string, newContent: Partial<Block['content']>) => {
-    setBlocks(prev =>
-      prev.map(b => (b.id === id ? { ...b, content: { ...b.content, ...newContent } } : b))
-    );
-  }, []);
+    setBlocksState(prev => {
+      const updated = prev.map(b => (b.id === id ? { ...b, content: { ...b.content, ...newContent } } : b));
+      pushToHistory(updated, settings);
+      return updated;
+    });
+  }, [pushToHistory, settings]);
 
   // Update block styles
   const updateBlockStyles = useCallback((id: string, newStyles: Partial<BlockStyles>) => {
-    setBlocks(prev =>
-      prev.map(b => (b.id === id ? { ...b, styles: { ...b.styles, ...newStyles } } : b))
-    );
-  }, []);
+    setBlocksState(prev => {
+      const updated = prev.map(b => (b.id === id ? { ...b, styles: { ...b.styles, ...newStyles } } : b));
+      pushToHistory(updated, settings);
+      return updated;
+    });
+  }, [pushToHistory, settings]);
 
   return {
     blocks,
@@ -109,6 +178,10 @@ export function useBuilderState() {
     moveBlock,
     updateBlockContent,
     updateBlockStyles,
-    resetProject
+    resetProject,
+    undo,
+    redo,
+    canUndo: historyIndex > 0,
+    canRedo: historyIndex < history.length - 1
   };
 }
