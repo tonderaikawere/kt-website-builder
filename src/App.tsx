@@ -134,6 +134,12 @@ function App() {
       {/* Dynamic Custom Global CSS stylesheet */}
       <style>{settings.customGlobalCss}</style>
 
+      {/* Dynamic Web Font Link loader */}
+      <link
+        rel="stylesheet"
+        href={`https://fonts.googleapis.com/css2?family=${settings.fontFamily.split(',')[0].replace(/['"\s]/g, '+')}:wght@400;500;600;700;800&display=swap`}
+      />
+
       {/* Top Toolbar */}
       {!isPreview && (
         <header className="flex items-center justify-between px-6 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10 shrink-0">
@@ -398,8 +404,26 @@ function App() {
                 </div>
               )}
               {activeTab === 'seo' && (
-                <div className="text-center py-8 text-slate-400 text-sm">
-                  SEO Meta tags editor will show here.
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-slate-900 dark:text-white text-sm">Page Settings</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Customize global styles, typography, and meta tags.</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Font Family</label>
+                    <select
+                      value={settings.fontFamily}
+                      onChange={(e) => updateSettings({ fontFamily: e.target.value })}
+                      className="w-full text-xs p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
+                    >
+                      <option value="Inter, sans-serif">Inter (Sans-serif)</option>
+                      <option value="Roboto, sans-serif">Roboto (Sans-serif)</option>
+                      <option value="Playfair Display, serif">Playfair Display (Serif)</option>
+                      <option value="Poppins, sans-serif">Poppins (Sans-serif)</option>
+                      <option value="Lora, serif">Lora (Serif)</option>
+                      <option value="JetBrains Mono, monospace">JetBrains Mono (Monospace)</option>
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
@@ -417,6 +441,7 @@ function App() {
         >
           {/* Device Simulator Bezel Wrapper */}
           <div 
+            style={{ fontFamily: settings.fontFamily }}
             className={`bg-white transition-all duration-300 relative ${
               deviceMode === 'mobile' 
                 ? 'w-[375px] min-h-[667px] border-[12px] border-slate-950 rounded-[40px] shadow-2xl my-8 mx-auto overflow-hidden' 
