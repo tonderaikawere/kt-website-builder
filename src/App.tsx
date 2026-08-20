@@ -12,7 +12,8 @@ import {
   Download, 
   Upload, 
   RotateCcw, 
-  Plus
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
@@ -282,10 +283,25 @@ function App() {
                     onClick={() => setSelectedBlockId(block.id)}
                     className={`relative group transition-all ${
                       !isPreview && selectedBlockId === block.id 
-                        ? 'ring-2 ring-indigo-500 ring-offset-2' 
+                        ? 'ring-2 ring-indigo-500 ring-offset-2 shadow-md' 
                         : 'hover:ring-1 hover:ring-slate-300'
                     }`}
                   >
+                    {/* Floating Controls */}
+                    {!isPreview && (
+                      <div className="absolute top-2 right-2 flex items-center bg-white border border-slate-200 rounded-lg shadow-md px-1 py-0.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteBlock(block.id);
+                          }}
+                          className="p-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete Block"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                     <BlockRenderer 
                       block={block} 
                       isEditing={!isPreview} 
