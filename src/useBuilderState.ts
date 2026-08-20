@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Block, BlockType, BlockStyles, ProjectSettings } from './types';
 
 const DEFAULT_SETTINGS: ProjectSettings = {
@@ -14,12 +14,38 @@ interface HistoryState {
 }
 
 export function useBuilderState() {
-  const [blocks, setBlocksState] = useState<Block[]>([]);
-  const [settings, setSettingsState] = useState<ProjectSettings>(DEFAULT_SETTINGS);
+  // Load blocks from localStorage synchronously
+  const [blocks, setBlocksState] = useState<Block[]>(() => {
+    try {
+      const saved = localStorage.getItem('kt-builder-project');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.blocks)) return parsed.blocks;
+      }
+    } catch (e) {}
+    return [];
+  });
+
+  // Load settings from localStorage synchronously
+  const [settings, setSettingsState] = useState<ProjectSettings>(() => {
+    try {
+      const saved = localStorage.getItem('kt-builder-project');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.settings) return { ...DEFAULT_SETTINGS, ...parsed.settings };
+      }
+    } catch (e) {}
+    return DEFAULT_SETTINGS;
+  });
   
-  // History tracking state
-  const [history, setHistory] = useState<HistoryState[]>([
-    { blocks: [], settings: DEFAULT_SETTINGS }
+  // Autosave to localStorage on changes
+  useEffect(() => {
+    localStorage.setItem('kt-builder-project', JSON.stringify({ blocks, settings }));
+  }, [blocks, settings]);
+  
+  // History tracking state initialized with the loaded initial state
+  const [history, setHistory] = useState<HistoryState[]>(() => [
+    { blocks, settings }
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
