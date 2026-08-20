@@ -20,6 +20,7 @@ import {
 import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
 import { BlockRenderer } from './components/Blocks';
+import { Inspector } from './components/Inspector';
 import { BlockType } from './types';
 
 function App() {
@@ -230,12 +231,10 @@ function App() {
                 </div>
               )}
               {activeTab === 'inspector' && (
-                <div className="text-center py-8 text-slate-400 text-sm">
-                  {selectedBlockId 
-                    ? `Selected section ID: ${selectedBlockId}. Style parameters will be configurable here.`
-                    : 'Select a section on the canvas to customize its style parameters.'
-                  }
-                </div>
+                <Inspector 
+                  selectedBlock={blocks.find(b => b.id === selectedBlockId)}
+                  onUpdateStyles={updateBlockStyles}
+                />
               )}
               {activeTab === 'templates' && (
                 <div className="text-center py-8 text-slate-400 text-sm">
