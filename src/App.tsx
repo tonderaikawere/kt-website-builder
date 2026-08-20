@@ -475,16 +475,41 @@ function App() {
         </main>
       </div>
       
-      {/* Floating Exit Preview Control */}
+      {/* Floating Preview Controls */}
       {isPreview && (
-        <button
-          onClick={() => setIsPreview(false)}
-          className="fixed bottom-6 right-6 bg-slate-900 hover:bg-slate-850 text-white px-4 py-2.5 rounded-full shadow-xl z-50 flex items-center gap-2 text-xs font-semibold tracking-wider transition-all transform hover:scale-105 active:scale-95 border border-slate-700"
-          title="Exit Preview"
-        >
-          <Eye className="w-4 h-4" />
-          Exit Preview
-        </button>
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 bg-white border border-slate-200 shadow-xl px-4 py-2 rounded-full z-50 flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="flex items-center gap-1.5 border-r border-slate-200 pr-3">
+            <button
+              onClick={() => setDeviceMode('desktop')}
+              className={`p-1.5 rounded-full transition-all ${deviceMode === 'desktop' ? 'bg-indigo-50 text-indigo-600 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+              title="Desktop View"
+            >
+              <Monitor className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setDeviceMode('tablet')}
+              className={`p-1.5 rounded-full transition-all ${deviceMode === 'tablet' ? 'bg-indigo-50 text-indigo-600 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+              title="Tablet View"
+            >
+              <Tablet className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setDeviceMode('mobile')}
+              className={`p-1.5 rounded-full transition-all ${deviceMode === 'mobile' ? 'bg-indigo-50 text-indigo-600 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+              title="Mobile View"
+            >
+              <Smartphone className="w-4 h-4" />
+            </button>
+          </div>
+          <button
+            onClick={() => setIsPreview(false)}
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-indigo-600 px-3 py-1.5 rounded-full hover:bg-slate-50 transition-colors cursor-pointer"
+            title="Exit Preview"
+          >
+            <Eye className="w-4 h-4 text-slate-500" />
+            Exit Preview
+          </button>
+        </div>
       )}
 
       {/* Export Modal */}
