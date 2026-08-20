@@ -142,6 +142,33 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'contact': {
+          const title = block.content.title || 'Contact Us';
+          const subtitle = block.content.subtitle || 'Subtitle';
+          const formEmailPlaceholder = block.content.formEmailPlaceholder || 'Email';
+          const formMessagePlaceholder = block.content.formMessagePlaceholder || 'Message';
+          const formButtonText = block.content.formButtonText || 'Send';
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#ffffff'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-16'} ${block.styles.paddingBottom || 'py-16'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto mb-10">
+        <h2 class="text-3xl font-extrabold mb-3 tracking-tight">${title}</h2>
+        <p class="text-slate-600 opacity-90 max-w-2xl mx-auto">${subtitle}</p>
+      </div>
+      <div class="max-w-md mx-auto bg-slate-50 border border-slate-200/60 p-6 rounded-2xl shadow-sm text-left">
+        <form onsubmit="event.preventDefault(); alert('Message sent (demo only)!');" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Email Address</label>
+            <input type="email" placeholder="${formEmailPlaceholder}" class="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500" required />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Message</label>
+            <textarea rows="3" placeholder="${formMessagePlaceholder}" class="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none" required></textarea>
+          </div>
+          <button type="submit" class="w-full py-2.5 px-4 text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm ${block.styles.borderRadius || 'rounded-lg'}">${formButtonText}</button>
+        </form>
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

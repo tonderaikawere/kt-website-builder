@@ -665,6 +665,127 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
   );
 };
 
+export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Contact Us', subtitle = 'Subtitle', formEmailPlaceholder = 'Email', formMessagePlaceholder = 'Message', formButtonText = 'Send' } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleEmailPlaceholderChange = (e: React.FocusEvent<HTMLSpanElement>) => {
+    if (onContentChange) onContentChange(block.id, { formEmailPlaceholder: e.target.innerText });
+  };
+
+  const handleMessagePlaceholderChange = (e: React.FocusEvent<HTMLSpanElement>) => {
+    if (onContentChange) onContentChange(block.id, { formMessagePlaceholder: e.target.innerText });
+  };
+
+  const handleButtonTextChange = (e: React.FocusEvent<HTMLSpanElement>) => {
+    if (onContentChange) onContentChange(block.id, { formButtonText: e.target.innerText });
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#ffffff',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-10">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="max-w-md mx-auto bg-slate-50 border border-slate-200/60 p-6 rounded-2xl shadow-sm text-left">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5">Email Address</label>
+            <div className="relative flex items-center">
+              <input
+                type="email"
+                disabled
+                placeholder={formEmailPlaceholder}
+                className="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg cursor-not-allowed focus:outline-none"
+              />
+              {isEditing && (
+                <span 
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={handleEmailPlaceholderChange}
+                  className="absolute right-3 text-[10px] font-semibold text-indigo-500 hover:text-indigo-600 outline-dashed outline-1 outline-indigo-400 px-1 rounded bg-indigo-50 cursor-text"
+                  title="Edit Placeholder"
+                >
+                  {formEmailPlaceholder}
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5">Message</label>
+            <div className="relative">
+              <textarea
+                rows={3}
+                disabled
+                placeholder={formMessagePlaceholder}
+                className="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg cursor-not-allowed focus:outline-none resize-none"
+              />
+              {isEditing && (
+                <span 
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={handleMessagePlaceholderChange}
+                  className="absolute bottom-3 right-3 text-[10px] font-semibold text-indigo-500 hover:text-indigo-600 outline-dashed outline-1 outline-indigo-400 px-1 rounded bg-indigo-50 cursor-text"
+                  title="Edit Placeholder"
+                >
+                  {formMessagePlaceholder}
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <button
+            type="button"
+            className={`w-full py-2.5 px-4 text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm ${styles.borderRadius || 'rounded-lg'} flex items-center justify-center`}
+          >
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={handleButtonTextChange}
+              className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50/20 cursor-text text-white' : ''}
+            >
+              {formButtonText}
+            </span>
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -683,6 +804,8 @@ export const BlockRenderer: React.FC<{
       return <TestimonialsBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'pricing':
       return <PricingBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'contact':
+      return <ContactBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:

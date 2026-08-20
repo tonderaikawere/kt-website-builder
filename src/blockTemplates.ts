@@ -129,6 +129,25 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'contact',
+    name: 'Contact Form',
+    description: 'A customizable contact form section with title and description.',
+    defaultContent: {
+      title: 'Get In Touch',
+      subtitle: 'Have questions? We would love to hear from you. Send us a message.',
+      formEmailPlaceholder: 'your.email@example.com',
+      formMessagePlaceholder: 'How can we help you?',
+      formButtonText: 'Send Message'
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#1e293b',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',
