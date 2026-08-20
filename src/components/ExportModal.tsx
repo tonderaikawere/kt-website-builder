@@ -86,6 +86,29 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'testimonials': {
+          const title = block.content.title || 'Testimonials';
+          const subtitle = block.content.subtitle || 'Subtitle';
+          const items = block.content.items || [];
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#ffffff'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-16'} ${block.styles.paddingBottom || 'py-16'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto mb-12">
+        <h2 class="text-3xl font-extrabold mb-3 tracking-tight">${title}</h2>
+        <p class="text-slate-600 opacity-90 max-w-2xl mx-auto">${subtitle}</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        ${items.map(item => `
+        <div class="p-6 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col items-center text-center shadow-sm">
+          ${item.imageSrc ? `<img src="${item.imageSrc}" alt="${item.name}" class="w-16 h-16 rounded-full object-cover border-2 border-indigo-500 shadow-sm mb-4" />` : ''}
+          <p class="text-sm italic text-slate-600 leading-relaxed mb-6">"${item.quote}"</p>
+          <div class="mt-auto">
+            <h4 class="font-bold text-sm text-slate-800">${item.name}</h4>
+            <p class="text-xs text-indigo-600 font-medium">${item.role}</p>
+          </div>
+        </div>`).join('\n        ')}
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

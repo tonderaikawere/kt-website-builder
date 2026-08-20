@@ -89,6 +89,26 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'testimonials',
+    name: 'Testimonials Grid',
+    description: 'Grid of customer reviews, profiles, quotes, and names.',
+    defaultContent: {
+      title: 'What Our Clients Say',
+      subtitle: 'Hear from our clients who have built and launched their sites using our tools.',
+      items: [
+        { id: '1', name: 'Sarah Connor', role: 'CTO, TechCorp', quote: 'KT Builder saved us weeks of dev time. The exported HTML is super clean and performance is outstanding!', imageSrc: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' },
+        { id: '2', name: 'John Doe', role: 'Founder, StartupX', quote: 'Offline editing in Tauri is a game-changer. I can edit and preview designs locally with full privacy.', imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#1e293b',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',

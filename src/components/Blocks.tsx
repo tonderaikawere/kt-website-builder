@@ -390,6 +390,139 @@ export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
   );
 };
 
+export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Testimonials', subtitle = 'Subtitle', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleItemNameChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, name: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const handleItemRoleChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, role: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const handleItemQuoteChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, quote: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#ffffff',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-12">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {items.map((item) => (
+          <div 
+            key={item.id} 
+            className="p-6 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col items-center text-center shadow-sm"
+          >
+            {item.imageSrc && (
+              <div className="relative group/avatar mb-4 shrink-0">
+                <img 
+                  src={item.imageSrc} 
+                  alt={item.name} 
+                  className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500 shadow-sm"
+                />
+                {isEditing && (
+                  <button
+                    onClick={() => {
+                      const newUrl = window.prompt('Enter avatar image URL:', item.imageSrc);
+                      if (newUrl !== null && onContentChange && items) {
+                        const updatedItems = items.map(it => 
+                          it.id === item.id ? { ...it, imageSrc: newUrl } : it
+                        );
+                        onContentChange(block.id, { items: updatedItems });
+                      }
+                    }}
+                    className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center rounded-full text-[8px] font-bold text-white cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+            )}
+            <p 
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleItemQuoteChange(item.id, e.target.innerText)}
+              className={`text-sm italic text-slate-600 leading-relaxed mb-6 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+            >
+              "{item.quote}"
+            </p>
+            <div className="mt-auto">
+              <h4 
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleItemNameChange(item.id, e.target.innerText)}
+                className={`font-bold text-sm text-slate-800 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              >
+                {item.name}
+              </h4>
+              <p 
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleItemRoleChange(item.id, e.target.innerText)}
+                className={`text-xs text-indigo-600 font-medium ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              >
+                {item.role}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -404,6 +537,8 @@ export const BlockRenderer: React.FC<{
       return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'cta':
       return <CtaBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'testimonials':
+      return <TestimonialsBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:
