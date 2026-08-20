@@ -17,7 +17,9 @@ import {
   ChevronUp,
   ChevronDown,
   Undo,
-  Redo
+  Redo,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
@@ -47,6 +49,7 @@ const PAGE_TEMPLATES = [
 function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   const {
     blocks,
@@ -126,19 +129,19 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-50 text-slate-800 select-none overflow-hidden">
+    <div className={`flex flex-col h-screen w-screen bg-slate-50 text-slate-800 select-none overflow-hidden ${isDarkMode ? 'dark bg-slate-900 text-slate-100' : ''}`}>
       {/* Dynamic Custom Global CSS stylesheet */}
       <style>{settings.customGlobalCss}</style>
 
       {/* Top Toolbar */}
       {!isPreview && (
-        <header className="flex items-center justify-between px-6 h-16 bg-white border-b border-slate-200 z-10 shrink-0">
+        <header className="flex items-center justify-between px-6 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10 shrink-0">
           <div className="flex items-center gap-3">
             <div className="bg-indigo-600 text-white p-2 rounded-lg shadow-sm">
               <Layout className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="font-bold text-slate-900 leading-none">KT Website Builder</h1>
+              <h1 className="font-bold text-slate-900 dark:text-white leading-none">KT Website Builder</h1>
               <span className="text-xs text-slate-500 font-medium">Design & Drag Editor</span>
             </div>
           </div>
@@ -167,6 +170,15 @@ function App() {
               <Smartphone className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={() => setIsDarkMode(prev => !prev)}
+            className="p-2 rounded-lg text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Toggle theme mode"
+          >
+            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
 
           {/* Action Controls */}
           <div className="flex items-center gap-2">
@@ -244,15 +256,15 @@ function App() {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Left Sidebar - Hidden in Preview */}
         {!isPreview && (
-          <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full z-10">
+          <aside className="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full z-10">
             {/* Sidebar Tabs */}
-            <div className="flex border-b border-slate-200 bg-slate-50">
+            <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
               <button
                 onClick={() => setActiveTab('blocks')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'blocks'
-                    ? 'border-indigo-600 text-indigo-600 bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <Layers className="w-4 h-4" />
@@ -262,8 +274,8 @@ function App() {
                 onClick={() => setActiveTab('inspector')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'inspector'
-                    ? 'border-indigo-600 text-indigo-600 bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <Palette className="w-4 h-4" />
@@ -273,8 +285,8 @@ function App() {
                 onClick={() => setActiveTab('templates')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'templates'
-                    ? 'border-indigo-600 text-indigo-600 bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <Layout className="w-4 h-4" />
@@ -284,8 +296,8 @@ function App() {
                 onClick={() => setActiveTab('css')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'css'
-                    ? 'border-indigo-600 text-indigo-600 bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <FileCode className="w-4 h-4" />
@@ -295,8 +307,8 @@ function App() {
                 onClick={() => setActiveTab('seo')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'seo'
-                    ? 'border-indigo-600 text-indigo-600 bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <Settings className="w-4 h-4" />
