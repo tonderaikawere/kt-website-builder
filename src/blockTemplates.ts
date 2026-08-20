@@ -169,6 +169,24 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'linkButton',
+    name: 'Link Button',
+    description: 'A simple section with a title, description, and custom external button link.',
+    defaultContent: {
+      title: 'Ready to Get Started?',
+      subtitle: 'Build your online presence today with our powerful site builder.',
+      buttonText: 'Learn More',
+      buttonLink: 'https://example.com'
+    },
+    defaultStyles: {
+      bgColor: '#f1f5f9',
+      textColor: '#1e293b',
+      paddingTop: 'py-12',
+      paddingBottom: 'py-12',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',

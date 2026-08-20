@@ -190,6 +190,20 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'linkButton': {
+          const title = block.content.title || 'Ready to Get Started?';
+          const subtitle = block.content.subtitle || 'Build your online presence today with our powerful site builder.';
+          const buttonText = block.content.buttonText || 'Learn More';
+          const buttonLink = block.content.buttonLink || '#';
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#f1f5f9'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-12'} ${block.styles.paddingBottom || 'py-12'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto flex flex-col items-center">
+        <h2 class="text-2xl font-bold mb-2 tracking-tight">${title}</h2>
+        <p class="text-sm opacity-90 max-w-xl mb-6">${subtitle}</p>
+        <a href="${buttonLink}" target="_blank" rel="noopener noreferrer" class="inline-block py-2.5 px-6 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm ${block.styles.borderRadius || 'rounded-lg'}">${buttonText}</a>
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

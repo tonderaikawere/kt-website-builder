@@ -861,6 +861,86 @@ export const SocialBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
   );
 };
 
+export const LinkButtonBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Link Button', subtitle = 'Subtitle', buttonText = 'Button', buttonLink = '#' } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleButtonTextChange = (e: React.FocusEvent<HTMLSpanElement>) => {
+    if (onContentChange) onContentChange(block.id, { buttonText: e.target.innerText });
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#f1f5f9',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-12'} ${styles.paddingBottom || 'py-12'}`}
+    >
+      <div className="max-w-4xl mx-auto flex flex-col items-center">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-2xl font-bold mb-2 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-sm opacity-90 max-w-xl mb-6 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+        <div className="relative group/btn flex items-center gap-2">
+          <a
+            href={isEditing ? undefined : buttonLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-block py-2.5 px-6 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm ${styles.borderRadius || 'rounded-lg'}`}
+          >
+            <span
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={handleButtonTextChange}
+              className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50/20 cursor-text text-white' : ''}
+            >
+              {buttonText}
+            </span>
+          </a>
+          {isEditing && (
+            <button
+              onClick={() => {
+                const newLink = window.prompt('Enter button URL link:', buttonLink);
+                if (newLink !== null && onContentChange) {
+                  onContentChange(block.id, { buttonLink: newLink });
+                }
+              }}
+              className="p-1 bg-white border border-slate-200 rounded-md text-[10px] text-slate-500 hover:text-indigo-600 transition-colors shadow-sm cursor-pointer"
+              title="Edit Link URL"
+            >
+              Link
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -883,6 +963,8 @@ export const BlockRenderer: React.FC<{
       return <ContactBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'social':
       return <SocialBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'linkButton':
+      return <LinkButtonBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:
