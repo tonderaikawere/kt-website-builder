@@ -169,6 +169,27 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'social': {
+          const title = block.content.title || 'Social Links';
+          const subtitle = block.content.subtitle || 'Subtitle';
+          const items = block.content.items || [];
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#ffffff'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-12'} ${block.styles.paddingBottom || 'py-12'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto mb-6">
+        <h2 class="text-2xl font-bold mb-2 tracking-tight">${title}</h2>
+        <p class="text-sm text-slate-500 opacity-90 max-w-xl mx-auto">${subtitle}</p>
+      </div>
+      <div class="flex items-center justify-center gap-6 max-w-xl mx-auto">
+        ${items.map(item => `
+        <div class="flex flex-col items-center gap-1.5">
+          <a href="${item.link || '#'}" class="p-3 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 hover:scale-105 transition-all shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+          </a>
+          <span class="text-[10px] font-semibold text-slate-500">${item.title}</span>
+        </div>`).join('\n        ')}
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

@@ -786,6 +786,81 @@ export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
   );
 };
 
+export const SocialBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Social Links', subtitle = 'Subtitle', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleItemTitleChange = (itemId: string, text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, title: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#ffffff',
+    color: styles.textColor || '#1e293b',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-12'} ${styles.paddingBottom || 'py-12'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-6">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          className={`text-2xl font-bold mb-2 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleSubtitleChange}
+          className={`text-sm text-slate-500 opacity-90 max-w-xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="flex items-center justify-center gap-6 max-w-xl mx-auto">
+        {items.map((item) => (
+          <div key={item.id} className="flex flex-col items-center gap-1.5">
+            <a 
+              href={item.link || '#'}
+              className="p-3 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 hover:scale-105 transition-all shadow-sm"
+            >
+              <IconRenderer name={item.icon || 'Layout'} className="w-5 h-5" />
+            </a>
+            <span 
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              onBlur={(e) => handleItemTitleChange(item.id, e.target.innerText)}
+              className={`text-[10px] font-semibold text-slate-500 hover:text-slate-800 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+            >
+              {item.title}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -806,6 +881,8 @@ export const BlockRenderer: React.FC<{
       return <PricingBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'contact':
       return <ContactBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'social':
+      return <SocialBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:

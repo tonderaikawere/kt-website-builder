@@ -148,6 +148,27 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'social',
+    name: 'Social Links',
+    description: 'A list of social media follow links with customizable icon lists.',
+    defaultContent: {
+      title: 'Follow Us Online',
+      subtitle: 'Connect with our team across these social channels.',
+      items: [
+        { id: '1', title: 'Twitter', icon: 'Share2', link: '#' },
+        { id: '2', title: 'GitHub', icon: 'FileCode', link: '#' },
+        { id: '3', title: 'Facebook', icon: 'Layout', link: '#' }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#1e293b',
+      paddingTop: 'py-12',
+      paddingBottom: 'py-12',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',
