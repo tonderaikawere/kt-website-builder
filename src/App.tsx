@@ -622,6 +622,16 @@ function App() {
                           placeholder="Type page description here..."
                         />
                       </div>
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Favicon Icon URL</label>
+                        <input
+                          type="text"
+                          value={settings.faviconUrl || ''}
+                          onChange={(e) => updateSettings({ faviconUrl: e.target.value })}
+                          className="w-full text-xs p-2.5 bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
+                          placeholder="/favicon.ico"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

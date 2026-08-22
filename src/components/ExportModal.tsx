@@ -251,6 +251,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
   <title>${settings.title || 'Kawerify Tech Project'}</title>
   <meta name="description" content="${settings.description || 'Designed visually with Kawerify Tech Builder'}">
   <meta name="generator" content="Kawerify Tech Website Builder">
+  <link rel="icon" type="image/x-icon" href="${settings.faviconUrl || '/favicon.ico'}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${settings.fontFamily.split(',')[0].replace(/['"\s]/g, '+')}:wght@400;500;600;700;800&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>

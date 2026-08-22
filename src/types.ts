@@ -66,6 +66,7 @@ export interface ProjectSettings {
   description: string;
   customGlobalCss: string;
   fontFamily: string;
+  faviconUrl: string;
 }
 
 export interface Project {

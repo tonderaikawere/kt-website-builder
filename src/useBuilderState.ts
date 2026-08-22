@@ -5,7 +5,8 @@ const DEFAULT_SETTINGS: ProjectSettings = {
   title: 'Kawerify Tech Site Project',
   description: 'Designed visually with Kawerify Tech Builder',
   customGlobalCss: '',
-  fontFamily: 'Poppins, sans-serif'
+  fontFamily: 'Poppins, sans-serif',
+  faviconUrl: '/favicon.ico'
 };
 
 interface HistoryState {
