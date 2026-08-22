@@ -1096,10 +1096,52 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
     if (!ctx) return;
 
     const coords = getCoordinates(e);
+    const width = canvas.width;
+    const height = canvas.height;
+
+    let targetX = coords.x;
+    let targetY = coords.y;
+    let snappedX = false;
+    let snappedY = false;
+
+    // Snap to center guideline X (if close to center)
+    if (Math.abs(targetX - width / 2) < 8) {
+      targetX = width / 2;
+      snappedX = true;
+    }
+    // Snap to center guideline Y (if close to center)
+    if (Math.abs(targetY - height / 2) < 8) {
+      targetY = height / 2;
+      snappedY = true;
+    }
 
     if (tool === 'pen' || tool === 'eraser') {
-      ctx.lineTo(coords.x, coords.y);
+      ctx.lineTo(targetX, targetY);
       ctx.stroke();
+      
+      // Draw smart guide lines for freehand if snapped
+      if (snappedX) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1;
+        ctx.moveTo(width / 2, 0);
+        ctx.lineTo(width / 2, height);
+        ctx.stroke();
+        ctx.restore();
+      }
+      if (snappedY) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1;
+        ctx.moveTo(0, height / 2);
+        ctx.lineTo(width, height / 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     } else {
       // For shapes (rect / circle), redraw the canvas state snapshot before rendering shape
       const img = new Image();
@@ -1112,12 +1154,33 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
         ctx.strokeStyle = color;
 
         if (tool === 'rect') {
-          ctx.strokeRect(startPos.x, startPos.y, coords.x - startPos.x, coords.y - startPos.y);
+          ctx.strokeRect(startPos.x, startPos.y, targetX - startPos.x, targetY - startPos.y);
         } else if (tool === 'circle') {
-          const radius = Math.sqrt(Math.pow(coords.x - startPos.x, 2) + Math.pow(coords.y - startPos.y, 2));
+          const radius = Math.sqrt(Math.pow(targetX - startPos.x, 2) + Math.pow(targetY - startPos.y, 2));
           ctx.arc(startPos.x, startPos.y, radius, 0, 2 * Math.PI);
           ctx.stroke();
         }
+
+        // Render smart red snapped guide lines
+        if (snappedX) {
+          ctx.beginPath();
+          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 1;
+          ctx.moveTo(width / 2, 0);
+          ctx.lineTo(width / 2, height);
+          ctx.stroke();
+        }
+        if (snappedY) {
+          ctx.beginPath();
+          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 1;
+          ctx.moveTo(0, height / 2);
+          ctx.lineTo(width, height / 2);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
       };
       img.src = canvasHistory[canvasHistory.length - 1];
     }
