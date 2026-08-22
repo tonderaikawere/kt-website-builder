@@ -237,6 +237,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
         default:
           return `<!-- Unknown block type: ${block.type} -->`;
       }
+    }).map((html, idx) => {
+      const block = blocks[idx];
+      if (!block) return html;
+      return html.replace(/<([a-zA-Z]+)/, `<$1 id="block-${block.id}"`);
     }).join('\n');
 
     return `<!DOCTYPE html>
@@ -251,6 +255,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     ${settings.customGlobalCss || ''}
+    ${blocks.map(block => {
+      if (!block.styles.customCss) return '';
+      return block.styles.customCss
+        .replace(/\.block-id/g, `#block-${block.id}`)
+        .replace(/__self__/g, `#block-${block.id}`);
+    }).join('\n')}
   </style>
 </head>
 <body style="font-family: ${settings.fontFamily};" class="bg-slate-50 text-slate-800">

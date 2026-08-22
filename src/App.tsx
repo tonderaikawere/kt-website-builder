@@ -142,6 +142,16 @@ function App() {
       {/* Dynamic Custom Global CSS stylesheet */}
       <style>{settings.customGlobalCss}</style>
 
+      {/* Dynamic Block-level Custom CSS rules */}
+      <style>
+        {blocks.map(block => {
+          if (!block.styles.customCss) return '';
+          return block.styles.customCss
+            .replace(/\.block-id/g, `#block-${block.id}`)
+            .replace(/__self__/g, `#block-${block.id}`);
+        }).join('\n')}
+      </style>
+
       {/* Dynamic Web Font Link loader */}
       <link
         rel="stylesheet"
@@ -579,6 +589,7 @@ function App() {
                 {blocks.map((block) => (
                   <div
                     key={block.id}
+                    id={`block-${block.id}`}
                     onClick={() => setSelectedBlockId(block.id)}
                     className={`relative group transition-all duration-300 ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'} ${
                       !isPreview && selectedBlockId === block.id 
