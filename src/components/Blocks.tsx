@@ -1149,6 +1149,73 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
     setHistoryIndex(-1);
   };
 
+  const alignCanvasContent = (direction: 'horizontal' | 'vertical' | 'both') => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    let minX = width, maxX = 0, minY = height, maxY = 0;
+    let hasPixels = false;
+
+    // Find bounding box of drawn pixels (alpha > 0)
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const alpha = data[(y * width + x) * 4 + 3];
+        if (alpha > 0) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+          hasPixels = true;
+        }
+      }
+    }
+
+    if (!hasPixels) return;
+
+    const boxWidth = maxX - minX;
+    const boxHeight = maxY - minY;
+    const boxCenterX = minX + boxWidth / 2;
+    const boxCenterY = minY + boxHeight / 2;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (direction === 'horizontal' || direction === 'both') {
+      dx = (width / 2) - boxCenterX;
+    }
+    if (direction === 'vertical' || direction === 'both') {
+      dy = (height / 2) - boxCenterY;
+    }
+
+    if (dx === 0 && dy === 0) return;
+
+    // Create temporary buffer canvas
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    tempCtx.drawImage(canvas, 0, 0);
+
+    // Clear and redraw shifted
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(tempCanvas, dx, dy);
+
+    // Save state
+    const dataUrl = canvas.toDataURL();
+    if (onContentChange) {
+      onContentChange(block.id, { drawingData: dataUrl });
+    }
+  };
+
   const inlineStyles: React.CSSProperties = {
     backgroundColor: styles.bgColor || '#f6f9fd',
     color: styles.textColor || '#07162f',
@@ -1238,6 +1305,24 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
                 onChange={(e) => setThickness(parseInt(e.target.value))}
                 className="w-16 accent-brand-accent cursor-pointer"
               />
+            </div>
+
+            {/* Figma-like Align Tools */}
+            <div className="flex items-center gap-1 border-l border-slate-200 dark:border-brand-ink pl-3.5">
+              <button
+                onClick={() => alignCanvasContent('horizontal')}
+                className="p-1 rounded text-slate-500 hover:text-brand-primary hover:bg-slate-200 dark:hover:bg-brand-ink transition-colors cursor-pointer"
+                title="Align horizontally to center"
+              >
+                <Icons.AlignHorizontalJustifyCenter className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => alignCanvasContent('vertical')}
+                className="p-1 rounded text-slate-500 hover:text-brand-primary hover:bg-slate-200 dark:hover:bg-brand-ink transition-colors cursor-pointer"
+                title="Align vertically to center"
+              >
+                <Icons.AlignVerticalJustifyCenter className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Grid & Clear controls */}
