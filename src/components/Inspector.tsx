@@ -212,6 +212,40 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
           </div>
         </div>
 
+        {/* Layout Flex Alignment */}
+        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-brand-ink">
+          <label className="text-xs font-semibold text-slate-650 dark:text-slate-350 block">Flex Content Alignment</label>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Horizontal Align</label>
+              <select
+                value={styles.flexJustify || 'justify-center'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { flexJustify: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
+              >
+                <option value="justify-start">Align Left</option>
+                <option value="justify-center">Center</option>
+                <option value="justify-end">Align Right</option>
+                <option value="justify-between">Space Between</option>
+                <option value="justify-around">Space Around</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Vertical Align</label>
+              <select
+                value={styles.flexAlign || 'items-center'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { flexAlign: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
+              >
+                <option value="items-start">Align Top</option>
+                <option value="items-center">Center</option>
+                <option value="items-end">Align Bottom</option>
+                <option value="items-stretch">Stretch</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         {/* Block Custom CSS */}
         <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
           <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">Block Custom CSS</label>

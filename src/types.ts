@@ -7,6 +7,8 @@ export interface BlockStyles {
   marginBottom?: string;
   textAlign?: 'left' | 'center' | 'right' | 'justify';
   borderRadius?: string; // e.g. "rounded-none", "rounded-lg"
+  flexJustify?: string;
+  flexAlign?: string;
   customCss?: string;
 }
 

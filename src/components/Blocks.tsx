@@ -90,7 +90,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
   return (
     <section 
       style={inlineStyles} 
-      className={`px-8 md:px-16 ${styles.paddingTop || 'py-20'} ${styles.paddingBottom || 'py-20'} flex flex-col md:flex-row items-center gap-8`}
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-20'} ${styles.paddingBottom || 'py-20'} flex flex-col md:flex-row ${styles.flexAlign || 'items-center'} ${styles.flexJustify || 'justify-center'} gap-8`}
     >
       <div className={`flex-1 flex flex-col ${styles.textAlign === 'center' ? 'items-center text-center' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
         <h2 
@@ -298,7 +298,7 @@ export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onCo
       style={inlineStyles} 
       className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
     >
-      <div className={`max-w-4xl mx-auto flex flex-col ${styles.textAlign === 'center' ? 'items-center text-center' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
+      <div className={`max-w-4xl mx-auto flex flex-col ${styles.flexAlign || (styles.textAlign === 'center' ? 'items-center text-center' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-start text-left')} ${styles.flexJustify || 'justify-center'}`}>
         <h2 
           contentEditable={isEditing}
           suppressContentEditableWarning
