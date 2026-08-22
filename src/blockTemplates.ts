@@ -204,6 +204,23 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'sandbox',
+    name: 'Design Sandbox (Figma Board)',
+    description: 'Figma-like drawing board to draw custom wireframes, shapes, and doodles directly on your page.',
+    defaultContent: {
+      title: 'Visual Design Canvas',
+      subtitle: 'Use the drawing tools to sketch your layout and align objects.',
+      drawingData: ''
+    },
+    defaultStyles: {
+      bgColor: '#f6f9fd',
+      textColor: '#07162f',
+      paddingTop: 'py-12',
+      paddingBottom: 'py-12',
+      textAlign: 'center'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',

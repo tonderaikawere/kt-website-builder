@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Block } from '../types';
 
 interface BlockComponentProps {
@@ -1011,6 +1011,291 @@ export const VideoBlock: React.FC<BlockComponentProps> = ({ block, isEditing, on
   );
 };
 
+export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Visual Design Canvas', subtitle = 'Use the drawing tools to sketch your layout and align objects.', drawingData = '' } = block.content;
+  const styles = block.styles;
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [tool, setTool] = useState<'pen' | 'rect' | 'circle' | 'eraser'>('pen');
+  const [color, setColor] = useState('#aa3bff');
+  const [thickness, setThickness] = useState(4);
+  const [showGrid, setShowGrid] = useState(true);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [canvasHistory, setCanvasHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // Initialize and load saved canvas drawingData
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width || 800;
+    canvas.height = 400; // Fixed canvas height inside section
+    
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (drawingData) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = drawingData;
+    }
+  }, [drawingData]);
+
+  // Handle drawing events
+  const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isEditing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const coords = getCoordinates(e);
+    setIsDrawing(true);
+    setStartPos(coords);
+
+    // Save snapshot of canvas before drawing shape
+    const snapshot = canvas.toDataURL();
+    setCanvasHistory((prev: string[]) => [...prev.slice(0, historyIndex + 1), snapshot]);
+    setHistoryIndex((prev: number) => prev + 1);
+
+    ctx.beginPath();
+    ctx.lineWidth = thickness;
+    ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color;
+    ctx.fillStyle = 'transparent';
+
+    if (tool === 'pen' || tool === 'eraser') {
+      ctx.moveTo(coords.x, coords.y);
+      ctx.lineTo(coords.x, coords.y);
+      ctx.stroke();
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !isEditing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const coords = getCoordinates(e);
+
+    if (tool === 'pen' || tool === 'eraser') {
+      ctx.lineTo(coords.x, coords.y);
+      ctx.stroke();
+    } else {
+      // For shapes (rect / circle), redraw the canvas state snapshot before rendering shape
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+
+        ctx.beginPath();
+        ctx.lineWidth = thickness;
+        ctx.strokeStyle = color;
+
+        if (tool === 'rect') {
+          ctx.strokeRect(startPos.x, startPos.y, coords.x - startPos.x, coords.y - startPos.y);
+        } else if (tool === 'circle') {
+          const radius = Math.sqrt(Math.pow(coords.x - startPos.x, 2) + Math.pow(coords.y - startPos.y, 2));
+          ctx.arc(startPos.x, startPos.y, radius, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+      };
+      img.src = canvasHistory[canvasHistory.length - 1];
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDrawing || !isEditing) return;
+    setIsDrawing(false);
+
+    // Save drawing back to state
+    const canvas = canvasRef.current;
+    if (canvas && onContentChange) {
+      const dataUrl = canvas.toDataURL();
+      onContentChange(block.id, { drawingData: dataUrl });
+    }
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (onContentChange) {
+      onContentChange(block.id, { drawingData: '' });
+    }
+    setCanvasHistory([]);
+    setHistoryIndex(-1);
+  };
+
+  const inlineStyles: React.CSSProperties = {
+    backgroundColor: styles.bgColor || '#f6f9fd',
+    color: styles.textColor || '#07162f',
+    textAlign: styles.textAlign || 'center',
+  };
+
+  return (
+    <section 
+      style={inlineStyles}
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-12'} ${styles.paddingBottom || 'py-12'}`}
+    >
+      <div className="max-w-4xl mx-auto mb-6 text-center">
+        <h2 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={(e) => onContentChange && onContentChange(block.id, { title: e.target.innerText })}
+          className={`text-2xl font-bold tracking-tight mb-2 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {title}
+        </h2>
+        <p 
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={(e) => onContentChange && onContentChange(block.id, { subtitle: e.target.innerText })}
+          className={`text-sm text-slate-500 max-w-xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+        >
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="max-w-3xl mx-auto relative rounded-2xl overflow-hidden border border-slate-200 dark:border-brand-ink bg-white shadow-xl">
+        {/* Figma-like Top Toolbar */}
+        {isEditing && (
+          <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50 dark:bg-brand-deep select-none">
+            {/* Draw Tools */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setTool('pen')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${tool === 'pen' ? 'bg-brand-accent text-white shadow-sm' : 'text-slate-650 dark:text-slate-350 hover:bg-slate-200 dark:hover:bg-brand-ink'}`}
+                title="Pen / Brush"
+              >
+                <Icons.Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setTool('rect')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${tool === 'rect' ? 'bg-brand-accent text-white shadow-sm' : 'text-slate-655 dark:text-slate-355 hover:bg-slate-200 dark:hover:bg-brand-ink'}`}
+                title="Rectangle shape"
+              >
+                <Icons.Square className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setTool('circle')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${tool === 'circle' ? 'bg-brand-accent text-white shadow-sm' : 'text-slate-655 dark:text-slate-355 hover:bg-slate-200 dark:hover:bg-brand-ink'}`}
+                title="Circle shape"
+              >
+                <Icons.Circle className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setTool('eraser')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${tool === 'eraser' ? 'bg-brand-accent text-white shadow-sm' : 'text-slate-655 dark:text-slate-355 hover:bg-slate-200 dark:hover:bg-brand-ink'}`}
+                title="Eraser"
+              >
+                <Icons.Eraser className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Drawing Color Presets */}
+            <div className="flex items-center gap-1.5 border-l border-slate-200 dark:border-brand-ink pl-3.5">
+              {['#aa3bff', '#0b4a86', '#07162f', '#10b981', '#db2777'].map(c => (
+                <button
+                  key={c}
+                  onClick={() => setColor(c)}
+                  style={{ backgroundColor: c }}
+                  className={`w-4 h-4 rounded-full border border-slate-300 transition-transform cursor-pointer ${color === c && tool !== 'eraser' ? 'scale-125 ring-2 ring-brand-accent ring-offset-1' : ''}`}
+                />
+              ))}
+            </div>
+
+            {/* Thickness Control */}
+            <div className="flex items-center gap-1.5 border-l border-slate-200 dark:border-brand-ink pl-3.5">
+              <span className="text-[10px] text-slate-500 font-bold uppercase">Size</span>
+              <input
+                type="range"
+                min="1"
+                max="12"
+                value={thickness}
+                onChange={(e) => setThickness(parseInt(e.target.value))}
+                className="w-16 accent-brand-accent cursor-pointer"
+              />
+            </div>
+
+            {/* Grid & Clear controls */}
+            <div className="flex items-center gap-1.5 border-l border-slate-200 dark:border-brand-ink pl-3.5">
+              <button
+                onClick={() => setShowGrid((prev: boolean) => !prev)}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${showGrid ? 'bg-brand-accent-bg text-brand-accent' : 'text-slate-550 hover:bg-slate-200 dark:hover:bg-brand-ink'}`}
+                title="Toggle Figma layout grid"
+              >
+                <Icons.Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={clearCanvas}
+                className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                title="Clear entire canvas"
+              >
+                <Icons.Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Drawing Board Canvas Area */}
+        <div 
+          className={`relative aspect-[3/1.8] min-h-[300px] w-full ${
+            showGrid && isEditing 
+              ? 'bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)]' 
+              : 'bg-white'
+          }`}
+        >
+          {isEditing ? (
+            <canvas
+              ref={canvasRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              className="absolute inset-0 w-full h-full cursor-crosshair"
+            />
+          ) : (
+            drawingData ? (
+              <img 
+                src={drawingData} 
+                className="absolute inset-0 w-full h-full object-contain" 
+                alt="Custom design drawing" 
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-slate-350 text-xs italic bg-white">
+                Blank Board
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -1037,6 +1322,8 @@ export const BlockRenderer: React.FC<{
       return <LinkButtonBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'video':
       return <VideoBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'sandbox':
+      return <SandboxBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:

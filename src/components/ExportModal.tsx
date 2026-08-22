@@ -221,6 +221,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'sandbox': {
+          const title = block.content.title || 'Visual Design Canvas';
+          const subtitle = block.content.subtitle || 'Use the drawing tools to sketch your layout and align objects.';
+          const drawingData = block.content.drawingData || '';
+          return `
+    <section style="background-color: ${block.styles.bgColor || '#f6f9fd'}; color: ${block.styles.textColor || '#07162f'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-12'} ${block.styles.paddingBottom || 'py-12'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-4xl mx-auto mb-6">
+        <h2 class="text-2xl font-bold tracking-tight mb-2">${title}</h2>
+        <p class="text-sm text-slate-500 max-w-xl mx-auto">${subtitle}</p>
+      </div>
+      <div class="max-w-3xl mx-auto relative rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xl min-h-[300px]">
+        ${drawingData ? `<img src="${drawingData}" class="w-full h-full object-contain max-h-[400px]" alt="Visual Canvas Sketch" />` : `<div class="absolute inset-0 flex items-center justify-center text-slate-300 text-xs italic">Blank Sandbox Board</div>`}
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

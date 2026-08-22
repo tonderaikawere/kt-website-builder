@@ -44,6 +44,11 @@ const PAGE_TEMPLATES = [
     name: 'Business Home Page',
     description: 'Logo navigation header, structured feature grid, and page footer.',
     blockTypes: ['header', 'features', 'footer'] as BlockType[]
+  },
+  {
+    name: 'Creative Sandbox Board',
+    description: 'Logo navigation header, Figma-like sketch sandbox board, and page footer.',
+    blockTypes: ['header', 'sandbox', 'footer'] as BlockType[]
   }
 ];
 

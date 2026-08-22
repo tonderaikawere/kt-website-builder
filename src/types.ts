@@ -22,6 +22,7 @@ export type BlockType =
   | 'button' 
   | 'linkButton'
   | 'video' 
+  | 'sandbox'
   | 'footer';
 
 export interface Block {
@@ -57,6 +58,7 @@ export interface Block {
     formEmailPlaceholder?: string;
     formMessagePlaceholder?: string;
     formButtonText?: string;
+    drawingData?: string;
   };
   styles: BlockStyles;
 }
