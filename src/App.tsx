@@ -489,7 +489,8 @@ function App() {
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
               {activeTab === 'inspector' && (
                 <Inspector 
                   selectedBlock={blocks.find(b => b.id === selectedBlockId)}
