@@ -47,6 +47,44 @@ const PAGE_TEMPLATES = [
   }
 ];
 
+const COLOR_PALETTES = [
+  {
+    name: 'Kawerify Tech',
+    primary: '#0b4a86',
+    accent: '#aa3bff',
+    deep: '#07162f',
+    light: '#f6f9fd'
+  },
+  {
+    name: 'Elegant Dark',
+    primary: '#1e1b4b',
+    accent: '#f43f5e',
+    deep: '#0f172a',
+    light: '#1e293b'
+  },
+  {
+    name: 'Ocean Tide',
+    primary: '#0f766e',
+    accent: '#06b6d4',
+    deep: '#111827',
+    light: '#ecfeff'
+  },
+  {
+    name: 'Sunset Rose',
+    primary: '#be123c',
+    accent: '#fb7185',
+    deep: '#1e1b4b',
+    light: '#fff1f2'
+  },
+  {
+    name: 'Forest Gold',
+    primary: '#15803d',
+    accent: '#eab308',
+    deep: '#14532d',
+    light: '#f0fdf4'
+  }
+];
+
 function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -75,6 +113,34 @@ function App() {
     canUndo,
     canRedo
   } = useBuilderState();
+
+  const applyColorPalette = (palette: typeof COLOR_PALETTES[0]) => {
+    const updatedBlocks = blocks.map(block => {
+      let bgColor = '#ffffff';
+      let textColor = palette.deep;
+      
+      if (block.type === 'hero' || block.type === 'cta') {
+        bgColor = palette.primary;
+        textColor = '#ffffff';
+      } else if (block.type === 'footer') {
+        bgColor = palette.deep;
+        textColor = '#94a3b8';
+      } else if (block.type === 'features' || block.type === 'pricing' || block.type === 'linkButton') {
+        bgColor = palette.light;
+        textColor = palette.deep;
+      }
+      
+      return {
+        ...block,
+        styles: {
+          ...block.styles,
+          bgColor,
+          textColor
+        }
+      };
+    });
+    setBlocks(updatedBlocks);
+  };
 
   // Dynamically update document title for editor tab preview
   useEffect(() => {
@@ -499,6 +565,29 @@ function App() {
                       <option value="Lora, serif">Lora (Serif)</option>
                       <option value="JetBrains Mono, monospace">JetBrains Mono (Monospace)</option>
                     </select>
+                  </div>
+
+                  {/* Theme Presets */}
+                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-brand-ink">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-350">Global Theme Presets</label>
+                    <p className="text-[10px] text-slate-400">Instantly theme all canvas sections in one click.</p>
+                    <div className="grid grid-cols-1 gap-2 mt-1.5">
+                      {COLOR_PALETTES.map((palette) => (
+                        <button
+                          key={palette.name}
+                          onClick={() => applyColorPalette(palette)}
+                          className="flex items-center justify-between p-2 bg-slate-50 dark:bg-brand-deep/30 border border-slate-200 dark:border-brand-ink hover:border-brand-accent rounded-xl text-left text-xs transition-all cursor-pointer group"
+                        >
+                          <span className="font-semibold text-slate-700 dark:text-slate-350 group-hover:text-brand-accent transition-colors">{palette.name}</span>
+                          <div className="flex gap-1">
+                            <span style={{ backgroundColor: palette.primary }} className="w-3.5 h-3.5 rounded-full border border-slate-200" title="Primary" />
+                            <span style={{ backgroundColor: palette.accent }} className="w-3.5 h-3.5 rounded-full border border-slate-200" title="Accent" />
+                            <span style={{ backgroundColor: palette.deep }} className="w-3.5 h-3.5 rounded-full border border-slate-200" title="Deep Background" />
+                            <span style={{ backgroundColor: palette.light }} className="w-3.5 h-3.5 rounded-full border border-slate-200" title="Light Background" />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="w-full h-px bg-slate-200 dark:bg-slate-800 my-4"></div>
