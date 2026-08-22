@@ -20,6 +20,7 @@ export type BlockType =
   | 'contact' 
   | 'social' 
   | 'button' 
+  | 'linkButton'
   | 'video' 
   | 'footer';
 
@@ -35,6 +36,7 @@ export interface Block {
     buttonLink?: string;
     imageSrc?: string;
     videoUrl?: string;
+    youtubeId?: string;
     items?: Array<{
       id: string;
       title?: string;
@@ -47,6 +49,8 @@ export interface Block {
       period?: string;
       features?: string[];
       link?: string;
+      imageSrc?: string;
+      buttonText?: string;
     }>;
     logoText?: string;
     copyrightText?: string;

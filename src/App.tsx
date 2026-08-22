@@ -27,7 +27,7 @@ import { BlockRenderer } from './components/Blocks';
 import { Inspector } from './components/Inspector';
 import { ExportModal } from './components/ExportModal';
 import { RichTextToolbar } from './components/RichTextToolbar';
-import { BlockType } from './types';
+import type { BlockType } from './types';
 
 const PAGE_TEMPLATES = [
   {
@@ -102,6 +102,8 @@ function App() {
     if (template) {
       addBlock(type, template.defaultContent, template.defaultStyles);
     }
+  };
+
   // Export project layout to JSON
   const exportProjectJson = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ blocks, settings }, null, 2));

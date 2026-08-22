@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Block, BlockType, BlockStyles, ProjectSettings } from './types';
+import type { Block, BlockType, BlockStyles, ProjectSettings } from './types';
 
 const DEFAULT_SETTINGS: ProjectSettings = {
   title: 'My Custom Website',

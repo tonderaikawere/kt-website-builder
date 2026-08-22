@@ -1,5 +1,5 @@
 import React from 'react';
-import { Block, BlockStyles } from '../types';
+import type { Block, BlockStyles } from '../types';
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 
 interface InspectorProps {
@@ -56,6 +56,8 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
               />
             ))}
           </div>
+        </div>
+
         {/* Text Color */}
         <div className="space-y-2 pt-2 border-t border-slate-100">
           <label className="text-xs font-semibold text-slate-600 block">Text Color</label>
@@ -86,6 +88,8 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
               />
             ))}
           </div>
+        </div>
+
         {/* Spacing Controls */}
         <div className="space-y-3 pt-2 border-t border-slate-100">
           <label className="text-xs font-semibold text-slate-600 block">Spacing (Padding & Margin)</label>
@@ -154,6 +158,8 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
               </select>
             </div>
           </div>
+        </div>
+
         {/* Border Radius */}
         <div className="space-y-2 pt-2 border-t border-slate-100">
           <label className="text-xs font-semibold text-slate-600 block">Button & Image Rounding</label>

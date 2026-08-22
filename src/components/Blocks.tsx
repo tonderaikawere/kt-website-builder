@@ -1,5 +1,5 @@
 import React from 'react';
-import { Block } from '../types';
+import type { Block } from '../types';
 
 interface BlockComponentProps {
   block: Block;
@@ -938,6 +938,7 @@ export const LinkButtonBlock: React.FC<BlockComponentProps> = ({ block, isEditin
         </div>
       </div>
     </section>
+  );
 };
 
 export const VideoBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {

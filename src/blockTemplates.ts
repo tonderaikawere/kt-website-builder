@@ -1,4 +1,4 @@
-import { Block, BlockType } from './types';
+import type { Block, BlockType } from './types';
 
 export interface BlockTemplate {
   type: BlockType;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Block } from '../types';
+import type { Block } from '../types';
 import { X, Copy, Download, Check } from 'lucide-react';
 
 interface ExportModalProps {
