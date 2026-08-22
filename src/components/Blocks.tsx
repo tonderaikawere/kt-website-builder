@@ -1023,6 +1023,7 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [canvasHistory, setCanvasHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [fillShape, setFillShape] = useState(false);
 
   // Initialize and load saved canvas drawingData
   useEffect(() => {
@@ -1154,11 +1155,21 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
         ctx.strokeStyle = color;
 
         if (tool === 'rect') {
-          ctx.strokeRect(startPos.x, startPos.y, targetX - startPos.x, targetY - startPos.y);
+          if (fillShape) {
+            ctx.fillStyle = color;
+            ctx.fillRect(startPos.x, startPos.y, targetX - startPos.x, targetY - startPos.y);
+          } else {
+            ctx.strokeRect(startPos.x, startPos.y, targetX - startPos.x, targetY - startPos.y);
+          }
         } else if (tool === 'circle') {
           const radius = Math.sqrt(Math.pow(targetX - startPos.x, 2) + Math.pow(targetY - startPos.y, 2));
           ctx.arc(startPos.x, startPos.y, radius, 0, 2 * Math.PI);
-          ctx.stroke();
+          if (fillShape) {
+            ctx.fillStyle = color;
+            ctx.fill();
+          } else {
+            ctx.stroke();
+          }
         }
 
         // Render smart red snapped guide lines
@@ -1355,6 +1366,17 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
                   className={`w-4 h-4 rounded-full border border-slate-300 transition-transform cursor-pointer ${color === c && tool !== 'eraser' ? 'scale-125 ring-2 ring-brand-accent ring-offset-1' : ''}`}
                 />
               ))}
+            </div>
+
+            {/* Shape Fill Toggle */}
+            <div className="flex items-center gap-1.5 border-l border-slate-200 dark:border-brand-ink pl-3.5">
+              <button
+                onClick={() => setFillShape((prev: boolean) => !prev)}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${fillShape ? 'bg-brand-accent-bg text-brand-accent' : 'text-slate-550 hover:bg-slate-200 dark:hover:bg-brand-ink'}`}
+                title="Fill shapes (Rectangle / Circle)"
+              >
+                <Icons.Droplet className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Thickness Control */}
