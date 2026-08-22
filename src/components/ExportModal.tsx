@@ -310,14 +310,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
           <div className="flex gap-2">
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-colors shadow-sm"
+              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-semibold border rounded-xl transition-all shadow-sm cursor-pointer ${
+                copied 
+                  ? 'border-green-300 bg-green-50 text-green-700 font-bold scale-[1.03]' 
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
             >
               {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy Code'}
             </button>
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand-primary hover:bg-brand-secondary rounded-xl transition-colors shadow-sm cursor-pointer"
             >
               <Download className="w-4 h-4" />
               Download index.html
