@@ -1,12 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #0b4a86;
+  --color-brand-secondary: #064780;
+  --color-brand-deep: #061a3b;
+  --color-brand-ink: #07162f;
+  --color-brand-accent: #aa3bff;
+  --color-brand-accent-bg: rgba(170, 59, 255, 0.1);
+  --color-brand-soft: #f6f9fd;
+  
+  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Montserrat', system-ui, -apple-system, sans-serif;
+}
 
 html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+  font-family: var(--font-sans);
 }
 
 /* Inline text editing global styles */
@@ -19,15 +31,15 @@ html, body, #root {
 }
 
 [contenteditable="true"]:hover {
-  background-color: rgba(99, 102, 241, 0.08);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+  background-color: rgba(170, 59, 255, 0.08);
+  box-shadow: 0 0 0 2px rgba(170, 59, 255, 0.4);
   border-radius: 0.25rem;
 }
 
 [contenteditable="true"]:focus {
   background-color: rgb(255, 255, 255) !important;
-  color: rgb(30, 41, 59) !important;
-  box-shadow: 0 0 0 3px rgb(99, 102, 241) !important;
+  color: #07162f !important;
+  box-shadow: 0 0 0 3px #aa3bff !important;
   border-radius: 0.25rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -42,17 +54,17 @@ html, body, #root {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d6dce5;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #0b4a86;
 }
 
 /* Pulsing effect for drag highlights */
 @keyframes drag-pulse {
-  0%, 100% { border-color: rgba(99, 102, 241, 0.4); background-color: rgba(99, 102, 241, 0.02); }
-  50% { border-color: rgba(99, 102, 241, 0.8); background-color: rgba(99, 102, 241, 0.08); }
+  0%, 100% { border-color: rgba(170, 59, 255, 0.4); background-color: rgba(170, 59, 255, 0.02); }
+  50% { border-color: rgba(170, 59, 255, 0.8); background-color: rgba(170, 59, 255, 0.08); }
 }
 .drag-over-pulse {
   animation: drag-pulse 1.5s infinite ease-in-out;

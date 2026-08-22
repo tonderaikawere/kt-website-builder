@@ -138,7 +138,7 @@ function App() {
   };
 
   return (
-    <div className={`flex flex-col h-screen w-screen bg-slate-50 text-slate-800 select-none overflow-hidden ${isDarkMode ? 'dark bg-slate-900 text-slate-100' : ''}`}>
+    <div className={`flex flex-col h-screen w-screen bg-brand-soft text-slate-800 select-none overflow-hidden ${isDarkMode ? 'dark bg-brand-ink text-slate-100' : ''}`}>
       {/* Dynamic Custom Global CSS stylesheet */}
       <style>{settings.customGlobalCss}</style>
 
@@ -150,9 +150,9 @@ function App() {
 
       {/* Top Toolbar */}
       {!isPreview && (
-        <header className="flex items-center justify-between px-6 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10 shrink-0">
+        <header className="flex items-center justify-between px-6 h-16 bg-white dark:bg-brand-deep border-b border-slate-200 dark:border-brand-ink z-10 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 text-white p-2 rounded-lg shadow-sm">
+            <div className="bg-brand-primary text-white p-2 rounded-lg shadow-sm">
               <Layout className="w-5 h-5" />
             </div>
             <div>
@@ -165,21 +165,21 @@ function App() {
           <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
             <button
               onClick={() => setDeviceMode('desktop')}
-              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'desktop' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'desktop' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
               title="Desktop View"
             >
               <Monitor className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDeviceMode('tablet')}
-              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'tablet' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'tablet' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
               title="Tablet View"
             >
               <Tablet className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDeviceMode('mobile')}
-              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'mobile' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'mobile' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
               title="Mobile View"
             >
               <Smartphone className="w-4 h-4" />
@@ -189,7 +189,7 @@ function App() {
           {/* Theme Toggle Button */}
           <button
             onClick={() => setIsDarkMode(prev => !prev)}
-            className="p-2 rounded-lg text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-lg text-slate-500 hover:text-brand-accent dark:text-slate-400 dark:hover:text-brand-accent hover:bg-brand-accent-bg dark:hover:bg-brand-accent-bg transition-colors"
             title="Toggle theme mode"
           >
             {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -249,7 +249,7 @@ function App() {
             <div className="w-px h-6 bg-slate-200 mx-1"></div>
             <button 
               onClick={() => setIsExportOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-accent hover:bg-brand-accent-bg rounded-lg transition-colors"
               title="Export HTML and CSS code"
             >
               <FileCode className="w-4 h-4" />
@@ -258,7 +258,7 @@ function App() {
             <div className="w-px h-6 bg-slate-200 mx-1"></div>
             <button
               onClick={() => setIsPreview(true)}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-colors bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-colors bg-brand-primary hover:bg-brand-secondary text-white"
             >
               <Eye className="w-4 h-4" />
               Preview Site
@@ -271,15 +271,15 @@ function App() {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Left Sidebar - Hidden in Preview */}
         {!isPreview && (
-          <aside className="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full z-10">
+          <aside className="w-80 bg-white dark:bg-brand-deep border-r border-slate-200 dark:border-brand-ink flex flex-col h-full z-10">
             {/* Sidebar Tabs */}
-            <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+            <div className="flex border-b border-slate-200 dark:border-brand-ink bg-slate-50 dark:bg-brand-deep">
               <button
                 onClick={() => setActiveTab('blocks')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'blocks'
-                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'border-brand-accent text-brand-accent bg-white dark:bg-brand-deep'
+                    : 'border-transparent text-slate-500 hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-accent'
                 }`}
               >
                 <Layers className="w-4 h-4" />
@@ -289,8 +289,8 @@ function App() {
                 onClick={() => setActiveTab('inspector')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'inspector'
-                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'border-brand-accent text-brand-accent bg-white dark:bg-brand-deep'
+                    : 'border-transparent text-slate-500 hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-accent'
                 }`}
               >
                 <Palette className="w-4 h-4" />
@@ -300,8 +300,8 @@ function App() {
                 onClick={() => setActiveTab('templates')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'templates'
-                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'border-brand-accent text-brand-accent bg-white dark:bg-brand-deep'
+                    : 'border-transparent text-slate-500 hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-accent'
                 }`}
               >
                 <Layout className="w-4 h-4" />
@@ -311,8 +311,8 @@ function App() {
                 onClick={() => setActiveTab('css')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'css'
-                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'border-brand-accent text-brand-accent bg-white dark:bg-brand-deep'
+                    : 'border-transparent text-slate-500 hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-accent'
                 }`}
               >
                 <FileCode className="w-4 h-4" />
@@ -322,8 +322,8 @@ function App() {
                 onClick={() => setActiveTab('seo')}
                 className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
                   activeTab === 'seo'
-                    ? 'border-indigo-600 text-indigo-600 bg-white dark:bg-slate-900'
-                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'border-brand-accent text-brand-accent bg-white dark:bg-brand-deep'
+                    : 'border-transparent text-slate-500 hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-accent'
                 }`}
               >
                 <Settings className="w-4 h-4" />
@@ -345,13 +345,13 @@ function App() {
                         draggable
                         onDragStart={(e) => handleDragStart(e, tpl.type)}
                         onClick={() => handleBlockClick(tpl.type)}
-                        className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 border-dashed hover:border-indigo-300 transition-all cursor-grab flex items-center justify-between group"
+                        className="p-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 border-dashed hover:border-brand-accent transition-all cursor-grab flex items-center justify-between group"
                       >
                         <div className="flex flex-col">
                           <span className="text-xs font-semibold text-slate-700">{tpl.name}</span>
                           <span className="text-[10px] text-slate-400 max-w-[200px] mt-0.5 line-clamp-1">{tpl.description}</span>
                         </div>
-                        <Plus className="w-4 h-4 text-indigo-600 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        <Plus className="w-4 h-4 text-brand-primary opacity-50 group-hover:opacity-100 transition-opacity" />
                       </div>
                     ))}
                   </div>
@@ -381,14 +381,14 @@ function App() {
                                 type,
                                 name: type.charAt(0).toUpperCase() + type.slice(1) + ' Section',
                                 content: blockTpl ? { ...blockTpl.defaultContent } : {},
-                                styles: blockTpl ? { ...blockTpl.defaultStyles } : { bgColor: '#ffffff', textColor: '#1e293b' }
+                                styles: blockTpl ? { ...blockTpl.defaultStyles } : { bgColor: '#ffffff', textColor: '#07162f' }
                               };
                             });
                             setBlocks(newBlocks);
                             setSelectedBlockId(newBlocks[0]?.id || null);
                           }
                         }}
-                        className="w-full text-left p-3.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-indigo-300 rounded-xl transition-all flex flex-col gap-1 shadow-sm"
+                        className="w-full text-left p-3.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-brand-primary rounded-xl transition-all flex flex-col gap-1 shadow-sm"
                       >
                         <span className="text-xs font-bold text-slate-800">{tpl.name}</span>
                         <span className="text-[10px] text-slate-500 leading-normal">{tpl.description}</span>
@@ -407,7 +407,7 @@ function App() {
                     value={settings.customGlobalCss}
                     onChange={(e) => updateSettings({ customGlobalCss: e.target.value })}
                     placeholder="/* Write custom CSS here */&#10;body {&#10;  font-family: sans-serif;&#10;}&#10;.my-class {&#10;  border: 2px solid red;&#10;}"
-                    className="w-full flex-1 min-h-[300px] text-xs font-mono p-3 bg-slate-900 text-slate-300 rounded-xl border border-slate-800 focus:outline-none resize-none"
+                    className="w-full flex-1 min-h-[300px] text-xs font-mono p-3 bg-brand-deep text-slate-300 rounded-xl border border-brand-ink focus:outline-none resize-none"
                   />
                 </div>
               )}
@@ -424,10 +424,11 @@ function App() {
                       onChange={(e) => updateSettings({ fontFamily: e.target.value })}
                       className="w-full text-xs p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
                     >
+                      <option value="Poppins, sans-serif">(Recommended) Poppins (Sans-serif)</option>
+                      <option value="Montserrat, sans-serif">Montserrat (Sans-serif)</option>
                       <option value="Inter, sans-serif">Inter (Sans-serif)</option>
                       <option value="Roboto, sans-serif">Roboto (Sans-serif)</option>
                       <option value="Playfair Display, serif">Playfair Display (Serif)</option>
-                      <option value="Poppins, sans-serif">Poppins (Sans-serif)</option>
                       <option value="Lora, serif">Lora (Serif)</option>
                       <option value="JetBrains Mono, monospace">JetBrains Mono (Monospace)</option>
                     </select>
@@ -476,8 +477,8 @@ function App() {
         {/* Central Canvas Workspace */}
         <main 
           className={`flex-1 flex justify-center items-start overflow-y-auto transition-all duration-300 ${
-            isPreview && deviceMode === 'desktop' ? 'bg-slate-50 p-0' :
-            isPreview ? 'bg-slate-900 p-12' : 'bg-slate-100 p-8'
+            isPreview && deviceMode === 'desktop' ? 'bg-brand-soft p-0' :
+            isPreview ? 'bg-brand-ink p-12' : 'bg-brand-soft p-8'
           }`}
           onDragOver={(e) => {
             e.preventDefault();
@@ -510,7 +511,7 @@ function App() {
             )}
             {blocks.length === 0 ? (
               /* Empty Canvas Container */
-              <div className={`p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-transparent transition-all duration-300 ${isDraggingOver ? 'drag-over-pulse border-indigo-400 rounded-xl' : ''}`}>
+              <div className={`p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-transparent transition-all duration-300 ${isDraggingOver ? 'drag-over-pulse border-brand-accent rounded-xl' : ''}`}>
                 <Layout className="w-12 h-12 text-slate-300 mb-3" />
                 <p className="font-semibold text-slate-600 text-sm">Your Canvas is Empty</p>
                 <p className="text-xs max-w-xs mt-1">Drag and drop sections from the sidebar, or select presets to populate the builder canvas.</p>
@@ -524,8 +525,8 @@ function App() {
                     onClick={() => setSelectedBlockId(block.id)}
                     className={`relative group transition-all duration-300 ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'} ${
                       !isPreview && selectedBlockId === block.id 
-                        ? 'ring-2 ring-indigo-500 ring-offset-2 shadow-lg scale-[1.002] z-10' 
-                        : 'hover:shadow-sm hover:ring-1 hover:ring-indigo-300/50'
+                        ? 'ring-2 ring-brand-accent ring-offset-2 shadow-lg scale-[1.002] z-10' 
+                        : 'hover:shadow-sm hover:ring-1 hover:ring-brand-accent/50'
                     }`}
                   >
                     {/* Floating Controls */}
@@ -536,7 +537,7 @@ function App() {
                             e.stopPropagation();
                             moveBlock(block.id, 'up');
                           }}
-                          className="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded transition-colors"
+                          className="p-1 text-slate-500 hover:text-brand-primary hover:bg-slate-100 rounded transition-colors"
                           title="Move Up"
                         >
                           <ChevronUp className="w-3.5 h-3.5" />
@@ -546,7 +547,7 @@ function App() {
                             e.stopPropagation();
                             moveBlock(block.id, 'down');
                           }}
-                          className="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded transition-colors"
+                          className="p-1 text-slate-500 hover:text-brand-primary hover:bg-slate-100 rounded transition-colors"
                           title="Move Down"
                         >
                           <ChevronDown className="w-3.5 h-3.5" />
@@ -557,10 +558,10 @@ function App() {
                             e.stopPropagation();
                             deleteBlock(block.id);
                           }}
-                          className="p-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          className="p-1 text-slate-500 hover:text-red-650 hover:bg-red-50 rounded transition-colors"
                           title="Delete Block"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
                         </button>
                       </div>
                     )}
@@ -583,21 +584,21 @@ function App() {
           <div className="flex items-center gap-1.5 border-r border-slate-200 pr-3">
             <button
               onClick={() => setDeviceMode('desktop')}
-              className={`p-1.5 rounded-full transition-all ${deviceMode === 'desktop' ? 'bg-indigo-50 text-indigo-600 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded-full transition-all ${deviceMode === 'desktop' ? 'bg-brand-accent-bg text-brand-accent scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
               title="Desktop View"
             >
               <Monitor className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDeviceMode('tablet')}
-              className={`p-1.5 rounded-full transition-all ${deviceMode === 'tablet' ? 'bg-indigo-50 text-indigo-600 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded-full transition-all ${deviceMode === 'tablet' ? 'bg-brand-accent-bg text-brand-accent scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
               title="Tablet View"
             >
               <Tablet className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDeviceMode('mobile')}
-              className={`p-1.5 rounded-full transition-all ${deviceMode === 'mobile' ? 'bg-indigo-50 text-indigo-600 scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+              className={`p-1.5 rounded-full transition-all ${deviceMode === 'mobile' ? 'bg-brand-accent-bg text-brand-accent scale-105' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
               title="Mobile View"
             >
               <Smartphone className="w-4 h-4" />
@@ -605,7 +606,7 @@ function App() {
           </div>
           <button
             onClick={() => setIsPreview(false)}
-            className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-indigo-600 px-3 py-1.5 rounded-full hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-brand-accent px-3 py-1.5 rounded-full hover:bg-slate-50 transition-colors cursor-pointer"
             title="Exit Preview"
           >
             <Eye className="w-4 h-4 text-slate-500" />

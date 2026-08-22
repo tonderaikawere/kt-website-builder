@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 import type { Block, BlockType, BlockStyles, ProjectSettings } from './types';
 
 const DEFAULT_SETTINGS: ProjectSettings = {
-  title: 'My Custom Website',
-  description: 'Created with KT Website Builder',
+  title: 'Kawerify Tech Site Project',
+  description: 'Designed visually with Kawerify Tech Builder',
   customGlobalCss: '',
-  fontFamily: 'Inter, sans-serif'
+  fontFamily: 'Poppins, sans-serif'
 };
 
 interface HistoryState {

@@ -14,7 +14,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     name: 'Navigation Header',
     description: 'Header navigation bar with logo and list of page links.',
     defaultContent: {
-      logoText: 'KT BUILDER',
+      logoText: 'KAWERIFY TECH',
       items: [
         { id: '1', title: 'Home', link: '#' },
         { id: '2', title: 'Features', link: '#features' },
@@ -24,7 +24,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     },
     defaultStyles: {
       bgColor: '#ffffff',
-      textColor: '#1e293b',
+      textColor: '#07162f',
       paddingTop: 'py-4',
       paddingBottom: 'py-4',
       textAlign: 'left'
@@ -42,7 +42,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
       imageSrc: 'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80'
     },
     defaultStyles: {
-      bgColor: '#4f46e5',
+      bgColor: '#0b4a86',
       textColor: '#ffffff',
       paddingTop: 'py-20',
       paddingBottom: 'py-20',
@@ -63,8 +63,8 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
       ]
     },
     defaultStyles: {
-      bgColor: '#f8fafc',
-      textColor: '#1e293b',
+      bgColor: '#f6f9fd',
+      textColor: '#07162f',
       paddingTop: 'py-16',
       paddingBottom: 'py-16',
       textAlign: 'center'
@@ -81,7 +81,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
       buttonLink: '#'
     },
     defaultStyles: {
-      bgColor: '#1e1b4b',
+      bgColor: '#061a3b',
       textColor: '#ffffff',
       paddingTop: 'py-16',
       paddingBottom: 'py-16',
@@ -102,7 +102,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     },
     defaultStyles: {
       bgColor: '#ffffff',
-      textColor: '#1e293b',
+      textColor: '#07162f',
       paddingTop: 'py-16',
       paddingBottom: 'py-16',
       textAlign: 'center'
@@ -121,8 +121,8 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
       ]
     },
     defaultStyles: {
-      bgColor: '#f8fafc',
-      textColor: '#1e293b',
+      bgColor: '#f6f9fd',
+      textColor: '#07162f',
       paddingTop: 'py-16',
       paddingBottom: 'py-16',
       textAlign: 'center'
@@ -141,7 +141,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     },
     defaultStyles: {
       bgColor: '#ffffff',
-      textColor: '#1e293b',
+      textColor: '#07162f',
       paddingTop: 'py-16',
       paddingBottom: 'py-16',
       textAlign: 'center'
@@ -162,7 +162,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     },
     defaultStyles: {
       bgColor: '#ffffff',
-      textColor: '#1e293b',
+      textColor: '#07162f',
       paddingTop: 'py-12',
       paddingBottom: 'py-12',
       textAlign: 'center'
@@ -179,8 +179,8 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
       buttonLink: 'https://example.com'
     },
     defaultStyles: {
-      bgColor: '#f1f5f9',
-      textColor: '#1e293b',
+      bgColor: '#f6f9fd',
+      textColor: '#07162f',
       paddingTop: 'py-12',
       paddingBottom: 'py-12',
       textAlign: 'center'
@@ -197,7 +197,7 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     },
     defaultStyles: {
       bgColor: '#ffffff',
-      textColor: '#1e293b',
+      textColor: '#07162f',
       paddingTop: 'py-16',
       paddingBottom: 'py-16',
       textAlign: 'center'
@@ -208,14 +208,14 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',
     defaultContent: {
-      copyrightText: '© 2026 KT Website Builder. All rights reserved.',
+      copyrightText: '© 2026 Kawerify Tech. All rights reserved.',
       items: [
         { id: '1', title: 'Privacy Policy', link: '#' },
         { id: '2', title: 'Terms of Service', link: '#' }
       ]
     },
     defaultStyles: {
-      bgColor: '#0f172a',
+      bgColor: '#061a3b',
       textColor: '#94a3b8',
       paddingTop: 'py-8',
       paddingBottom: 'py-8',
