@@ -531,32 +531,72 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
       className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}
     >
       <div className="max-w-4xl mx-auto mb-12">
-        <h2 
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={handleTitleChange}
-          onClick={(e) => {
-            if (!isEditing) return;
-            e.stopPropagation();
-            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
-          }}
-          className={`text-3xl font-extrabold tracking-tight mb-3 ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
-        >
-          {title}
-        </h2>
-        <p 
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={handleSubtitleChange}
-          onClick={(e) => {
-            if (!isEditing) return;
-            e.stopPropagation();
-            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
-          }}
-          className={`text-slate-650 opacity-90 max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
-        >
-          {subtitle}
-        </p>
+        <div className="relative w-full">
+          <h2 
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleTitleChange}
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+            }}
+            onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
+            style={{
+              fontSize: block.content.titleFontSize ? `${block.content.titleFontSize}px` : undefined,
+              color: block.content.titleColor || undefined
+            }}
+            className={`text-3xl font-extrabold tracking-tight mb-3 ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
+          >
+            {title}
+          </h2>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'title' && (
+            <>
+              <FigmaResizeHandles />
+              <FloatingFormatToolbar 
+                blockId={block.id}
+                elementPath="title"
+                elementType="title"
+                blockContent={block.content}
+                onUpdateBlockContent={onContentChange}
+                onSelectElement={onSelectElement} 
+              />
+            </>
+          )}
+        </div>
+        <div className="relative w-full mt-2">
+          <p 
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleSubtitleChange}
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+            }}
+            onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
+            style={{
+              fontSize: block.content.subtitleFontSize ? `${block.content.subtitleFontSize}px` : undefined,
+              color: block.content.subtitleColor || undefined
+            }}
+            className={`text-slate-650 opacity-90 max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
+          >
+            {subtitle}
+          </p>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'subtitle' && (
+            <>
+              <FigmaResizeHandles />
+              <FloatingFormatToolbar 
+                blockId={block.id}
+                elementPath="subtitle"
+                elementType="subtitle"
+                blockContent={block.content}
+                onUpdateBlockContent={onContentChange}
+                onSelectElement={onSelectElement} 
+              />
+            </>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
