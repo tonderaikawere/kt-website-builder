@@ -410,21 +410,58 @@ export const Inspector: React.FC<InspectorProps> = ({
           </div>
         </div>
 
-        {/* Border Radius */}
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-650 dark:text-slate-300 block">Button & Image Rounding</label>
-          <select
-            value={styles.borderRadius || 'rounded-md'}
-            onChange={(e) => onUpdateStyles(selectedBlock.id, { borderRadius: e.target.value })}
-            className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-          >
-            <option value="rounded-none">Sharp Corners (rounded-none)</option>
-            <option value="rounded-sm">Rounded Small (rounded-sm)</option>
-            <option value="rounded-md">Rounded Medium (rounded-md)</option>
-            <option value="rounded-lg">Rounded Large (rounded-lg)</option>
-            <option value="rounded-xl">Rounded Extra Large (rounded-xl)</option>
-            <option value="rounded-full">Pill / Circle (rounded-full)</option>
-          </select>
+        {/* Border Customizer */}
+        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-brand-ink">
+          <label className="text-xs font-semibold text-slate-650 dark:text-slate-300 block">Border Customization</label>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Thickness</label>
+              <select
+                value={styles.borderWidth || '0px'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { borderWidth: e.target.value })}
+                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
+              >
+                <option value="0px">None (0px)</option>
+                <option value="1px">Thin (1px)</option>
+                <option value="2px">Medium (2px)</option>
+                <option value="4px">Thick (4px)</option>
+                <option value="8px">Extra Thick (8px)</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Border Color</label>
+              <div className="flex items-center gap-1">
+                <input
+                  type="color"
+                  value={styles.borderColor || '#cbd5e1'}
+                  onChange={(e) => onUpdateStyles(selectedBlock.id, { borderColor: e.target.value })}
+                  className="w-8 h-8 rounded border border-slate-200 dark:border-slate-700 bg-transparent p-0 cursor-pointer overflow-hidden"
+                />
+                <input
+                  type="text"
+                  value={styles.borderColor || ''}
+                  placeholder="#cbd5e1"
+                  onChange={(e) => onUpdateStyles(selectedBlock.id, { borderColor: e.target.value })}
+                  className="w-full text-xs px-1 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none text-[10px] text-slate-700 dark:text-slate-300"
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-400 block mb-1">Button & Image Rounding</label>
+            <select
+              value={styles.borderRadius || 'rounded-md'}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { borderRadius: e.target.value })}
+              className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
+            >
+              <option value="rounded-none">Sharp Corners (rounded-none)</option>
+              <option value="rounded-sm">Rounded Small (rounded-sm)</option>
+              <option value="rounded-md">Rounded Medium (rounded-md)</option>
+              <option value="rounded-lg">Rounded Large (rounded-lg)</option>
+              <option value="rounded-xl">Rounded Extra Large (rounded-xl)</option>
+              <option value="rounded-full">Pill / Circle (rounded-full)</option>
+            </select>
+          </div>
         </div>
 
         {/* Text Alignment */}

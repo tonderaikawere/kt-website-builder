@@ -22,6 +22,9 @@ const getBlockStyles = (
     backgroundPosition: 'center',
     color: styles.textColor || defaultText,
     textAlign: styles.textAlign || defaultAlign,
+    borderWidth: styles.borderWidth || undefined,
+    borderStyle: styles.borderWidth && styles.borderWidth !== '0px' ? 'solid' : undefined,
+    borderColor: styles.borderColor || undefined
   };
 };
 
