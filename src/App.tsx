@@ -453,54 +453,108 @@ function App() {
                     {blocks.length === 0 ? (
                       <p className="text-[11px] text-slate-400 italic">No sections on the canvas. Drag elements below to start.</p>
                     ) : (
-                      <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                        {blocks.map((block, idx) => (
-                          <div
-                            key={block.id}
-                            onClick={() => setSelectedBlockId(block.id)}
-                            className={`group flex items-center justify-between px-3 py-2 rounded-xl border text-xs cursor-pointer transition-all ${
-                              selectedBlockId === block.id
-                                ? 'bg-brand-accent-bg border-brand-accent text-brand-accent font-semibold shadow-sm'
-                                : 'bg-slate-50 dark:bg-brand-deep/50 border-slate-200 dark:border-brand-ink text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-brand-deep'
-                            }`}
-                          >
-                            <span className="truncate pr-2">{idx + 1}. {block.name}</span>
-                            <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  moveBlock(block.id, 'up');
+                      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        {blocks.map((block, idx) => {
+                          const isBlockSelected = selectedBlockId === block.id;
+                          return (
+                            <div key={block.id} className="space-y-1">
+                              <div
+                                onClick={() => {
+                                  setSelectedBlockId(block.id);
+                                  setSelectedElement(null);
                                 }}
-                                disabled={idx === 0}
-                                className="hover:text-brand-primary p-0.5 disabled:opacity-30 cursor-pointer"
-                                title="Move Up"
+                                className={`group flex items-center justify-between px-3 py-2 rounded-xl border text-xs cursor-pointer transition-all ${
+                                  isBlockSelected
+                                    ? 'bg-brand-accent-bg border-brand-accent text-brand-accent font-semibold shadow-sm animate-pulse-once'
+                                    : 'bg-slate-50 dark:bg-brand-deep/50 border-slate-200 dark:border-brand-ink text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-brand-deep'
+                                }`}
                               >
-                                <ChevronUp className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  moveBlock(block.id, 'down');
-                                }}
-                                disabled={idx === blocks.length - 1}
-                                className="hover:text-brand-primary p-0.5 disabled:opacity-30 cursor-pointer"
-                                title="Move Down"
-                              >
-                                <ChevronDown className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteBlock(block.id);
-                                }}
-                                className="hover:text-red-500 p-0.5 cursor-pointer"
-                                title="Delete Section"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                                <div className="flex items-center gap-2 truncate">
+                                  <span className="text-slate-450 dark:text-slate-500">
+                                    {block.type === 'header' ? '☰' : block.type === 'hero' ? '❖' : block.type === 'features' ? '⚏' : block.type === 'portfolio' ? '🖼️' : '❑'}
+                                  </span>
+                                  <span className="truncate pr-2 font-medium">{block.name}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      moveBlock(block.id, 'up');
+                                    }}
+                                    disabled={idx === 0}
+                                    className="hover:text-brand-primary p-0.5 disabled:opacity-30 cursor-pointer"
+                                    title="Move Up"
+                                  >
+                                    <ChevronUp className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      moveBlock(block.id, 'down');
+                                    }}
+                                    disabled={idx === blocks.length - 1}
+                                    className="hover:text-brand-primary p-0.5 disabled:opacity-30 cursor-pointer"
+                                    title="Move Down"
+                                  >
+                                    <ChevronDown className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deleteBlock(block.id);
+                                    }}
+                                    className="hover:text-red-500 p-0.5 cursor-pointer"
+                                    title="Delete Section"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Child Element Sub-tree list (Wix style) */}
+                              {isBlockSelected && (
+                                <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-slate-200 dark:border-slate-800 ml-4 animate-in fade-in slide-in-from-left-1 duration-150">
+                                  {block.content.logoText !== undefined && (
+                                    <button
+                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'logoText', elementType: 'logoText' })}
+                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'logoText' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                    >
+                                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                      <span className="truncate">Logo Text</span>
+                                    </button>
+                                  )}
+                                  {block.content.title !== undefined && (
+                                    <button
+                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'title', elementType: 'title' })}
+                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'title' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                    >
+                                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                      <span className="truncate">Heading Title</span>
+                                    </button>
+                                  )}
+                                  {block.content.subtitle !== undefined && (
+                                    <button
+                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'subtitle', elementType: 'subtitle' })}
+                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'subtitle' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                    >
+                                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                      <span className="truncate">Subheading Text</span>
+                                    </button>
+                                  )}
+                                  {block.content.buttonText !== undefined && (
+                                    <button
+                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'buttonText', elementType: 'button' })}
+                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'buttonText' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                    >
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                      <span className="truncate">Action Button</span>
+                                    </button>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
