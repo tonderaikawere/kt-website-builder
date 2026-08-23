@@ -602,40 +602,92 @@ function App() {
                               {isBlockSelected && (
                                 <div className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-slate-200 dark:border-slate-800 ml-4 animate-in fade-in slide-in-from-left-1 duration-150">
                                   {block.content.logoText !== undefined && (
-                                    <button
-                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'logoText', elementType: 'logoText' })}
-                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'logoText' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                                    >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                      <span className="truncate">Logo Text</span>
-                                    </button>
+                                    <div className="group/item flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 rounded pr-1.5">
+                                      <button
+                                        onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'logoText', elementType: 'logoText' })}
+                                        className={`flex-1 text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'logoText' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500'}`}
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                        <span className="truncate">Logo Text</span>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          updateBlockContent(block.id, { logoText: '' });
+                                          setSelectedElement(null);
+                                        }}
+                                        className="opacity-0 group-hover/item:opacity-100 hover:text-red-505 p-0.5 text-slate-400 cursor-pointer"
+                                        title="Clear logo text"
+                                      >
+                                        <Trash2 className="w-2.5 h-2.5" />
+                                      </button>
+                                    </div>
                                   )}
                                   {block.content.title !== undefined && (
-                                    <button
-                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'title', elementType: 'title' })}
-                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'title' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                                    >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                      <span className="truncate">Heading Title</span>
-                                    </button>
+                                    <div className="group/item flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 rounded pr-1.5">
+                                      <button
+                                        onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'title', elementType: 'title' })}
+                                        className={`flex-1 text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'title' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500'}`}
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                        <span className="truncate">Heading Title</span>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          updateBlockContent(block.id, { title: '' });
+                                          setSelectedElement(null);
+                                        }}
+                                        className="opacity-0 group-hover/item:opacity-100 hover:text-red-505 p-0.5 text-slate-400 cursor-pointer"
+                                        title="Clear heading title"
+                                      >
+                                        <Trash2 className="w-2.5 h-2.5" />
+                                      </button>
+                                    </div>
                                   )}
                                   {block.content.subtitle !== undefined && (
-                                    <button
-                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'subtitle', elementType: 'subtitle' })}
-                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'subtitle' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                                    >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                      <span className="truncate">Subheading Text</span>
-                                    </button>
+                                    <div className="group/item flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 rounded pr-1.5">
+                                      <button
+                                        onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'subtitle', elementType: 'subtitle' })}
+                                        className={`flex-1 text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'subtitle' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500'}`}
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                        <span className="truncate">Subheading Text</span>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          updateBlockContent(block.id, { subtitle: '' });
+                                          setSelectedElement(null);
+                                        }}
+                                        className="opacity-0 group-hover/item:opacity-100 hover:text-red-505 p-0.5 text-slate-400 cursor-pointer"
+                                        title="Clear subheading"
+                                      >
+                                        <Trash2 className="w-2.5 h-2.5" />
+                                      </button>
+                                    </div>
                                   )}
                                   {block.content.buttonText !== undefined && (
-                                    <button
-                                      onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'buttonText', elementType: 'button' })}
-                                      className={`w-full text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'buttonText' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                                    >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                      <span className="truncate">Action Button</span>
-                                    </button>
+                                    <div className="group/item flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 rounded pr-1.5">
+                                      <button
+                                        onClick={() => setSelectedElement({ blockId: block.id, elementPath: 'buttonText', elementType: 'button' })}
+                                        className={`flex-1 text-left px-2 py-1 rounded text-[11px] flex items-center gap-2 transition-colors cursor-pointer ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'buttonText' ? 'bg-slate-100 dark:bg-slate-800 text-brand-accent font-bold' : 'text-slate-500'}`}
+                                      >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span className="truncate">Action Button</span>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          updateBlockContent(block.id, { buttonText: '' });
+                                          setSelectedElement(null);
+                                        }}
+                                        className="opacity-0 group-hover/item:opacity-100 hover:text-red-505 p-0.5 text-slate-400 cursor-pointer"
+                                        title="Clear button text"
+                                      >
+                                        <Trash2 className="w-2.5 h-2.5" />
+                                      </button>
+                                    </div>
                                   )}
                                 </div>
                               )}
