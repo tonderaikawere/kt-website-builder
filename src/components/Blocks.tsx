@@ -61,8 +61,28 @@ const handleElementDoubleClick = (e: React.MouseEvent<HTMLElement>, isEditing: b
 };
 
 const FloatingFormatToolbar: React.FC<{
+  blockId: string;
+  elementPath: string;
+  elementType: string;
+  blockContent: any;
+  onUpdateBlockContent?: (blockId: string, content: any) => void;
   onSelectElement?: (blockId: string, elementPath: string, elementType: string) => void;
-}> = ({ onSelectElement }) => {
+}> = ({ blockId, elementPath, elementType, blockContent, onUpdateBlockContent, onSelectElement }) => {
+  const currentFontSize = blockContent[`${elementPath}FontSize`] || '';
+  const currentColor = blockContent[`${elementPath}Color`] || '';
+
+  const handleFontSizeChange = (val: string) => {
+    if (onUpdateBlockContent) {
+      onUpdateBlockContent(blockId, { [`${elementPath}FontSize`]: val });
+    }
+  };
+
+  const handleColorChange = (val: string) => {
+    if (onUpdateBlockContent) {
+      onUpdateBlockContent(blockId, { [`${elementPath}Color`]: val });
+    }
+  };
+
   const triggerFormat = (e: React.MouseEvent, cmd: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -79,9 +99,43 @@ const FloatingFormatToolbar: React.FC<{
   return (
     <div 
       contentEditable={false}
-      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 shadow-xl z-50 flex items-center gap-1.5 select-none animate-in fade-in slide-in-from-bottom-2 duration-150 text-[10px] font-sans"
+      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl z-50 flex items-center gap-2 select-none animate-in fade-in slide-in-from-bottom-2 duration-150 text-[10px] font-sans"
       onClick={(e) => e.stopPropagation()}
     >
+      {/* Font Size Selector */}
+      {(elementType === 'title' || elementType === 'subtitle' || elementType === 'description' || elementType === 'logoText') && (
+        <div className="flex items-center gap-1">
+          <input
+            type="number"
+            min="10"
+            max="120"
+            placeholder="Size"
+            value={currentFontSize}
+            onChange={(e) => handleFontSizeChange(e.target.value)}
+            className="w-10 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-[9px] text-center text-slate-700 dark:text-slate-300 font-bold focus:outline-none"
+            title="Font Size (px)"
+          />
+          <span className="text-[9px] text-slate-400 font-bold">px</span>
+        </div>
+      )}
+
+      {/* Color Circle Picker */}
+      {(elementType === 'title' || elementType === 'subtitle' || elementType === 'description' || elementType === 'logoText') && (
+        <div className="relative flex items-center" title="Text Color">
+          <input
+            type="color"
+            value={currentColor || '#000000'}
+            onChange={(e) => handleColorChange(e.target.value)}
+            className="w-4 h-4 rounded-full border border-slate-200 dark:border-slate-750 p-0 bg-transparent cursor-pointer overflow-hidden shrink-0"
+          />
+        </div>
+      )}
+
+      {/* Divider */}
+      {(elementType === 'title' || elementType === 'subtitle' || elementType === 'description' || elementType === 'logoText') && (
+        <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5" />
+      )}
+
       <button
         onMouseDown={(e) => triggerFormat(e, 'bold')}
         className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-bold w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
@@ -132,7 +186,7 @@ const FloatingFormatToolbar: React.FC<{
       
       <button
         onClick={handleClearSelection}
-        className="text-[10px] text-slate-500 hover:text-slate-800 dark:hover:text-white px-1.5 py-0.5 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 cursor-pointer font-medium"
+        className="text-[10px] text-slate-500 hover:text-slate-800 dark:hover:text-white px-2 py-0.5 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 cursor-pointer font-bold"
         title="Close floating format panel"
       >
         Done
@@ -204,7 +258,14 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
         {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'logoText' && (
           <>
             <FigmaResizeHandles />
-            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            <FloatingFormatToolbar 
+              blockId={block.id}
+              elementPath="logoText"
+              elementType="logoText"
+              blockContent={block.content}
+              onUpdateBlockContent={onContentChange}
+              onSelectElement={onSelectElement} 
+            />
           </>
         )}
       </div>
@@ -230,7 +291,14 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
               {isEditing && isLinkSelected && (
                 <>
                   <FigmaResizeHandles />
-                  <FloatingFormatToolbar onSelectElement={onSelectElement} />
+                  <FloatingFormatToolbar 
+                    blockId={block.id}
+                    elementPath={`items.${item.id}.title`}
+                    elementType="link"
+                    blockContent={block.content}
+                    onUpdateBlockContent={onContentChange}
+                    onSelectElement={onSelectElement} 
+                  />
                 </>
               )}
             </span>
@@ -287,7 +355,14 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
           {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'title' && (
             <>
               <FigmaResizeHandles />
-              <FloatingFormatToolbar onSelectElement={onSelectElement} />
+              <FloatingFormatToolbar 
+                blockId={block.id}
+                elementPath="title"
+                elementType="title"
+                blockContent={block.content}
+                onUpdateBlockContent={onContentChange}
+                onSelectElement={onSelectElement} 
+              />
             </>
           )}
         </div>
@@ -313,7 +388,14 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
           {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'subtitle' && (
             <>
               <FigmaResizeHandles />
-              <FloatingFormatToolbar onSelectElement={onSelectElement} />
+              <FloatingFormatToolbar 
+                blockId={block.id}
+                elementPath="subtitle"
+                elementType="subtitle"
+                blockContent={block.content}
+                onUpdateBlockContent={onContentChange}
+                onSelectElement={onSelectElement} 
+              />
             </>
           )}
         </div>
@@ -339,7 +421,14 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
           {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'buttonText' && (
             <>
               <FigmaResizeHandles />
-              <FloatingFormatToolbar onSelectElement={onSelectElement} />
+              <FloatingFormatToolbar 
+                blockId={block.id}
+                elementPath="buttonText"
+                elementType="button"
+                blockContent={block.content}
+                onUpdateBlockContent={onContentChange}
+                onSelectElement={onSelectElement} 
+              />
             </>
           )}
         </div>
