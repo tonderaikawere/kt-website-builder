@@ -19,7 +19,8 @@ import {
   Undo,
   Redo,
   Sun,
-  Moon
+  Moon,
+  Cloud
 } from 'lucide-react';
 import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
@@ -230,79 +231,110 @@ function App() {
         href={`https://fonts.googleapis.com/css2?family=${settings.fontFamily.split(',')[0].replace(/['"\s]/g, '+')}:wght@400;500;600;700;800&display=swap`}
       />
 
-      {/* Top Toolbar */}
+      {/* Top Toolbar (Wix Studio style) */}
       {!isPreview && (
-        <header className="flex items-center justify-between px-6 h-16 bg-white dark:bg-brand-deep border-b border-slate-200 dark:border-brand-ink z-10 shrink-0">
-          <div className="flex items-center gap-3">
-            <img src="/icon.svg" className="w-8 h-8 rounded-lg object-contain shadow-sm bg-brand-accent-bg p-1 shrink-0" alt="Kawerify Logo" />
-            <div>
-              <h1 className="font-extrabold text-slate-900 dark:text-white text-sm tracking-tight leading-none">KT BUILDER</h1>
-              <span className="text-[9px] text-brand-primary dark:text-brand-accent font-bold tracking-wider uppercase leading-none block mt-0.5">Kawerify Tech</span>
+        <header className="flex items-center justify-between px-6 h-14 bg-[#f8f9fa] dark:bg-[#1a1b1e] border-b border-slate-250 dark:border-brand-ink z-20 shrink-0 select-none">
+          {/* Left Side: Brand, User Initials, Site Name and Zoom */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 border-r border-slate-200 dark:border-slate-800 pr-4">
+              <div className="w-6 h-6 rounded-full bg-brand-primary text-white flex items-center justify-center text-[10px] font-bold">
+                T
+              </div>
+              <span className="text-[11px] font-bold text-slate-800 dark:text-white tracking-tight">My Site 1</span>
+              <span className="text-[10px] text-slate-400">▼</span>
+            </div>
+            
+            <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
+              <span>Fit (85%)</span>
+              <span className="text-[9px]">▼</span>
             </div>
           </div>
 
-          {/* Viewport Toggles */}
-          <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
-            <button
-              onClick={() => setDeviceMode('desktop')}
-              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'desktop' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
-              title="Desktop View"
-            >
-              <Monitor className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setDeviceMode('tablet')}
-              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'tablet' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
-              title="Tablet View"
-            >
-              <Tablet className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setDeviceMode('mobile')}
-              className={`p-1.5 rounded-md transition-colors ${deviceMode === 'mobile' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
-              title="Mobile View"
-            >
-              <Smartphone className="w-4 h-4" />
-            </button>
+          {/* Center Address and Page selector */}
+          <div className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 px-3 py-1 rounded-full text-[11px] shadow-sm text-slate-500">
+            <div className="flex items-center gap-1">
+              <span className="font-bold text-slate-700 dark:text-slate-300">Page:</span>
+              <select className="bg-transparent border-none text-[11px] font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer">
+                <option>Home</option>
+                <option>About Projects</option>
+                <option>Contact Info</option>
+              </select>
+            </div>
+            <div className="w-px h-3 bg-slate-200 dark:bg-slate-800" />
+            <span className="font-mono text-[10px] opacity-75">tondeskawere.wixsite.com/my-site-1</span>
           </div>
 
-          {/* Theme Toggle Button */}
-          <button
-            onClick={() => setIsDarkMode(prev => !prev)}
-            className="p-2 rounded-lg text-slate-500 hover:text-brand-accent dark:text-slate-400 dark:hover:text-brand-accent hover:bg-brand-accent-bg dark:hover:bg-brand-accent-bg transition-colors"
-            title="Toggle theme mode"
-          >
-            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+          {/* Right Side: Device viewports, Save, Undo, Redo, Preview, and Publish */}
+          <div className="flex items-center gap-3">
+            {/* Viewport device toggles */}
+            <div className="flex bg-slate-200/60 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-250 dark:border-slate-700 mr-2">
+              <button
+                onClick={() => setDeviceMode('desktop')}
+                className={`p-1 rounded-md transition-colors ${deviceMode === 'desktop' ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-sm' : 'text-slate-550 hover:text-slate-850 dark:text-slate-400'}`}
+                title="Desktop Layout"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setDeviceMode('mobile')}
+                className={`p-1 rounded-md transition-colors ${deviceMode === 'mobile' ? 'bg-white dark:bg-slate-700 text-brand-primary shadow-sm' : 'text-slate-550 hover:text-slate-850 dark:text-slate-400'}`}
+                title="Mobile Layout"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
-          {/* Action Controls */}
-          <div className="flex items-center gap-2">
-            <button 
+            {/* Save indicator */}
+            <div className="flex items-center text-slate-400 dark:text-slate-500" title="All changes saved to cloud">
+              <Cloud className="w-4 h-4 text-emerald-500 animate-pulse mr-1" />
+              <span className="text-[10px] hidden lg:inline font-medium">Saved</span>
+            </div>
+
+            <div className="w-px h-4 bg-slate-200 dark:bg-slate-800" />
+
+            {/* Undo/Redo arrows */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={undo}
+                disabled={!canUndo}
+                className={`p-1.5 rounded-lg transition-colors ${canUndo ? 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed'}`}
+                title="Undo last change"
+              >
+                <Undo className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={redo}
+                disabled={!canRedo}
+                className={`p-1.5 rounded-lg transition-colors ${canRedo ? 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed'}`}
+                title="Redo next change"
+              >
+                <Redo className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="w-px h-4 bg-slate-200 dark:bg-slate-800" />
+
+            {/* Reset button */}
+            <button
               onClick={resetProject}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 transition-colors"
+              title="Reset layout configuration"
             >
-              <RotateCcw className="w-4 h-4" />
-              Reset
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
-            <button 
-              onClick={undo}
-              disabled={!canUndo}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${canUndo ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed'}`}
-              title="Undo last change"
+
+            <div className="w-px h-4 bg-slate-200 dark:bg-slate-800" />
+
+            {/* Dark Mode toggle */}
+            <button
+              onClick={() => setIsDarkMode(prev => !prev)}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-brand-accent transition-colors"
+              title="Toggle theme mode"
             >
-              <Undo className="w-4 h-4" />
-              Undo
+              {isDarkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>
-            <button 
-              onClick={redo}
-              disabled={!canRedo}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${canRedo ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 cursor-not-allowed'}`}
-              title="Redo next change"
-            >
-              <Redo className="w-4 h-4" />
-              Redo
-            </button>
-            <div className="w-px h-6 bg-slate-200 mx-1"></div>
+
+            {/* Import JSON */}
             <input 
               type="file" 
               id="import-json" 
@@ -312,36 +344,36 @@ function App() {
             />
             <button 
               onClick={() => document.getElementById('import-json')?.click()}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Import layout from JSON file"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-brand-accent transition-colors"
+              title="Import Layout JSON"
             >
-              <Upload className="w-4 h-4" />
-              Import JSON
+              <Upload className="w-3.5 h-3.5" />
             </button>
+
+            {/* Export JSON */}
             <button 
               onClick={exportProjectJson}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Download layout configuration as JSON"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-brand-accent transition-colors"
+              title="Export Layout JSON"
             >
-              <Download className="w-4 h-4" />
-              Export JSON
+              <Download className="w-3.5 h-3.5" />
             </button>
-            <div className="w-px h-6 bg-slate-200 mx-1"></div>
-            <button 
-              onClick={() => setIsExportOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-accent hover:bg-brand-accent-bg rounded-lg transition-colors"
-              title="Export HTML and CSS code"
-            >
-              <FileCode className="w-4 h-4" />
-              Get Code
-            </button>
-            <div className="w-px h-6 bg-slate-200 mx-1"></div>
+
+            <div className="w-px h-4 bg-slate-200 dark:bg-slate-800" />
+
             <button
               onClick={() => setIsPreview(true)}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-colors bg-brand-primary hover:bg-brand-secondary text-white"
+              className="text-[11px] font-semibold text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <Eye className="w-4 h-4" />
-              Preview Site
+              Preview
+            </button>
+
+            {/* Publish button */}
+            <button
+              onClick={() => setIsExportOpen(true)}
+              className="px-4 py-1.5 bg-[#005cff] hover:bg-[#004ecc] text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              Publish
             </button>
           </div>
         </header>
