@@ -71,6 +71,32 @@ const FloatingFormatToolbar: React.FC<{
   const currentFontSize = blockContent[`${elementPath}FontSize`] || '';
   const currentColor = blockContent[`${elementPath}Color`] || '';
 
+  // Link / Button editing support
+  const isLinkOrButton = elementType === 'link' || elementType === 'button';
+  const getActiveLinkValue = () => {
+    if (elementType === 'button') {
+      return blockContent.buttonLink || '';
+    }
+    if (elementType === 'link' && elementPath.startsWith('items.')) {
+      const itemId = elementPath.split('.')[1];
+      return blockContent.items?.find((it: any) => it.id === itemId)?.link || '';
+    }
+    return '';
+  };
+
+  const handleLinkValueChange = (newLink: string) => {
+    if (!onUpdateBlockContent) return;
+    if (elementType === 'button') {
+      onUpdateBlockContent(blockId, { buttonLink: newLink });
+    } else if (elementType === 'link' && elementPath.startsWith('items.')) {
+      const itemId = elementPath.split('.')[1];
+      const updatedItems = (blockContent.items || []).map((it: any) => 
+        it.id === itemId ? { ...it, link: newLink } : it
+      );
+      onUpdateBlockContent(blockId, { items: updatedItems });
+    }
+  };
+
   const handleFontSizeChange = (val: string) => {
     if (onUpdateBlockContent) {
       onUpdateBlockContent(blockId, { [`${elementPath}FontSize`]: val });
@@ -102,6 +128,25 @@ const FloatingFormatToolbar: React.FC<{
       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl z-50 flex items-center gap-2 select-none animate-in fade-in slide-in-from-bottom-2 duration-150 text-[10px] font-sans"
       onClick={(e) => e.stopPropagation()}
     >
+      {/* Link URL editor */}
+      {isLinkOrButton && (
+        <div className="flex items-center gap-1.5 mr-1">
+          <span className="text-slate-400 font-bold">Link:</span>
+          <input
+            type="text"
+            placeholder="#"
+            value={getActiveLinkValue()}
+            onChange={(e) => handleLinkValueChange(e.target.value)}
+            className="w-20 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[9px] text-slate-700 dark:text-slate-300 focus:outline-none"
+            title="Link URL (e.g. #pricing, /contact)"
+          />
+        </div>
+      )}
+      
+      {isLinkOrButton && (
+        <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5" />
+      )}
+      
       {/* Font Size Selector */}
       {(elementType === 'title' || elementType === 'subtitle' || elementType === 'description' || elementType === 'logoText') && (
         <div className="flex items-center gap-1">
