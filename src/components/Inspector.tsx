@@ -5,9 +5,18 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 interface InspectorProps {
   selectedBlock: Block | undefined;
   onUpdateStyles: (id: string, styles: Partial<BlockStyles>) => void;
+  selectedElement?: { blockId: string; elementPath: string; elementType: string } | null;
+  onSelectElement?: (element: { blockId: string; elementPath: string; elementType: string } | null) => void;
+  onUpdateBlockContent?: (id: string, content: Partial<Block['content']>) => void;
 }
 
-export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateStyles }) => {
+export const Inspector: React.FC<InspectorProps> = ({ 
+  selectedBlock, 
+  onUpdateStyles,
+  selectedElement,
+  onSelectElement,
+  onUpdateBlockContent
+}) => {
   if (!selectedBlock) {
     return (
       <div className="text-center py-8 text-slate-400 text-sm">
@@ -17,6 +26,119 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
   }
 
   const { styles } = selectedBlock;
+
+  if (selectedElement && selectedElement.blockId === selectedBlock.id) {
+    const { elementPath, elementType } = selectedElement;
+    
+    let currentValue = '';
+    let currentLinkValue = '';
+    
+    if (elementPath.startsWith('items.')) {
+      const parts = elementPath.split('.');
+      const itemId = parts[1];
+      const fieldName = parts[2];
+      const item = (selectedBlock.content.items || []).find(i => i.id === itemId);
+      if (item) {
+        currentValue = (item as any)[fieldName] || '';
+        currentLinkValue = item.link || '';
+      }
+    } else {
+      currentValue = (selectedBlock.content as any)[elementPath] || '';
+      if (elementPath === 'buttonText') {
+        currentLinkValue = selectedBlock.content.buttonLink || '';
+      }
+    }
+
+    const handleValueChange = (val: string) => {
+      if (!onUpdateBlockContent) return;
+      if (elementPath.startsWith('items.')) {
+        const parts = elementPath.split('.');
+        const itemId = parts[1];
+        const fieldName = parts[2];
+        const updatedItems = (selectedBlock.content.items || []).map(item => 
+          item.id === itemId ? { ...item, [fieldName]: val } : item
+        );
+        onUpdateBlockContent(selectedBlock.id, { items: updatedItems });
+      } else {
+        onUpdateBlockContent(selectedBlock.id, { [elementPath]: val });
+      }
+    };
+
+    const handleLinkChange = (val: string) => {
+      if (!onUpdateBlockContent) return;
+      if (elementPath.startsWith('items.')) {
+        const parts = elementPath.split('.');
+        const itemId = parts[1];
+        const updatedItems = (selectedBlock.content.items || []).map(item => 
+          item.id === itemId ? { ...item, link: val } : item
+        );
+        onUpdateBlockContent(selectedBlock.id, { items: updatedItems });
+      } else {
+        onUpdateBlockContent(selectedBlock.id, { buttonLink: val });
+      }
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-brand-ink pb-3">
+          <button
+            onClick={() => onSelectElement && onSelectElement(null)}
+            className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer font-medium"
+          >
+            ← Back to Section
+          </button>
+          <span className="text-[10px] uppercase font-bold text-brand-accent tracking-wider">
+            Active Element
+          </span>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
+            {elementType === 'title' ? 'Edit Heading' : elementType === 'subtitle' ? 'Edit Subheading' : elementType === 'button' ? 'Edit Action Button' : elementType === 'image' ? 'Edit Cover Image' : `Edit ${elementType}`}
+          </h3>
+          <p className="text-[10px] text-slate-400 mt-0.5">Customize content & layout details</p>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          {/* Main Text / Image URL Input */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-350">
+              {elementType === 'image' ? 'Image File URL' : 'Content Text'}
+            </label>
+            {elementType === 'description' ? (
+              <textarea
+                rows={4}
+                value={currentValue}
+                onChange={(e) => handleValueChange(e.target.value)}
+                className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-350"
+              />
+            ) : (
+              <input
+                type="text"
+                value={currentValue}
+                onChange={(e) => handleValueChange(e.target.value)}
+                className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355"
+              />
+            )}
+          </div>
+
+          {/* Action Destination URL (For Buttons / Links) */}
+          {(elementType === 'button' || elementType === 'link') && (
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Link Destination URL</label>
+              <input
+                type="text"
+                placeholder="https://..."
+                value={currentLinkValue}
+                onChange={(e) => handleLinkChange(e.target.value)}
+                className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355 font-mono"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
