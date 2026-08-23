@@ -174,6 +174,10 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
             e.stopPropagation();
             if (onSelectElement) onSelectElement(block.id, 'logoText', 'logoText');
           }}
+          style={{
+            fontSize: block.content.logoTextFontSize ? `${block.content.logoTextFontSize}px` : undefined,
+            color: block.content.logoTextColor || undefined
+          }}
           className={getSelectionBorderClass(block.id, 'logoText', selectedElement, isEditing)}
         >
           {logoText}
@@ -251,6 +255,10 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               e.stopPropagation();
               if (onSelectElement) onSelectElement(block.id, 'title', 'title');
             }}
+            style={{
+              fontSize: block.content.titleFontSize ? `${block.content.titleFontSize}px` : undefined,
+              color: block.content.titleColor || undefined
+            }}
             className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
           >
             {title}
@@ -271,6 +279,10 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               if (!isEditing) return;
               e.stopPropagation();
               if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+            }}
+            style={{
+              fontSize: block.content.subtitleFontSize ? `${block.content.subtitleFontSize}px` : undefined,
+              color: block.content.subtitleColor || undefined
             }}
             className={`text-lg md:text-xl opacity-90 max-w-2xl mb-8 ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
           >

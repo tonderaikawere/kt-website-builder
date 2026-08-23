@@ -65,6 +65,14 @@ export interface Block {
     formMessagePlaceholder?: string;
     formButtonText?: string;
     drawingData?: string;
+    logoTextFontSize?: string;
+    logoTextColor?: string;
+    titleFontSize?: string;
+    titleColor?: string;
+    subtitleFontSize?: string;
+    subtitleColor?: string;
+    descriptionFontSize?: string;
+    descriptionColor?: string;
   };
   styles: BlockStyles;
 }

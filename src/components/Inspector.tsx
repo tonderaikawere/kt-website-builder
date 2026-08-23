@@ -54,6 +54,21 @@ export const Inspector: React.FC<InspectorProps> = ({
       }
     }
 
+    const currentFontSize = (selectedBlock.content as any)[`${elementPath}FontSize`] || '';
+    const currentColor = (selectedBlock.content as any)[`${elementPath}Color`] || '';
+
+    const handleFontSizeChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}FontSize`]: val });
+      }
+    };
+
+    const handleColorChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}Color`]: val });
+      }
+    };
+
     const handleValueChange = (val: string) => {
       if (!onUpdateBlockContent) return;
       if (elementPath.startsWith('items.')) {
@@ -184,6 +199,46 @@ export const Inspector: React.FC<InspectorProps> = ({
                 onChange={(e) => handleLinkChange(e.target.value)}
                 className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355 font-mono"
               />
+            </div>
+          )}
+
+          {/* Typography options for text elements */}
+          {(elementType === 'title' || elementType === 'subtitle' || elementType === 'description' || elementType === 'logoText') && (
+            <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-brand-ink">
+              <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Typography</h4>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-semibold text-slate-500">Size (px)</label>
+                  <input
+                    type="number"
+                    min="10"
+                    max="100"
+                    placeholder="Auto"
+                    value={currentFontSize}
+                    onChange={(e) => handleFontSizeChange(e.target.value)}
+                    className="w-full text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none text-slate-700 dark:text-slate-350"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-semibold text-slate-500">Color</label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="color"
+                      value={currentColor || '#000000'}
+                      onChange={(e) => handleColorChange(e.target.value)}
+                      className="w-8 h-8 rounded border border-slate-200 p-0 bg-transparent cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Inherit"
+                      value={currentColor}
+                      onChange={(e) => handleColorChange(e.target.value)}
+                      className="w-full text-[10px] px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none text-slate-700 dark:text-slate-355 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
