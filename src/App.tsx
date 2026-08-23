@@ -98,6 +98,7 @@ function App() {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedElement, setSelectedElement] = useState<{ blockId: string; elementPath: string; elementType: string } | null>(null);
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+  const [zoomMode, setZoomMode] = useState<'fit' | 'full'>('full');
   
   const {
     blocks,
@@ -280,10 +281,14 @@ function App() {
               <span className="text-[10px] text-slate-400">▼</span>
             </div>
             
-            <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500 mr-2">
-              <span>Fit (85%)</span>
-              <span className="text-[9px]">▼</span>
-            </div>
+            <button
+              onClick={() => setZoomMode(prev => prev === 'fit' ? 'full' : 'fit')}
+              className="flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer mr-2 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded transition-all"
+              title="Toggle Birds-eye view vs Full scale"
+            >
+              <span>{zoomMode === 'fit' ? 'Zoom: 80%' : 'Fit (100%)'}</span>
+              <span className="text-[8px]">▼</span>
+            </button>
             
             <button
               onClick={() => setIsAddDrawerOpen(prev => !prev)}
@@ -834,7 +839,12 @@ function App() {
         >
           {/* Device Simulator Bezel Wrapper */}
           <div 
-            style={{ fontFamily: settings.fontFamily }}
+            style={{ 
+              fontFamily: settings.fontFamily,
+              transform: zoomMode === 'fit' ? 'scale(0.8)' : 'scale(1)',
+              transformOrigin: 'top center',
+              transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
             className={`bg-white transition-all duration-300 relative ${
               deviceMode === 'mobile' 
                 ? 'w-[375px] min-h-[667px] border-[12px] border-slate-950 rounded-[40px] shadow-2xl my-8 mx-auto overflow-hidden' 
