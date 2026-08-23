@@ -42,6 +42,24 @@ const getSelectionBorderClass = (
   }`;
 };
 
+const handleElementDoubleClick = (e: React.MouseEvent<HTMLElement>, isEditing: boolean) => {
+  if (!isEditing) return;
+  e.stopPropagation();
+  const target = e.currentTarget;
+  target.focus();
+  try {
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  } catch (err) {
+    // Fallback quietly if range selection is not supported by device viewport
+  }
+};
+
 const FloatingFormatToolbar: React.FC<{
   onSelectElement?: (blockId: string, elementPath: string, elementType: string) => void;
 }> = ({ onSelectElement }) => {
@@ -174,6 +192,7 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
             e.stopPropagation();
             if (onSelectElement) onSelectElement(block.id, 'logoText', 'logoText');
           }}
+          onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
           style={{
             fontSize: block.content.logoTextFontSize ? `${block.content.logoTextFontSize}px` : undefined,
             color: block.content.logoTextColor || undefined
@@ -203,6 +222,7 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
                   e.stopPropagation();
                   if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'link');
                 }}
+                onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
                 className={getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}
               >
                 {item.title}
@@ -255,6 +275,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               e.stopPropagation();
               if (onSelectElement) onSelectElement(block.id, 'title', 'title');
             }}
+            onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
             style={{
               fontSize: block.content.titleFontSize ? `${block.content.titleFontSize}px` : undefined,
               color: block.content.titleColor || undefined
@@ -280,6 +301,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               e.stopPropagation();
               if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
             }}
+            onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
             style={{
               fontSize: block.content.subtitleFontSize ? `${block.content.subtitleFontSize}px` : undefined,
               color: block.content.subtitleColor || undefined
@@ -308,6 +330,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
                 e.stopPropagation();
                 if (onSelectElement) onSelectElement(block.id, 'buttonText', 'button');
               }}
+              onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
               className={`px-1 rounded cursor-text text-slate-800 ${getSelectionBorderClass(block.id, 'buttonText', selectedElement, isEditing)}`}
             >
               {buttonText}
