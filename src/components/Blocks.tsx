@@ -123,6 +123,21 @@ const FloatingFormatToolbar: React.FC<{
   );
 };
 
+const FigmaResizeHandles: React.FC = () => {
+  return (
+    <>
+      {/* Left border line and drag handle */}
+      <div className="absolute top-0 bottom-0 left-0 w-[2px] bg-brand-accent -translate-x-[2px] select-none pointer-events-none z-40">
+        <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[6px] h-[12px] bg-white border border-brand-accent rounded cursor-ew-resize"></div>
+      </div>
+      {/* Right border line and drag handle */}
+      <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-brand-accent translate-x-[2px] select-none pointer-events-none z-40">
+        <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[6px] h-[12px] bg-white border border-brand-accent rounded cursor-ew-resize"></div>
+      </div>
+    </>
+  );
+};
+
 export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { logoText = 'LOGO', items = [] } = block.content;
   const styles = block.styles;
@@ -164,7 +179,10 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
           {logoText}
         </span>
         {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'logoText' && (
-          <FloatingFormatToolbar onSelectElement={onSelectElement} />
+          <>
+            <FigmaResizeHandles />
+            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+          </>
         )}
       </div>
       <nav className="flex items-center gap-6">
@@ -186,7 +204,10 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
                 {item.title}
               </span>
               {isEditing && isLinkSelected && (
-                <FloatingFormatToolbar onSelectElement={onSelectElement} />
+                <>
+                  <FigmaResizeHandles />
+                  <FloatingFormatToolbar onSelectElement={onSelectElement} />
+                </>
               )}
             </span>
           );
@@ -235,7 +256,10 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
             {title}
           </h2>
           {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'title' && (
-            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            <>
+              <FigmaResizeHandles />
+              <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            </>
           )}
         </div>
         <div className="relative w-full">
@@ -253,7 +277,10 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
             {subtitle}
           </p>
           {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'subtitle' && (
-            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            <>
+              <FigmaResizeHandles />
+              <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            </>
           )}
         </div>
         <div className="relative">
@@ -275,7 +302,10 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
             </span>
           </span>
           {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'buttonText' && (
-            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            <>
+              <FigmaResizeHandles />
+              <FloatingFormatToolbar onSelectElement={onSelectElement} />
+            </>
           )}
         </div>
       </div>
