@@ -5,6 +5,8 @@ interface BlockComponentProps {
   block: Block;
   isEditing: boolean;
   onContentChange?: (id: string, content: Partial<Block['content']>) => void;
+  selectedElement?: { blockId: string; elementPath: string; elementType: string } | null;
+  onSelectElement?: (blockId: string, elementPath: string, elementType: string) => void;
 }
 
 const getBlockStyles = (
@@ -23,7 +25,24 @@ const getBlockStyles = (
   };
 };
 
-export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+const getSelectionBorderClass = (
+  blockId: string,
+  elementPath: string,
+  selectedElement: { blockId: string; elementPath: string; elementType: string } | null | undefined,
+  isEditing: boolean
+): string => {
+  if (!isEditing) return '';
+  const isSelected = selectedElement && 
+                     selectedElement.blockId === blockId && 
+                     selectedElement.elementPath === elementPath;
+  return `cursor-pointer transition-all duration-150 ${
+    isSelected 
+      ? 'ring-2 ring-brand-accent ring-offset-1 rounded-md px-1 bg-brand-accent-bg/10' 
+      : 'hover:outline-dashed hover:outline-1 hover:outline-slate-400 hover:bg-slate-500/5 px-1 rounded'
+  }`;
+};
+
+export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { logoText = 'LOGO', items = [] } = block.content;
   const styles = block.styles;
 
@@ -54,7 +73,12 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleLogoChange}
-          className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50' : ''}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'logoText', 'logoText');
+          }}
+          className={getSelectionBorderClass(block.id, 'logoText', selectedElement, isEditing)}
         >
           {logoText}
         </span>
@@ -66,7 +90,12 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleLinkTextChange(item.id, e.target.innerText)}
-              className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50 cursor-text' : ''}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'link');
+              }}
+              className={getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}
             >
               {item.title}
             </span>
@@ -77,7 +106,7 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
   );
 };
 
-export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { title = 'Title', subtitle = 'Subtitle', buttonText = 'Button', imageSrc = '' } = block.content;
   const styles = block.styles;
 
@@ -105,7 +134,12 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleTitleChange}
-          className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-white/10' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+          }}
+          className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
         >
           {title}
         </h2>
@@ -113,7 +147,12 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSubtitleChange}
-          className={`text-lg md:text-xl opacity-90 max-w-2xl mb-8 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-white/10' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+          }}
+          className={`text-lg md:text-xl opacity-90 max-w-2xl mb-8 ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
         >
           {subtitle}
         </p>
@@ -125,7 +164,12 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={handleButtonChange}
-              className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50 cursor-text text-slate-800' : ''}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, 'buttonText', 'button');
+              }}
+              className={`px-1 rounded cursor-text text-slate-800 ${getSelectionBorderClass(block.id, 'buttonText', selectedElement, isEditing)}`}
             >
               {buttonText}
             </span>
@@ -137,7 +181,12 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
           <img 
             src={imageSrc} 
             alt="Hero Banner" 
-            className={`w-full h-auto object-cover shadow-lg ${styles.borderRadius || 'rounded-lg'}`} 
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'imageSrc', 'image');
+            }}
+            className={`w-full h-auto object-cover shadow-lg ${styles.borderRadius || 'rounded-lg'} ${getSelectionBorderClass(block.id, 'imageSrc', selectedElement, isEditing)}`} 
           />
           {isEditing && (
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
@@ -1469,8 +1518,7 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
     </section>
   );
 };
-
-export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { title = 'Projects Portfolio', subtitle = 'Subtitle', items = [] } = block.content;
   const styles = block.styles;
 
@@ -1504,7 +1552,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
             contentEditable={isEditing}
             suppressContentEditableWarning
             onBlur={handleTitleChange}
-            className={`text-3xl font-extrabold tracking-tight mb-4 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+            }}
+            className={`text-3xl font-extrabold tracking-tight mb-4 ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
           >
             {title}
           </h2>
@@ -1512,7 +1565,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
             contentEditable={isEditing}
             suppressContentEditableWarning
             onBlur={handleSubtitleChange}
-            className={`text-slate-500 text-lg max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+            }}
+            className={`text-slate-500 text-lg max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
           >
             {subtitle}
           </p>
@@ -1530,7 +1588,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
                 <img 
                   src={item.image || 'https://images.unsplash.com/photo-1561070791-26c113006238?w=800'} 
                   alt={item.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onClick={(e) => {
+                    if (!isEditing) return;
+                    e.stopPropagation();
+                    if (onSelectElement) onSelectElement(block.id, `items.${item.id}.image`, 'image');
+                  }}
+                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${getSelectionBorderClass(block.id, `items.${item.id}.image`, selectedElement, isEditing)}`}
                 />
                 {isEditing && (
                   <button
@@ -1551,7 +1614,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleItemTextChange(item.id, 'category', e.target.innerText)}
-                  className={`text-[10px] uppercase font-bold tracking-wider text-brand-accent mb-2 block ${isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1' : ''}`}
+                  onClick={(e) => {
+                    if (!isEditing) return;
+                    e.stopPropagation();
+                    if (onSelectElement) onSelectElement(block.id, `items.${item.id}.category`, 'category');
+                  }}
+                  className={`text-[10px] uppercase font-bold tracking-wider text-brand-accent mb-2 block ${getSelectionBorderClass(block.id, `items.${item.id}.category`, selectedElement, isEditing)}`}
                 >
                   {item.category || 'Category'}
                 </span>
@@ -1559,7 +1627,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleItemTextChange(item.id, 'title', e.target.innerText)}
-                  className={`text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 leading-snug ${isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1' : ''}`}
+                  onClick={(e) => {
+                    if (!isEditing) return;
+                    e.stopPropagation();
+                    if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'title');
+                  }}
+                  className={`text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 leading-snug ${getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}`}
                 >
                   {item.title}
                 </h3>
@@ -1567,7 +1640,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleItemTextChange(item.id, 'description', e.target.innerText)}
-                  className={`text-slate-505 dark:text-slate-405 text-xs flex-1 mb-4 leading-relaxed ${isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1' : ''}`}
+                  onClick={(e) => {
+                    if (!isEditing) return;
+                    e.stopPropagation();
+                    if (onSelectElement) onSelectElement(block.id, `items.${item.id}.description`, 'description');
+                  }}
+                  className={`text-slate-505 dark:text-slate-405 text-xs flex-1 mb-4 leading-relaxed ${getSelectionBorderClass(block.id, `items.${item.id}.description`, selectedElement, isEditing)}`}
                 >
                   {item.description}
                 </p>
@@ -1578,7 +1656,12 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
                     contentEditable={isEditing}
                     suppressContentEditableWarning
                     onBlur={(e) => handleItemTextChange(item.id, 'link', e.target.innerText)}
-                    className={isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1 cursor-text' : ''}
+                    onClick={(e) => {
+                      if (!isEditing) return;
+                      e.stopPropagation();
+                      if (onSelectElement) onSelectElement(block.id, `items.${item.id}.link`, 'link');
+                    }}
+                    className={`cursor-text ${getSelectionBorderClass(block.id, `items.${item.id}.link`, selectedElement, isEditing)}`}
                   >
                     View Project
                   </span>
@@ -1597,12 +1680,14 @@ export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
   onContentChange: (id: string, content: Partial<Block['content']>) => void;
-}> = ({ block, isEditing, onContentChange }) => {
+  selectedElement?: { blockId: string; elementPath: string; elementType: string } | null;
+  onSelectElement?: (blockId: string, elementPath: string, elementType: string) => void;
+}> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   switch (block.type) {
     case 'header':
-      return <HeaderBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <HeaderBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'hero':
-      return <HeroBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <HeroBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'features':
       return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'cta':
@@ -1622,7 +1707,7 @@ export const BlockRenderer: React.FC<{
     case 'sandbox':
       return <SandboxBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'portfolio':
-      return <PortfolioBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <PortfolioBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:

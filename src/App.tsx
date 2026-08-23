@@ -95,6 +95,7 @@ function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [selectedElement, setSelectedElement] = useState<{ blockId: string; elementPath: string; elementType: string } | null>(null);
   
   const {
     blocks,
@@ -742,6 +743,12 @@ function App() {
                       block={block} 
                       isEditing={!isPreview} 
                       onContentChange={updateBlockContent}
+                      selectedElement={selectedElement}
+                      onSelectElement={(blockId, elementPath, elementType) => {
+                        setSelectedElement({ blockId, elementPath, elementType });
+                        setSelectedBlockId(blockId);
+                        setActiveTab('inspector');
+                      }}
                     />
                   </div>
                 ))}
