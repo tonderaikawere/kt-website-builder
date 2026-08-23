@@ -1,6 +1,11 @@
 import React from 'react';
 import type { Block, BlockStyles } from '../types';
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
+import { 
+  AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Star, Heart, Check, Phone, Mail, Globe, Info, HelpCircle, 
+  ArrowRight, Search, User, Settings, Code, Monitor, Briefcase, 
+  Layers, Shield
+} from 'lucide-react';
 
 interface InspectorProps {
   selectedBlock: Block | undefined;
@@ -101,26 +106,72 @@ export const Inspector: React.FC<InspectorProps> = ({
 
         <div className="space-y-4 pt-2">
           {/* Main Text / Image URL Input */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-350">
-              {elementType === 'image' ? 'Image File URL' : 'Content Text'}
-            </label>
-            {elementType === 'description' ? (
-              <textarea
-                rows={4}
-                value={currentValue}
-                onChange={(e) => handleValueChange(e.target.value)}
-                className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-350"
-              />
-            ) : (
-              <input
-                type="text"
-                value={currentValue}
-                onChange={(e) => handleValueChange(e.target.value)}
-                className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355"
-              />
-            )}
-          </div>
+          {elementType !== 'icon' && (
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-350">
+                {elementType === 'image' ? 'Image File URL' : 'Content Text'}
+              </label>
+              {elementType === 'description' ? (
+                <textarea
+                  rows={4}
+                  value={currentValue}
+                  onChange={(e) => handleValueChange(e.target.value)}
+                  className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-350"
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={currentValue}
+                  onChange={(e) => handleValueChange(e.target.value)}
+                  className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355"
+                />
+              )}
+            </div>
+          )}
+
+          {/* Interactive Visual Icon Picker */}
+          {elementType === 'icon' && (
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Select Icon Shape</label>
+              <div className="grid grid-cols-5 gap-2 bg-slate-50 dark:bg-brand-deep/30 p-2.5 rounded-lg border border-slate-200 dark:border-brand-ink">
+                {[
+                  { name: 'Star', comp: Star },
+                  { name: 'Heart', comp: Heart },
+                  { name: 'Check', comp: Check },
+                  { name: 'Phone', comp: Phone },
+                  { name: 'Mail', comp: Mail },
+                  { name: 'Globe', comp: Globe },
+                  { name: 'Info', comp: Info },
+                  { name: 'HelpCircle', comp: HelpCircle },
+                  { name: 'ArrowRight', comp: ArrowRight },
+                  { name: 'Search', comp: Search },
+                  { name: 'User', comp: User },
+                  { name: 'Settings', comp: Settings },
+                  { name: 'Code', comp: Code },
+                  { name: 'Monitor', comp: Monitor },
+                  { name: 'Briefcase', comp: Briefcase },
+                  { name: 'Layers', comp: Layers },
+                  { name: 'Shield', comp: Shield }
+                ].map(ic => {
+                  const IconComp = ic.comp;
+                  const isCurrent = currentValue === ic.name;
+                  return (
+                    <button
+                      key={ic.name}
+                      onClick={() => handleValueChange(ic.name)}
+                      className={`p-2 rounded-md hover:bg-slate-200 dark:hover:bg-brand-ink flex items-center justify-center transition-all cursor-pointer ${isCurrent ? 'bg-brand-accent text-white shadow-sm scale-110' : 'text-slate-550 dark:text-slate-400 hover:text-slate-900'}`}
+                      title={ic.name}
+                    >
+                      <IconComp className="w-4 h-4" />
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="text-[10px] text-slate-450 italic mt-1 pl-1">
+                Selected: <span className="font-bold font-mono text-brand-accent">{currentValue || 'None'}</span>
+              </div>
+            </div>
+          )}
 
           {/* Action Destination URL (For Buttons / Links) */}
           {(elementType === 'button' || elementType === 'link') && (

@@ -236,7 +236,7 @@ const IconRenderer = ({ name, className }: { name: string; className?: string })
   }
 };
 
-export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { title = 'Features', subtitle = 'Subtitle', items = [] } = block.content;
   const styles = block.styles;
 
@@ -266,11 +266,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
     }
   };
 
-  const inlineStyles: React.CSSProperties = {
-    backgroundColor: styles.bgColor || '#f8fafc',
-    color: styles.textColor || '#1e293b',
-    textAlign: styles.textAlign || 'center',
-  };
+  const inlineStyles = getBlockStyles(styles, '#f8fafc', '#1e293b', 'center');
 
   return (
     <section 
@@ -282,7 +278,12 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleTitleChange}
-          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+          }}
+          className={`text-3xl font-extrabold tracking-tight mb-3 ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
         >
           {title}
         </h2>
@@ -290,7 +291,12 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSubtitleChange}
-          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+          }}
+          className={`text-slate-650 opacity-90 max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
         >
           {subtitle}
         </p>
@@ -300,16 +306,28 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
         {items.map((item) => (
           <div 
             key={item.id} 
-            className={`p-6 bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col ${styles.textAlign === 'left' ? 'items-start text-left' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
+            className={`p-6 bg-white dark:bg-brand-deep rounded-xl shadow-sm border border-slate-100 dark:border-brand-ink flex flex-col ${styles.textAlign === 'left' ? 'items-start text-left' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
           >
-            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg mb-4">
+            <div 
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.icon`, 'icon');
+              }}
+              className={`p-3 bg-indigo-50 text-indigo-600 rounded-lg mb-4 ${getSelectionBorderClass(block.id, `items.${item.id}.icon`, selectedElement, isEditing)}`}
+            >
               <IconRenderer name={item.icon || 'Layout'} className="w-6 h-6" />
             </div>
             <h3 
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleItemTitleChange(item.id, e.target.innerText)}
-              className={`text-lg font-bold mb-2 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'title');
+              }}
+              className={`text-lg font-bold mb-2 ${getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}`}
             >
               {item.title}
             </h3>
@@ -317,7 +335,12 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleItemDescChange(item.id, e.target.innerText)}
-              className={`text-sm text-slate-500 leading-relaxed ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.description`, 'description');
+              }}
+              className={`text-sm text-slate-550 leading-relaxed ${getSelectionBorderClass(block.id, `items.${item.id}.description`, selectedElement, isEditing)}`}
             >
               {item.description}
             </p>
