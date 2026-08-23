@@ -97,6 +97,7 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedElement, setSelectedElement] = useState<{ blockId: string; elementPath: string; elementType: string } | null>(null);
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   
   const {
     blocks,
@@ -279,10 +280,18 @@ function App() {
               <span className="text-[10px] text-slate-400">▼</span>
             </div>
             
-            <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
+            <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500 mr-2">
               <span>Fit (85%)</span>
               <span className="text-[9px]">▼</span>
             </div>
+            
+            <button
+              onClick={() => setIsAddDrawerOpen(prev => !prev)}
+              className="flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-[11px] font-bold rounded border border-slate-200 dark:border-slate-750 shadow-sm text-brand-primary cursor-pointer transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add
+            </button>
           </div>
 
           {/* Center Address and Page selector */}
@@ -416,6 +425,44 @@ function App() {
 
       {/* Main Workspace Body */}
       <div className="flex flex-1 overflow-hidden relative">
+        {/* Wix-style Add Elements Slide-out Drawer */}
+        {isAddDrawerOpen && !isPreview && (
+          <div className="absolute top-0 bottom-0 left-80 w-72 bg-white dark:bg-[#1a1b1e] border-r border-slate-200 dark:border-slate-800 shadow-2xl z-40 flex flex-col animate-in slide-in-from-left duration-250">
+            <div className="p-4 border-b border-slate-100 dark:border-brand-ink flex items-center justify-between bg-slate-50 dark:bg-brand-deep">
+              <div>
+                <h3 className="font-bold text-xs text-slate-805 dark:text-white uppercase tracking-wider">Add Elements</h3>
+                <p className="text-[10px] text-slate-400">Click to insert sections to your page</p>
+              </div>
+              <button 
+                onClick={() => setIsAddDrawerOpen(false)}
+                className="text-xs text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 hover:bg-slate-105 dark:hover:bg-slate-800 rounded cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {BLOCK_TEMPLATES.map((tpl) => (
+                <button
+                  key={tpl.type}
+                  onClick={() => {
+                    addBlock(tpl.type);
+                    setIsAddDrawerOpen(false);
+                  }}
+                  className="w-full text-left p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-brand-ink hover:border-brand-accent transition-all flex items-center justify-between group cursor-pointer"
+                >
+                  <div className="flex flex-col pr-2">
+                    <span className="text-xs font-semibold text-slate-805 dark:text-white group-hover:text-brand-accent">{tpl.name}</span>
+                    <span className="text-[9px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">{tpl.description}</span>
+                  </div>
+                  <span className="text-xs text-brand-primary opacity-0 group-hover:opacity-100 font-bold transition-opacity shrink-0">
+                    + Add
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Left Sidebar - Hidden in Preview */}
         {!isPreview && (
           <aside className="w-80 bg-white dark:bg-brand-deep border-r border-slate-200 dark:border-brand-ink flex flex-col h-full z-10">
