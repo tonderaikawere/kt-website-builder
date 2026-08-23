@@ -42,6 +42,87 @@ const getSelectionBorderClass = (
   }`;
 };
 
+const FloatingFormatToolbar: React.FC<{
+  onSelectElement?: (blockId: string, elementPath: string, elementType: string) => void;
+}> = ({ onSelectElement }) => {
+  const triggerFormat = (e: React.MouseEvent, cmd: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    document.execCommand(cmd, false);
+  };
+
+  const handleClearSelection = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onSelectElement) {
+      onSelectElement('', '', '');
+    }
+  };
+
+  return (
+    <div 
+      contentEditable={false}
+      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 shadow-xl z-50 flex items-center gap-1.5 select-none animate-in fade-in slide-in-from-bottom-2 duration-150 text-[10px] font-sans"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onMouseDown={(e) => triggerFormat(e, 'bold')}
+        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-bold w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
+        title="Bold text"
+      >
+        B
+      </button>
+      <button
+        onMouseDown={(e) => triggerFormat(e, 'italic')}
+        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 italic w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
+        title="Italic text"
+      >
+        I
+      </button>
+      <button
+        onMouseDown={(e) => triggerFormat(e, 'underline')}
+        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 underline w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
+        title="Underline text"
+      >
+        U
+      </button>
+      
+      <div className="w-px h-4 bg-slate-250 dark:bg-slate-805 mx-0.5"></div>
+
+      <button
+        onMouseDown={(e) => triggerFormat(e, 'justifyLeft')}
+        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer w-6 h-6"
+        title="Align Left"
+      >
+        <Icons.AlignLeft className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onMouseDown={(e) => triggerFormat(e, 'justifyCenter')}
+        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer w-6 h-6"
+        title="Align Center"
+      >
+        <Icons.AlignCenter className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onMouseDown={(e) => triggerFormat(e, 'justifyRight')}
+        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer w-6 h-6"
+        title="Align Right"
+      >
+        <Icons.AlignRight className="w-3.5 h-3.5" />
+      </button>
+
+      <div className="w-px h-4 bg-slate-250 dark:bg-slate-805 mx-0.5"></div>
+      
+      <button
+        onClick={handleClearSelection}
+        className="text-[10px] text-slate-500 hover:text-slate-800 dark:hover:text-white px-1.5 py-0.5 bg-slate-50 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 cursor-pointer font-medium"
+        title="Close floating format panel"
+      >
+        Done
+      </button>
+    </div>
+  );
+};
+
 export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { logoText = 'LOGO', items = [] } = block.content;
   const styles = block.styles;
@@ -68,7 +149,7 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
       style={inlineStyles} 
       className={`px-6 py-4 flex items-center justify-between border-b border-slate-100 ${styles.paddingTop || 'py-4'} ${styles.paddingBottom || 'py-4'}`}
     >
-      <div className="font-bold text-xl tracking-tight">
+      <div className="font-bold text-xl tracking-tight relative">
         <span
           contentEditable={isEditing}
           suppressContentEditableWarning
@@ -82,25 +163,34 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
         >
           {logoText}
         </span>
+        {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'logoText' && (
+          <FloatingFormatToolbar onSelectElement={onSelectElement} />
+        )}
       </div>
       <nav className="flex items-center gap-6">
-        {items.map((item) => (
-          <span key={item.id} className="text-sm font-medium hover:opacity-80 transition-opacity">
-            <span
-              contentEditable={isEditing}
-              suppressContentEditableWarning
-              onBlur={(e) => handleLinkTextChange(item.id, e.target.innerText)}
-              onClick={(e) => {
-                if (!isEditing) return;
-                e.stopPropagation();
-                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'link');
-              }}
-              className={getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}
-            >
-              {item.title}
+        {items.map((item) => {
+          const isLinkSelected = selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === `items.${item.id}.title`;
+          return (
+            <span key={item.id} className="text-sm font-medium hover:opacity-80 transition-opacity relative">
+              <span
+                contentEditable={isEditing}
+                suppressContentEditableWarning
+                onBlur={(e) => handleLinkTextChange(item.id, e.target.innerText)}
+                onClick={(e) => {
+                  if (!isEditing) return;
+                  e.stopPropagation();
+                  if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'link');
+                }}
+                className={getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}
+              >
+                {item.title}
+              </span>
+              {isEditing && isLinkSelected && (
+                <FloatingFormatToolbar onSelectElement={onSelectElement} />
+              )}
             </span>
-          </span>
-        ))}
+          );
+        })}
       </nav>
     </header>
   );
@@ -130,33 +220,43 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
       className={`px-8 md:px-16 ${styles.paddingTop || 'py-20'} ${styles.paddingBottom || 'py-20'} flex flex-col md:flex-row ${styles.flexAlign || 'items-center'} ${styles.flexJustify || 'justify-center'} gap-8`}
     >
       <div className={`flex-1 flex flex-col ${styles.textAlign === 'center' ? 'items-center text-center' : styles.textAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
-        <h2 
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={handleTitleChange}
-          onClick={(e) => {
-            if (!isEditing) return;
-            e.stopPropagation();
-            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
-          }}
-          className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
-        >
-          {title}
-        </h2>
-        <p 
-          contentEditable={isEditing}
-          suppressContentEditableWarning
-          onBlur={handleSubtitleChange}
-          onClick={(e) => {
-            if (!isEditing) return;
-            e.stopPropagation();
-            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
-          }}
-          className={`text-lg md:text-xl opacity-90 max-w-2xl mb-8 ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
-        >
-          {subtitle}
-        </p>
-        <div>
+        <div className="relative w-full">
+          <h2 
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleTitleChange}
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+            }}
+            className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
+          >
+            {title}
+          </h2>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'title' && (
+            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+          )}
+        </div>
+        <div className="relative w-full">
+          <p 
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleSubtitleChange}
+            onClick={(e) => {
+              if (!isEditing) return;
+              e.stopPropagation();
+              if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+            }}
+            className={`text-lg md:text-xl opacity-90 max-w-2xl mb-8 ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
+          >
+            {subtitle}
+          </p>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'subtitle' && (
+            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+          )}
+        </div>
+        <div className="relative">
           <span 
             className={`inline-block px-6 py-3 font-semibold text-indigo-600 bg-white shadow hover:bg-indigo-50 transition-colors ${styles.borderRadius || 'rounded-md'}`}
           >
@@ -174,6 +274,9 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               {buttonText}
             </span>
           </span>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'buttonText' && (
+            <FloatingFormatToolbar onSelectElement={onSelectElement} />
+          )}
         </div>
       </div>
       {imageSrc && (
