@@ -121,6 +121,41 @@ function App() {
     canRedo
   } = useBuilderState();
 
+  // Global Keyboard Shortcuts for Undo, Redo, and Block Deletion (Wix / Figma style)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' || 
+        target.tagName === 'TEXTAREA' || 
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redo();
+      }
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedBlockId) {
+          e.preventDefault();
+          deleteBlock(selectedBlockId);
+          setSelectedBlockId(null);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedBlockId, undo, redo, deleteBlock, setSelectedBlockId]);
+
   const applyColorPalette = (palette: typeof COLOR_PALETTES[0]) => {
     const updatedBlocks = blocks.map(block => {
       let bgColor = '#ffffff';
