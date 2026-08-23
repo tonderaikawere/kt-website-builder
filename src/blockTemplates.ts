@@ -221,6 +221,49 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'portfolio',
+    name: 'Projects Portfolio Grid',
+    description: 'Showcase your work and projects in a highly engaging, customizable design grid.',
+    defaultContent: {
+      title: 'Our Project Portfolio',
+      subtitle: 'Explore our latest creative designs, development work, and case studies.',
+      items: [
+        {
+          id: 'p1',
+          title: 'Premium Brand Identity',
+          category: 'Branding & Design',
+          description: 'A complete typography, logo system, and visual branding package for a next-gen fintech.',
+          image: 'https://images.unsplash.com/photo-1561070791-26c113006238?w=800&auto=format&fit=crop&q=60',
+          link: '#'
+        },
+        {
+          id: 'p2',
+          title: 'E-Commerce Platform Redesign',
+          category: 'Web Development',
+          description: 'Custom Shopify-like interface built with modern performance optimization and high conversion design.',
+          image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60',
+          link: '#'
+        },
+        {
+          id: 'p3',
+          title: 'Interactive Design System',
+          category: 'UI/UX Design',
+          description: 'Figma component library and interactive style guides built to scale digital products.',
+          image: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&auto=format&fit=crop&q=60',
+          link: '#'
+        }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#07162f',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center',
+      borderRadius: 'rounded-xl'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',

@@ -245,6 +245,38 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
       </div>
     </section>`;
         }
+        case 'portfolio': {
+          const title = block.content.title || 'Our Project Portfolio';
+          const subtitle = block.content.subtitle || 'Explore our latest creative designs, development work, and case studies.';
+          const items = block.content.items || [];
+          return `
+    <section style="${getSectionStyleString(block, '#ffffff', '#07162f', 'center')}" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-16'} ${block.styles.paddingBottom || 'py-16'} ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+      <div class="max-w-6xl mx-auto">
+        <div class="mb-12 text-center">
+          <h2 class="text-3xl font-extrabold tracking-tight mb-4">${title}</h2>
+          <p class="text-slate-550 text-lg max-w-2xl mx-auto">${subtitle}</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          ${items.map(item => `
+          <div class="bg-white border border-slate-100 overflow-hidden shadow-lg flex flex-col h-full rounded-xl text-left" style="border-radius: ${block.styles.borderRadius === 'rounded-none' ? '0px' : block.styles.borderRadius === 'rounded-sm' ? '4px' : block.styles.borderRadius === 'rounded-md' ? '8px' : block.styles.borderRadius === 'rounded-lg' ? '12px' : '16px'};">
+            <div class="aspect-video w-full overflow-hidden bg-slate-100">
+              <img src="${item.image || 'https://images.unsplash.com/photo-1561070791-26c113006238?w=800'}" alt="${item.title}" class="w-full h-full object-cover" />
+            </div>
+            <div class="p-6 flex-1 flex flex-col">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-600 mb-2 block">${item.category || 'Category'}</span>
+              <h3 class="text-lg font-bold text-slate-800 mb-2 leading-snug">${item.title}</h3>
+              <p class="text-slate-500 text-xs flex-1 mb-4 leading-relaxed">${item.description}</p>
+              <div class="pt-2 mt-auto border-t border-slate-50 flex justify-between items-center text-xs font-semibold text-indigo-600">
+                <a href="${item.link || '#'}" class="hover:underline">View Project</a>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </div>
+            </div>
+          </div>
+          `).join('\n          ')}
+        </div>
+      </div>
+    </section>`;
+        }
         case 'footer': {
           const copyrightText = block.content.copyrightText || '';
           const items = block.content.items || [];

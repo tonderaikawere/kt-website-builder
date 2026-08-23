@@ -26,6 +26,7 @@ export type BlockType =
   | 'linkButton'
   | 'video' 
   | 'sandbox'
+  | 'portfolio'
   | 'footer';
 
 export interface Block {
@@ -54,6 +55,8 @@ export interface Block {
       features?: string[];
       link?: string;
       imageSrc?: string;
+      image?: string;
+      category?: string;
       buttonText?: string;
     }>;
     logoText?: string;

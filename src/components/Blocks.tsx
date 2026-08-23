@@ -1470,6 +1470,129 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
   );
 };
 
+export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+  const { title = 'Projects Portfolio', subtitle = 'Subtitle', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleItemTextChange = (itemId: string, field: 'title' | 'category' | 'description' | 'image' | 'link', text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, [field]: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles = getBlockStyles(styles, '#ffffff', '#07162f', 'center');
+
+  return (
+    <section 
+      style={inlineStyles} 
+      className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'} ${styles.marginTop || 'mt-0'} ${styles.marginBottom || 'mb-0'}`}
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-12 text-center">
+          <h2 
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleTitleChange}
+            className={`text-3xl font-extrabold tracking-tight mb-4 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          >
+            {title}
+          </h2>
+          <p 
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleSubtitleChange}
+            className={`text-slate-500 text-lg max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          >
+            {subtitle}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {items.map((item) => (
+            <div 
+              key={item.id}
+              className="bg-white dark:bg-brand-deep border border-slate-100 dark:border-brand-ink overflow-hidden shadow-lg transition-transform hover:-translate-y-1 duration-300 flex flex-col h-full rounded-xl text-left"
+              style={{ borderRadius: styles.borderRadius === 'rounded-none' ? '0px' : styles.borderRadius === 'rounded-sm' ? '4px' : styles.borderRadius === 'rounded-md' ? '8px' : styles.borderRadius === 'rounded-lg' ? '12px' : styles.borderRadius === 'rounded-xl' ? '16px' : '16px' }}
+            >
+              {/* Card Image */}
+              <div className="aspect-video w-full overflow-hidden bg-slate-100 relative group">
+                <img 
+                  src={item.image || 'https://images.unsplash.com/photo-1561070791-26c113006238?w=800'} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {isEditing && (
+                  <button
+                    onClick={() => {
+                      const newUrl = window.prompt('Enter image URL:', item.image);
+                      if (newUrl !== null) handleItemTextChange(item.id, 'image', newUrl);
+                    }}
+                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer"
+                  >
+                    Change Image URL
+                  </button>
+                )}
+              </div>
+
+              {/* Card Body */}
+              <div className="p-6 flex-1 flex flex-col">
+                <span 
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleItemTextChange(item.id, 'category', e.target.innerText)}
+                  className={`text-[10px] uppercase font-bold tracking-wider text-brand-accent mb-2 block ${isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1' : ''}`}
+                >
+                  {item.category || 'Category'}
+                </span>
+                <h3 
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleItemTextChange(item.id, 'title', e.target.innerText)}
+                  className={`text-lg font-bold text-slate-800 dark:text-slate-200 mb-2 leading-snug ${isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1' : ''}`}
+                >
+                  {item.title}
+                </h3>
+                <p 
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleItemTextChange(item.id, 'description', e.target.innerText)}
+                  className={`text-slate-505 dark:text-slate-405 text-xs flex-1 mb-4 leading-relaxed ${isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1' : ''}`}
+                >
+                  {item.description}
+                </p>
+                
+                {/* Link */}
+                <div className="pt-2 mt-auto border-t border-slate-50 dark:border-brand-ink/50 flex justify-between items-center text-xs font-semibold text-brand-accent hover:text-brand-accent-hover transition-colors">
+                  <span
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleItemTextChange(item.id, 'link', e.target.innerText)}
+                    className={isEditing ? 'outline-dashed outline-1 outline-indigo-200 rounded px-1 cursor-text' : ''}
+                  >
+                    View Project
+                  </span>
+                  <Icons.ArrowUpRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export const BlockRenderer: React.FC<{
   block: Block;
   isEditing: boolean;
@@ -1498,6 +1621,8 @@ export const BlockRenderer: React.FC<{
       return <VideoBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'sandbox':
       return <SandboxBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+    case 'portfolio':
+      return <PortfolioBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:
