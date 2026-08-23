@@ -16,13 +16,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
 
   // Generate exported HTML
   const generateHTML = () => {
+    const getSectionStyleString = (block: Block, defaultBg: string, defaultText: string, defaultAlign: string = 'center') => {
+      const bgColor = block.styles.bgColor || defaultBg;
+      const bgImage = block.styles.bgImage;
+      const bgStyle = bgImage 
+        ? `background-image: url('${bgImage}'); background-size: cover; background-position: center;` 
+        : `background-color: ${bgColor};`;
+      return `${bgStyle} color: ${block.styles.textColor || defaultText}; text-align: ${block.styles.textAlign || defaultAlign};`;
+    };
+
     const bodyContent = blocks.map(block => {
       switch (block.type) {
         case 'header': {
           const logoText = block.content.logoText || 'LOGO';
           const items = block.content.items || [];
           return `
-    <header style="background-color: ${block.styles.bgColor || '#ffffff'}; color: ${block.styles.textColor || '#1e293b'}; text-align: ${block.styles.textAlign || 'left'};" class="px-6 py-4 flex items-center justify-between border-b border-slate-100 ${block.styles.paddingTop || 'py-4'} ${block.styles.paddingBottom || 'py-4'}">
+    <header style="${getSectionStyleString(block, '#ffffff', '#1e293b', 'left')}" class="px-6 py-4 flex items-center justify-between border-b border-slate-100 ${block.styles.paddingTop || 'py-4'} ${block.styles.paddingBottom || 'py-4'}">
       <div class="font-bold text-xl tracking-tight">${logoText}</div>
       <nav class="flex items-center gap-6">
         ${items.map(item => `<a href="${item.link || '#'}" class="text-sm font-medium hover:opacity-85 transition-opacity">${item.title}</a>`).join('\n        ')}
@@ -35,7 +44,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, block
           const buttonText = block.content.buttonText || 'Button';
           const imageSrc = block.content.imageSrc || '';
           return `
-    <section style="background-color: ${block.styles.bgColor || '#4f46e5'}; color: ${block.styles.textColor || '#ffffff'}; text-align: ${block.styles.textAlign || 'center'};" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-20'} ${block.styles.paddingBottom || 'py-20'} flex flex-col md:flex-row items-center gap-8 ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
+    <section style="${getSectionStyleString(block, '#4f46e5', '#ffffff', 'center')}" class="px-8 md:px-16 ${block.styles.paddingTop || 'py-20'} ${block.styles.paddingBottom || 'py-20'} flex flex-col md:flex-row items-center gap-8 ${block.styles.marginTop || 'mt-0'} ${block.styles.marginBottom || 'mb-0'}">
       <div class="flex-1 flex flex-col ${block.styles.textAlign === 'center' ? 'items-center text-center' : block.styles.textAlign === 'right' ? 'items-end text-right' : 'items-start text-left'}">
         <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">${title}</h2>
         <p class="text-lg md:text-xl opacity-90 max-w-2xl mb-8">${subtitle}</p>

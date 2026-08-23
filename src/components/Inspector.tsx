@@ -58,6 +58,28 @@ export const Inspector: React.FC<InspectorProps> = ({ selectedBlock, onUpdateSty
           </div>
         </div>
 
+        {/* Background Image */}
+        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
+          <label className="text-xs font-semibold text-slate-600 dark:text-slate-350 block">Background Image URL</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="https://images.unsplash.com/... (optional)"
+              value={styles.bgImage || ''}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgImage: e.target.value })}
+              className="flex-1 text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
+            />
+            {styles.bgImage && (
+              <button
+                onClick={() => onUpdateStyles(selectedBlock.id, { bgImage: '' })}
+                className="text-xs text-red-500 hover:text-red-650 px-2 py-1 bg-red-50 dark:bg-red-950/30 rounded border border-red-200 dark:border-red-900/50 cursor-pointer font-medium"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Text Color */}
         <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
           <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">Text Color</label>

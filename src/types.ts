@@ -1,5 +1,6 @@
 export interface BlockStyles {
   bgColor?: string;
+  bgImage?: string;
   textColor?: string;
   paddingTop?: string; // e.g. "py-12"
   paddingBottom?: string;

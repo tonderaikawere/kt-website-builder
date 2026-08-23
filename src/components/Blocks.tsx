@@ -7,6 +7,22 @@ interface BlockComponentProps {
   onContentChange?: (id: string, content: Partial<Block['content']>) => void;
 }
 
+const getBlockStyles = (
+  styles: Block['styles'],
+  defaultBg: string,
+  defaultText: string,
+  defaultAlign: 'left' | 'center' | 'right' | 'justify' = 'center'
+): React.CSSProperties => {
+  return {
+    backgroundColor: styles.bgImage ? undefined : (styles.bgColor || defaultBg),
+    backgroundImage: styles.bgImage ? `url(${styles.bgImage})` : undefined,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    color: styles.textColor || defaultText,
+    textAlign: styles.textAlign || defaultAlign,
+  };
+};
+
 export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
   const { logoText = 'LOGO', items = [] } = block.content;
   const styles = block.styles;
@@ -26,11 +42,7 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
     }
   };
 
-  const inlineStyles: React.CSSProperties = {
-    backgroundColor: styles.bgColor || '#ffffff',
-    color: styles.textColor || '#1e293b',
-    textAlign: styles.textAlign || 'left',
-  };
+  const inlineStyles = getBlockStyles(styles, '#ffffff', '#1e293b', 'left');
 
   return (
     <header 
@@ -81,11 +93,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
     if (onContentChange) onContentChange(block.id, { buttonText: e.target.innerText });
   };
 
-  const inlineStyles: React.CSSProperties = {
-    backgroundColor: styles.bgColor || '#4f46e5',
-    color: styles.textColor || '#ffffff',
-    textAlign: styles.textAlign || 'center',
-  };
+  const inlineStyles = getBlockStyles(styles, '#4f46e5', '#ffffff', 'center');
 
   return (
     <section 
@@ -1290,11 +1298,7 @@ export const SandboxBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
     }
   };
 
-  const inlineStyles: React.CSSProperties = {
-    backgroundColor: styles.bgColor || '#f6f9fd',
-    color: styles.textColor || '#07162f',
-    textAlign: styles.textAlign || 'center',
-  };
+  const inlineStyles = getBlockStyles(styles, '#f6f9fd', '#07162f', 'center');
 
   return (
     <section 
