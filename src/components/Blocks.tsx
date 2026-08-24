@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Block } from '../types';
 
 interface BlockComponentProps {
@@ -74,6 +74,31 @@ const FloatingFormatToolbar: React.FC<{
   const currentFontSize = blockContent[`${elementPath}FontSize`] || '';
   const currentColor = blockContent[`${elementPath}Color`] || '';
 
+  const [activeStyles, setActiveStyles] = useState({
+    bold: false,
+    italic: false,
+    underline: false
+  });
+
+  const updateActiveStyles = useCallback(() => {
+    try {
+      setActiveStyles({
+        bold: document.queryCommandState('bold'),
+        italic: document.queryCommandState('italic'),
+        underline: document.queryCommandState('underline')
+      });
+    } catch (e) {
+      // Quiet fallback
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('selectionchange', updateActiveStyles);
+    return () => {
+      document.removeEventListener('selectionchange', updateActiveStyles);
+    };
+  }, [updateActiveStyles]);
+
   // Link / Button editing support
   const isLinkOrButton = elementType === 'link' || elementType === 'button';
   const getActiveLinkValue = () => {
@@ -116,6 +141,7 @@ const FloatingFormatToolbar: React.FC<{
     e.preventDefault();
     e.stopPropagation();
     document.execCommand(cmd, false);
+    updateActiveStyles();
   };
 
   const handleClearSelection = (e: React.MouseEvent) => {
@@ -186,21 +212,33 @@ const FloatingFormatToolbar: React.FC<{
 
       <button
         onMouseDown={(e) => triggerFormat(e, 'bold')}
-        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-bold w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
+        className={`p-1 rounded font-bold w-6 h-6 flex items-center justify-center cursor-pointer text-xs transition-colors ${
+          activeStyles.bold 
+            ? 'bg-brand-accent-bg text-brand-accent font-black shadow-sm' 
+            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
+        }`}
         title="Bold text"
       >
         B
       </button>
       <button
         onMouseDown={(e) => triggerFormat(e, 'italic')}
-        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 italic w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
+        className={`p-1 rounded italic w-6 h-6 flex items-center justify-center cursor-pointer text-xs transition-colors ${
+          activeStyles.italic 
+            ? 'bg-brand-accent-bg text-brand-accent font-black shadow-sm' 
+            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
+        }`}
         title="Italic text"
       >
         I
       </button>
       <button
         onMouseDown={(e) => triggerFormat(e, 'underline')}
-        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 underline w-6 h-6 flex items-center justify-center cursor-pointer text-xs"
+        className={`p-1 rounded underline w-6 h-6 flex items-center justify-center cursor-pointer text-xs transition-colors ${
+          activeStyles.underline 
+            ? 'bg-brand-accent-bg text-brand-accent font-black shadow-sm' 
+            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350'
+        }`}
         title="Underline text"
       >
         U
