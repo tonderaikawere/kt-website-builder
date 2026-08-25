@@ -264,6 +264,69 @@ export const BLOCK_TEMPLATES: BlockTemplate[] = [
     }
   },
   {
+    type: 'gallery',
+    name: 'Visual Grid Gallery',
+    description: 'Grid layout of stock photos and design assets snapping cleanly on the page.',
+    defaultContent: {
+      title: 'Our Visual Gallery',
+      items: [
+        { id: 'g1', imageSrc: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600' },
+        { id: 'g2', imageSrc: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600' },
+        { id: 'g3', imageSrc: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600' },
+        { id: 'g4', imageSrc: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=600' }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#f8fafc',
+      textColor: '#0f172a',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center'
+    }
+  },
+  {
+    type: 'faq',
+    name: 'Accordion FAQ List',
+    description: 'Answers to common questions in a clean, interactive accordion layout.',
+    defaultContent: {
+      title: 'Frequently Asked Questions',
+      subtitle: 'Everything you need to know about our visual builder platform.',
+      items: [
+        { id: '1', title: 'How do I publish my website?', description: 'Click the Publish button in the top bar to export clean, responsive HTML, CSS, and project JSON code that you can host anywhere.' },
+        { id: '2', title: 'Can I connect a custom domain name?', description: 'Absolutely. You can host the exported standard HTML files on any hosting provider (Vercel, Netlify, Github Pages) and connect your custom domain name.' },
+        { id: '3', title: 'Is the website builder completely offline?', description: 'Yes! Antigravity KT Builder operates local-first, autosaving your layout and settings securely in your browser storage.' }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#0f172a',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center'
+    }
+  },
+  {
+    type: 'ecommerce',
+    name: 'Product Grid Store',
+    description: 'Storefront grid showcasing store items with title, price, descriptions, and checkout buttons.',
+    defaultContent: {
+      title: 'Our Premium Products',
+      items: [
+        { id: 'e1', title: 'Starter Landing Page', price: '$29.00', description: 'One-page visual canvas matching your corporate branding kit.', imageSrc: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600' },
+        { id: 'e2', title: 'E-Commerce Storefront', price: '$99.00', description: 'Multi-page store templates containing interactive lists and forms.', imageSrc: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600' },
+        { id: 'e3', title: 'Developer Portfolio', price: '$49.00', description: 'Clean showcase theme optimized for high speed and light loading.', imageSrc: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600' }
+      ]
+    },
+    defaultStyles: {
+      bgColor: '#ffffff',
+      textColor: '#0f172a',
+      paddingTop: 'py-16',
+      paddingBottom: 'py-16',
+      textAlign: 'center',
+      borderRadius: 'rounded-2xl'
+    }
+  },
+  {
     type: 'footer',
     name: 'Simple Footer',
     description: 'Clean website footer with copyright notice and simple link structure.',

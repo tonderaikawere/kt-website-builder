@@ -29,7 +29,20 @@ export type BlockType =
   | 'video' 
   | 'sandbox'
   | 'portfolio'
+  | 'gallery'
+  | 'faq'
+  | 'ecommerce'
   | 'footer';
+
+export interface Page {
+  id: string;
+  name: string;
+  slug: string;
+  blocks: Block[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+}
 
 export interface Block {
   id: string;
@@ -88,6 +101,6 @@ export interface ProjectSettings {
 }
 
 export interface Project {
-  blocks: Block[];
+  pages: Page[];
   settings: ProjectSettings;
 }

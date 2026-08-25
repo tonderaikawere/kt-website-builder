@@ -20,7 +20,9 @@ import {
   Redo,
   Sun,
   Moon,
-  Cloud
+  Cloud,
+  Grid,
+  Image
 } from 'lucide-react';
 import { useBuilderState } from './useBuilderState';
 import { BLOCK_TEMPLATES } from './blockTemplates';
@@ -92,17 +94,45 @@ const COLOR_PALETTES = [
 ];
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo'>('blocks');
+  const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo' | 'assets'>('blocks');
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedElement, setSelectedElement] = useState<{ blockId: string; elementPath: string; elementType: string } | null>(null);
   const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
-  const [zoomMode, setZoomMode] = useState<'fit' | 'full'>('full');
+  const [zoomLevel, setZoomLevel] = useState<number>(100);
+  const [showGridLines, setShowGridLines] = useState(false);
+  const [formSubmissions, setFormSubmissions] = useState<Array<{ id: string; name: string; email: string; message: string; date: string }>>(() => {
+    try {
+      const saved = localStorage.getItem('kt-form-submissions');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [
+      { id: '1', name: 'John Doe', email: 'john@example.com', message: 'Hello! I would love to build a landing page using your awesome builder.', date: '2026-08-25 10:24' }
+    ];
+  });
+  
+  useEffect(() => {
+    localStorage.setItem('kt-form-submissions', JSON.stringify(formSubmissions));
+  }, [formSubmissions]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        const saved = localStorage.getItem('kt-form-submissions');
+        if (saved) setFormSubmissions(JSON.parse(saved));
+      } catch (e) {}
+    };
+    window.addEventListener('kt-submissions-updated', handleUpdate);
+    return () => window.removeEventListener('kt-submissions-updated', handleUpdate);
+  }, []);
   
   const {
+    pages,
+    currentPageId,
+    setCurrentPageId,
     blocks,
-    setBlocks,
+    setPages,
     selectedBlockId,
     setSelectedBlockId,
     settings,
@@ -117,6 +147,9 @@ function App() {
     updateBlockContent,
     updateBlockStyles,
     resetProject,
+    addPage,
+    duplicatePage,
+    deletePage,
     undo,
     redo,
     canUndo,
@@ -183,7 +216,7 @@ function App() {
         }
       };
     });
-    setBlocks(updatedBlocks);
+    setPages(pages.map(p => p.id === currentPageId ? { ...p, blocks: updatedBlocks } : p));
   };
 
   // Dynamically update document title for editor tab preview
@@ -233,8 +266,15 @@ function App() {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target?.result as string);
-        if (Array.isArray(data.blocks)) {
-          setBlocks(data.blocks);
+        if (Array.isArray(data.pages)) {
+          setPages(data.pages);
+        } else if (Array.isArray(data.blocks)) {
+          setPages([{
+            id: 'home',
+            name: 'Home',
+            slug: 'home',
+            blocks: data.blocks
+          }]);
         }
         if (data.settings) {
           updateSettings(data.settings);
@@ -281,14 +321,17 @@ function App() {
               <span className="text-[10px] text-slate-400">▼</span>
             </div>
             
-            <button
-              onClick={() => setZoomMode(prev => prev === 'fit' ? 'full' : 'fit')}
-              className="flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer mr-2 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded transition-all"
-              title="Toggle Birds-eye view vs Full scale"
+            <select
+              value={zoomLevel}
+              onChange={(e) => setZoomLevel(Number(e.target.value))}
+              className="flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer mr-2 bg-slate-105 dark:bg-slate-800 border-none px-2 py-0.5 rounded transition-all focus:outline-none"
+              title="Canvas Scale Zoom"
             >
-              <span>{zoomMode === 'fit' ? 'Zoom: 80%' : 'Fit (100%)'}</span>
-              <span className="text-[8px]">▼</span>
-            </button>
+              <option value="50">Zoom 50%</option>
+              <option value="75">Zoom 75%</option>
+              <option value="100">Fit (100%)</option>
+              <option value="125">Zoom 125%</option>
+            </select>
             
             <button
               onClick={() => setIsAddDrawerOpen(prev => !prev)}
@@ -300,21 +343,61 @@ function App() {
           </div>
 
           {/* Center Address and Page selector */}
-          <div className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 px-3 py-1 rounded-full text-[11px] shadow-sm text-slate-500">
+          <div className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 px-3.5 py-1 rounded-full text-[11px] shadow-sm text-slate-500 z-10">
             <div className="flex items-center gap-1">
-              <span className="font-bold text-slate-700 dark:text-slate-300">Page:</span>
-              <select className="bg-transparent border-none text-[11px] font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer">
-                <option>Home</option>
-                <option>About Projects</option>
-                <option>Contact Info</option>
+              <span className="font-bold text-slate-700 dark:text-slate-350">Page:</span>
+              <select
+                value={currentPageId}
+                onChange={(e) => setCurrentPageId(e.target.value)}
+                className="bg-transparent border-none text-[11px] font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+              >
+                {pages.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
               </select>
             </div>
             <div className="w-px h-3 bg-slate-200 dark:bg-slate-800" />
-            <span className="font-mono text-[10px] opacity-75">tondeskawere.wixsite.com/my-site-1</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const name = window.prompt('Enter new page name:');
+                  if (name) addPage(name);
+                }}
+                className="hover:text-[#005cff] cursor-pointer text-[10px] font-bold text-slate-500 transition-colors"
+                title="Create New Blank Page"
+              >
+                + Add Page
+              </button>
+              <button
+                onClick={() => duplicatePage(currentPageId)}
+                className="hover:text-[#005cff] cursor-pointer text-[10px] font-bold text-slate-500 transition-colors"
+                title="Duplicate Current Page"
+              >
+                ❐ Duplicate
+              </button>
+              {pages.length > 1 && (
+                <button
+                  onClick={() => deletePage(currentPageId)}
+                  className="hover:text-red-500 cursor-pointer text-[10px] font-bold text-slate-500 transition-colors"
+                  title="Delete Active Page"
+                >
+                  🗑 Delete
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Right Side: Device viewports, Save, Undo, Redo, Preview, and Publish */}
           <div className="flex items-center gap-3">
+            {/* Grid Snapping toggle */}
+            <button
+              onClick={() => setShowGridLines(prev => !prev)}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer mr-1.5 ${showGridLines ? 'bg-[#005cff] text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-850'}`}
+              title="Toggle Snapping Guidelines Grid"
+            >
+              <Grid className="w-3.5 h-3.5" />
+            </button>
+
             {/* Viewport device toggles */}
             <div className="flex bg-slate-200/60 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-250 dark:border-slate-700 mr-2">
               <button
@@ -527,6 +610,17 @@ function App() {
               >
                 <Settings className="w-4 h-4" />
                 SEO
+              </button>
+              <button
+                onClick={() => setActiveTab('assets')}
+                className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 flex flex-col items-center gap-1 transition-colors ${
+                  activeTab === 'assets'
+                    ? 'border-brand-accent text-brand-accent bg-white dark:bg-brand-deep'
+                    : 'border-transparent text-slate-500 hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-accent'
+                }`}
+              >
+                <Image className="w-4 h-4" />
+                Assets
               </button>
             </div>
 
@@ -749,7 +843,7 @@ function App() {
                                 styles: blockTpl ? { ...blockTpl.defaultStyles } : { bgColor: '#ffffff', textColor: '#07162f' }
                               };
                             });
-                            setBlocks(newBlocks);
+                            setPages(pages.map(p => p.id === currentPageId ? { ...p, blocks: newBlocks } : p));
                             setSelectedBlockId(newBlocks[0]?.id || null);
                           }
                         }}
@@ -864,6 +958,107 @@ function App() {
                           placeholder="/favicon.ico"
                         />
                       </div>
+                      
+                      {/* Form Submissions List */}
+                      <div className="pt-4 mt-4 border-t border-slate-200 dark:border-brand-ink space-y-3">
+                        <div className="flex justify-between items-center">
+                          <label className="block text-xs font-bold text-slate-850 dark:text-slate-200">Form Submissions</label>
+                          <button
+                            onClick={() => {
+                              if (window.confirm('Clear all submissions?')) {
+                                setFormSubmissions([]);
+                              }
+                            }}
+                            className="text-[9px] font-black uppercase text-red-500 hover:underline cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                        {formSubmissions.length === 0 ? (
+                          <p className="text-[10px] text-slate-400 italic">No submitted form submissions logged yet.</p>
+                        ) : (
+                          <div className="space-y-2 max-h-48 overflow-y-auto">
+                            {formSubmissions.map((sub) => (
+                              <div key={sub.id} className="p-2.5 bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 rounded-lg space-y-1">
+                                <div className="flex justify-between text-[9px] text-slate-400 font-bold">
+                                  <span>{sub.name} ({sub.email})</span>
+                                  <span>{sub.date}</span>
+                                </div>
+                                <p className="text-[10px] text-slate-600 dark:text-slate-350 leading-relaxed font-sans">{sub.message}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {activeTab === 'assets' && (
+                <div className="space-y-5 animate-in fade-in duration-200">
+                  <div>
+                    <h3 className="font-bold text-slate-850 dark:text-white text-xs uppercase tracking-wider">Asset Manager</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Search stock imagery or insert custom shapes.</p>
+                  </div>
+
+                  {/* Stock Search Mockup */}
+                  <div className="space-y-2.5">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Stock Photo Library</label>
+                    <div className="relative">
+                      <input 
+                        type="text" 
+                        placeholder="Search Unsplash (e.g. tech, food)..."
+                        className="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            alert('Mock Search: Displaying high-resolution asset matching keyword.');
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mt-1.5">
+                      {[
+                        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=200',
+                        'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200',
+                        'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=200',
+                        'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=200'
+                      ].map((imgUrl, i) => (
+                        <div key={i} className="relative group rounded-lg overflow-hidden border border-slate-105 dark:border-slate-800 aspect-video shadow-sm">
+                          <img src={imgUrl} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => {
+                              const blockId = window.prompt('Enter block ID to set image background (or select a block):', selectedBlockId || '');
+                              if (blockId) {
+                                updateBlockStyles(blockId, { bgImage: `url('${imgUrl}')` });
+                              }
+                            }}
+                            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[9px] font-black text-white cursor-pointer"
+                          >
+                            Set Cover
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Shapes Library */}
+                  <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-brand-ink">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Figma Custom Shapes</label>
+                    <p className="text-[10px] text-slate-400">Click a vector shape layout to append it directly to the active sandbox layout.</p>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      {[
+                        { name: 'Wireframe Box', type: 'sandbox', styles: { bgColor: '#f1f5f9', borderRadius: 'rounded-none', borderWidth: 'border-2', borderColor: '#cbd5e1' } },
+                        { name: 'Circle Badge', type: 'sandbox', styles: { bgColor: '#005cff', borderRadius: 'rounded-full' } },
+                        { name: 'Soft Container', type: 'sandbox', styles: { bgColor: '#ffffff', borderRadius: 'rounded-xl', borderWidth: 'border', borderColor: '#e2e8f0' } }
+                      ].map((shp, i) => (
+                        <button
+                          key={i}
+                          onClick={() => addBlock(shp.type as any, { title: shp.name }, shp.styles)}
+                          className="p-2.5 bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-accent rounded-xl text-left text-[10px] font-bold dark:text-slate-200 transition-all cursor-pointer"
+                        >
+                          {shp.name}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -893,7 +1088,7 @@ function App() {
           <div 
             style={{ 
               fontFamily: settings.fontFamily,
-              transform: zoomMode === 'fit' ? 'scale(0.8)' : 'scale(1)',
+              transform: `scale(${zoomLevel / 100})`,
               transformOrigin: 'top center',
               transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
@@ -910,6 +1105,13 @@ function App() {
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-950 rounded-full z-40 flex items-center justify-center gap-1.5 px-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
                 <div className="w-8 h-1 bg-slate-800 rounded-full"></div>
+              </div>
+            )}
+            {showGridLines && (
+              <div className="absolute inset-y-0 left-0 right-0 grid grid-cols-12 gap-4 pointer-events-none z-30 select-none opacity-[0.03]">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} className="h-full bg-slate-900 border-x border-dashed border-slate-900"></div>
+                ))}
               </div>
             )}
             {blocks.length === 0 ? (

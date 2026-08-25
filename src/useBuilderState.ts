@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Block, BlockType, BlockStyles, ProjectSettings } from './types';
+import type { Block, BlockType, BlockStyles, ProjectSettings, Page } from './types';
 
 const DEFAULT_SETTINGS: ProjectSettings = {
   title: 'Kawerify Tech Site Project',
@@ -10,24 +10,50 @@ const DEFAULT_SETTINGS: ProjectSettings = {
 };
 
 interface HistoryState {
-  blocks: Block[];
+  pages: Page[];
   settings: ProjectSettings;
 }
 
 export function useBuilderState() {
-  // Load blocks from localStorage synchronously
-  const [blocks, setBlocksState] = useState<Block[]>(() => {
+  // Load pages from localStorage synchronously with old schema migration
+  const [pages, setPagesState] = useState<Page[]>(() => {
     try {
       const saved = localStorage.getItem('kt-builder-project');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.blocks)) return parsed.blocks;
+        if (Array.isArray(parsed.pages)) return parsed.pages;
+        if (Array.isArray(parsed.blocks)) {
+          return [{
+            id: 'home',
+            name: 'Home',
+            slug: 'home',
+            blocks: parsed.blocks
+          }];
+        }
       }
     } catch (e) {}
-    return [];
+    return [{
+      id: 'home',
+      name: 'Home',
+      slug: 'home',
+      blocks: []
+    }];
   });
 
-  // Load settings from localStorage synchronously
+  const [currentPageId, setCurrentPageId] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('kt-builder-project');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.pages) && parsed.pages.length > 0) {
+          return parsed.pages[0].id;
+        }
+      }
+    } catch (e) {}
+    return 'home';
+  });
+
+  // Load settings from localStorage
   const [settings, setSettingsState] = useState<ProjectSettings>(() => {
     try {
       const saved = localStorage.getItem('kt-builder-project');
@@ -38,15 +64,15 @@ export function useBuilderState() {
     } catch (e) {}
     return DEFAULT_SETTINGS;
   });
-  
+
   // Autosave to localStorage on changes
   useEffect(() => {
-    localStorage.setItem('kt-builder-project', JSON.stringify({ blocks, settings }));
-  }, [blocks, settings]);
-  
-  // History tracking state initialized with the loaded initial state
+    localStorage.setItem('kt-builder-project', JSON.stringify({ pages, settings }));
+  }, [pages, settings]);
+
+  // History tracking state
   const [history, setHistory] = useState<HistoryState[]>(() => [
-    { blocks, settings }
+    { pages, settings }
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
@@ -55,10 +81,10 @@ export function useBuilderState() {
   const [isPreview, setIsPreview] = useState(false);
 
   // Helper to push new state to history
-  const pushToHistory = useCallback((newBlocks: Block[], newSettings: ProjectSettings) => {
+  const pushToHistory = useCallback((newPages: Page[], newSettings: ProjectSettings) => {
     setHistory(prev => {
       const cleanHistory = prev.slice(0, historyIndex + 1);
-      return [...cleanHistory, { blocks: newBlocks, settings: newSettings }];
+      return [...cleanHistory, { pages: newPages, settings: newSettings }];
     });
     setHistoryIndex(prev => prev + 1);
   }, [historyIndex]);
@@ -68,7 +94,7 @@ export function useBuilderState() {
     if (historyIndex > 0) {
       const prevIdx = historyIndex - 1;
       const prevState = history[prevIdx];
-      setBlocksState(prevState.blocks);
+      setPagesState(prevState.pages);
       setSettingsState(prevState.settings);
       setHistoryIndex(prevIdx);
     }
@@ -79,32 +105,115 @@ export function useBuilderState() {
     if (historyIndex < history.length - 1) {
       const nextIdx = historyIndex + 1;
       const nextState = history[nextIdx];
-      setBlocksState(nextState.blocks);
+      setPagesState(nextState.pages);
       setSettingsState(nextState.settings);
       setHistoryIndex(nextIdx);
     }
   }, [history, historyIndex]);
 
-  // Wrapper setter for loading external projects or templates directly
-  const setBlocks = useCallback((newBlocks: Block[]) => {
-    setBlocksState(newBlocks);
-    pushToHistory(newBlocks, settings);
-  }, [pushToHistory, settings]);
+  // Set Pages directly (loading external json)
+  const setPages = useCallback((newPages: Page[]) => {
+    setPagesState(newPages);
+    if (newPages.length > 0 && !newPages.some(p => p.id === currentPageId)) {
+      setCurrentPageId(newPages[0].id);
+    }
+    pushToHistory(newPages, settings);
+  }, [pushToHistory, settings, currentPageId]);
 
   // Generate unique IDs
   const generateId = useCallback(() => {
     return Math.random().toString(36).substring(2, 9);
   }, []);
 
+  // Active Page details
+  const activePage = pages.find(p => p.id === currentPageId) || pages[0] || { id: 'home', name: 'Home', slug: 'home', blocks: [] };
+  const blocks = activePage.blocks;
+
+  // Add Page
+  const addPage = useCallback((name: string) => {
+    const id = generateId();
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const newPage: Page = {
+      id,
+      name,
+      slug,
+      blocks: []
+    };
+    setPagesState(prev => {
+      const updated = [...prev, newPage];
+      pushToHistory(updated, settings);
+      return updated;
+    });
+    setCurrentPageId(id);
+  }, [generateId, pushToHistory, settings]);
+
+  // Duplicate Page
+  const duplicatePage = useCallback((id: string) => {
+    const target = pages.find(p => p.id === id);
+    if (!target) return;
+    const newId = generateId();
+    const newPage: Page = {
+      ...target,
+      id: newId,
+      name: `${target.name} Copy`,
+      slug: `${target.slug}-copy`,
+      blocks: JSON.parse(JSON.stringify(target.blocks))
+    };
+    setPagesState(prev => {
+      const updated = [...prev, newPage];
+      pushToHistory(updated, settings);
+      return updated;
+    });
+    setCurrentPageId(newId);
+  }, [pages, generateId, pushToHistory, settings]);
+
+  // Delete Page
+  const deletePage = useCallback((id: string) => {
+    if (pages.length <= 1) {
+      alert('You cannot delete the last remaining page of the website.');
+      return;
+    }
+    setPagesState(prev => {
+      const updated = prev.filter(p => p.id !== id);
+      pushToHistory(updated, settings);
+      return updated;
+    });
+    if (currentPageId === id) {
+      const remaining = pages.filter(p => p.id !== id);
+      setCurrentPageId(remaining[0].id);
+    }
+  }, [pages, currentPageId, pushToHistory, settings]);
+
+  // Rename Page
+  const renamePage = useCallback((id: string, name: string) => {
+    setPagesState(prev => {
+      const updated = prev.map(p => {
+        if (p.id === id) {
+          const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          return { ...p, name, slug };
+        }
+        return p;
+      });
+      pushToHistory(updated, settings);
+      return updated;
+    });
+  }, [pushToHistory, settings]);
+
   // Reset Project
   const resetProject = useCallback(() => {
     if (window.confirm('Are you sure you want to clear all blocks and start over?')) {
-      const newBlocks: Block[] = [];
+      const newPages = [{
+        id: 'home',
+        name: 'Home',
+        slug: 'home',
+        blocks: []
+      }];
       const newSettings = DEFAULT_SETTINGS;
-      setBlocksState(newBlocks);
+      setPagesState(newPages);
       setSettingsState(newSettings);
+      setCurrentPageId('home');
       setSelectedBlockId(null);
-      pushToHistory(newBlocks, newSettings);
+      pushToHistory(newPages, newSettings);
     }
   }, [pushToHistory]);
 
@@ -112,12 +221,12 @@ export function useBuilderState() {
   const updateSettings = useCallback((newSettings: Partial<ProjectSettings>) => {
     setSettingsState(prev => {
       const updated = { ...prev, ...newSettings };
-      pushToHistory(blocks, updated);
+      pushToHistory(pages, updated);
       return updated;
     });
-  }, [blocks, pushToHistory]);
+  }, [pages, pushToHistory]);
 
-  // Add block to canvas
+  // Add block to current page
   const addBlock = useCallback((type: BlockType, content: Block['content'] = {}, styles: BlockStyles = {}) => {
     const newBlock: Block = {
       id: generateId(),
@@ -134,64 +243,78 @@ export function useBuilderState() {
         ...styles
       }
     };
-    setBlocksState(prev => {
-      const updated = [...prev, newBlock];
+    setPagesState(prev => {
+      const updated = prev.map(p => p.id === currentPageId ? { ...p, blocks: [...p.blocks, newBlock] } : p);
       pushToHistory(updated, settings);
       return updated;
     });
     setSelectedBlockId(newBlock.id);
-  }, [generateId, pushToHistory, settings]);
+  }, [generateId, pushToHistory, settings, currentPageId]);
 
-  // Delete block
+  // Delete block from current page
   const deleteBlock = useCallback((id: string) => {
-    setBlocksState(prev => {
-      const updated = prev.filter(b => b.id !== id);
+    setPagesState(prev => {
+      const updated = prev.map(p => p.id === currentPageId ? { ...p, blocks: p.blocks.filter(b => b.id !== id) } : p);
       pushToHistory(updated, settings);
       return updated;
     });
     if (selectedBlockId === id) {
       setSelectedBlockId(null);
     }
-  }, [selectedBlockId, pushToHistory, settings]);
+  }, [selectedBlockId, pushToHistory, settings, currentPageId]);
 
-  // Move block up or down
+  // Move block up/down inside current page
   const moveBlock = useCallback((id: string, direction: 'up' | 'down') => {
-    setBlocksState(prev => {
-      const idx = prev.findIndex(b => b.id === id);
-      if (idx === -1) return prev;
-      
-      const newIdx = direction === 'up' ? idx - 1 : idx + 1;
-      if (newIdx < 0 || newIdx >= prev.length) return prev;
-
-      const result = [...prev];
-      const [temp] = result.splice(idx, 1);
-      result.splice(newIdx, 0, temp);
-      pushToHistory(result, settings);
-      return result;
+    setPagesState(prev => {
+      const updated = prev.map(p => {
+        if (p.id !== currentPageId) return p;
+        const idx = p.blocks.findIndex(b => b.id === id);
+        if (idx === -1) return p;
+        const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (newIdx < 0 || newIdx >= p.blocks.length) return p;
+        const result = [...p.blocks];
+        const [temp] = result.splice(idx, 1);
+        result.splice(newIdx, 0, temp);
+        return { ...p, blocks: result };
+      });
+      pushToHistory(updated, settings);
+      return updated;
     });
-  }, [pushToHistory, settings]);
+  }, [pushToHistory, settings, currentPageId]);
 
-  // Update block content
+  // Update block content inside current page
   const updateBlockContent = useCallback((id: string, newContent: Partial<Block['content']>) => {
-    setBlocksState(prev => {
-      const updated = prev.map(b => (b.id === id ? { ...b, content: { ...b.content, ...newContent } } : b));
+    setPagesState(prev => {
+      const updated = prev.map(p => {
+        if (p.id !== currentPageId) return p;
+        const blocks = p.blocks.map(b => (b.id === id ? { ...b, content: { ...b.content, ...newContent } } : b));
+        return { ...p, blocks };
+      });
       pushToHistory(updated, settings);
       return updated;
     });
-  }, [pushToHistory, settings]);
+  }, [pushToHistory, settings, currentPageId]);
 
-  // Update block styles
+  // Update block styles inside current page
   const updateBlockStyles = useCallback((id: string, newStyles: Partial<BlockStyles>) => {
-    setBlocksState(prev => {
-      const updated = prev.map(b => (b.id === id ? { ...b, styles: { ...b.styles, ...newStyles } } : b));
+    setPagesState(prev => {
+      const updated = prev.map(p => {
+        if (p.id !== currentPageId) return p;
+        const blocks = p.blocks.map(b => (b.id === id ? { ...b, styles: { ...b.styles, ...newStyles } } : b));
+        return { ...p, blocks };
+      });
       pushToHistory(updated, settings);
       return updated;
     });
-  }, [pushToHistory, settings]);
+  }, [pushToHistory, settings, currentPageId]);
 
   return {
+    pages,
+    currentPageId,
+    setCurrentPageId,
+    activePage,
     blocks,
-    setBlocks,
+    setPages,
     selectedBlockId,
     setSelectedBlockId,
     settings,
@@ -206,6 +329,10 @@ export function useBuilderState() {
     updateBlockContent,
     updateBlockStyles,
     resetProject,
+    addPage,
+    duplicatePage,
+    deletePage,
+    renamePage,
     undo,
     redo,
     canUndo: historyIndex > 0,

@@ -1131,6 +1131,8 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
 export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
   const { title = 'Contact Us', subtitle = 'Subtitle', formEmailPlaceholder = 'Email', formMessagePlaceholder = 'Message', formButtonText = 'Send' } = block.content;
   const styles = block.styles;
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
     if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
@@ -1150,6 +1152,31 @@ export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
 
   const handleButtonTextChange = (e: React.FocusEvent<HTMLSpanElement>) => {
     if (onContentChange) onContentChange(block.id, { formButtonText: e.target.innerText });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isEditing) return;
+    if (!email || !message) {
+      alert('Please fill out all fields before submitting.');
+      return;
+    }
+    try {
+      const saved = localStorage.getItem('kt-form-submissions');
+      const submissions = saved ? JSON.parse(saved) : [];
+      const newSubmission = {
+        id: Math.random().toString(36).substring(2, 9),
+        name: 'Web Form User',
+        email,
+        message,
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16)
+      };
+      localStorage.setItem('kt-form-submissions', JSON.stringify([newSubmission, ...submissions]));
+      window.dispatchEvent(new Event('kt-submissions-updated'));
+      alert('Message sent successfully! Your message has been logged in the Form Submissions tab.');
+      setEmail('');
+      setMessage('');
+    } catch (err) {}
   };
 
   const inlineStyles: React.CSSProperties = {
@@ -1183,15 +1210,17 @@ export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
       </div>
 
       <div className="max-w-md mx-auto bg-slate-50 border border-slate-200/60 p-6 rounded-2xl shadow-sm text-left">
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-500 mb-1.5">Email Address</label>
             <div className="relative flex items-center">
               <input
                 type="email"
-                disabled
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder={formEmailPlaceholder}
-                className="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg cursor-not-allowed focus:outline-none"
+                className="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#005cff] dark:text-slate-800"
               />
               {isEditing && (
                 <span 
@@ -1212,9 +1241,11 @@ export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
             <div className="relative">
               <textarea
                 rows={3}
-                disabled
+                required
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 placeholder={formMessagePlaceholder}
-                className="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg cursor-not-allowed focus:outline-none resize-none"
+                className="w-full text-xs px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#005cff] resize-none dark:text-slate-800"
               />
               {isEditing && (
                 <span 
@@ -1231,8 +1262,8 @@ export const ContactBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
           </div>
           
           <button
-            type="button"
-            className={`w-full py-2.5 px-4 text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm ${styles.borderRadius || 'rounded-lg'} flex items-center justify-center`}
+            type="submit"
+            className={`w-full py-2.5 px-4 text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm ${styles.borderRadius || 'rounded-lg'} flex items-center justify-center cursor-pointer`}
           >
             <span
               contentEditable={isEditing}
@@ -2081,6 +2112,277 @@ export const PortfolioBlock: React.FC<BlockComponentProps> = ({ block, isEditing
     </section>
   );
 };
+export const FaqBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
+  const { title = 'Frequently Asked Questions', subtitle = 'Answers to common questions about our products.', items = [] } = block.content;
+  const styles = block.styles;
+  const [openId, setOpenId] = useState<string | null>('1');
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleSubtitleChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
+    if (onContentChange) onContentChange(block.id, { subtitle: e.target.innerText });
+  };
+
+  const handleItemTextChange = (itemId: string, field: 'title' | 'description', text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, [field]: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles = getBlockStyles(styles, '#ffffff', '#1e293b', 'center');
+
+  return (
+    <section style={inlineStyles} className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-10 relative">
+          <h2
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleTitleChange}
+            onClick={(e) => { if (!isEditing) return; e.stopPropagation(); if (onSelectElement) onSelectElement(block.id, 'title', 'title'); }}
+            onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
+            style={{
+              fontSize: block.content.titleFontSize ? `${block.content.titleFontSize}px` : undefined,
+              color: block.content.titleColor || undefined
+            }}
+            className={`text-3xl font-extrabold tracking-tight mb-3 ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
+          >
+            {title}
+          </h2>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'title' && (
+            <FloatingFormatToolbar 
+              blockId={block.id}
+              elementPath="title"
+              elementType="title"
+              blockContent={block.content}
+              onUpdateBlockContent={onContentChange}
+              onSelectElement={onSelectElement} 
+            />
+          )}
+          <p
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onBlur={handleSubtitleChange}
+            onClick={(e) => { if (!isEditing) return; e.stopPropagation(); if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle'); }}
+            onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
+            style={{
+              fontSize: block.content.subtitleFontSize ? `${block.content.subtitleFontSize}px` : undefined,
+              color: block.content.subtitleColor || undefined
+            }}
+            className={`text-slate-500 max-w-lg mx-auto text-sm ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
+          >
+            {subtitle}
+          </p>
+          {isEditing && selectedElement && selectedElement.blockId === block.id && selectedElement.elementPath === 'subtitle' && (
+            <FloatingFormatToolbar 
+              blockId={block.id}
+              elementPath="subtitle"
+              elementType="subtitle"
+              blockContent={block.content}
+              onUpdateBlockContent={onContentChange}
+              onSelectElement={onSelectElement} 
+            />
+          )}
+        </div>
+
+        <div className="space-y-3">
+          {items.map((item) => {
+            const isOpen = openId === item.id;
+            return (
+              <div key={item.id} className="border border-slate-100 dark:border-brand-ink rounded-xl overflow-hidden bg-slate-50 dark:bg-brand-deep/30 transition-all">
+                <button
+                  onClick={() => setOpenId(isOpen ? null : item.id)}
+                  className="w-full px-5 py-4 flex items-center justify-between text-left font-bold text-xs text-slate-800 dark:text-white cursor-pointer hover:bg-slate-100 dark:hover:bg-brand-deep/50 transition-colors"
+                >
+                  <span
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleItemTextChange(item.id, 'title', e.target.innerText)}
+                    onClick={(e) => { if (!isEditing) return; e.stopPropagation(); if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'title'); }}
+                    className={`cursor-text ${getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}`}
+                  >
+                    {item.title}
+                  </span>
+                  <span>{isOpen ? '−' : '+'}</span>
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-4 pt-1 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-brand-ink/50 animate-in fade-in duration-200">
+                    <div
+                      contentEditable={isEditing}
+                      suppressContentEditableWarning
+                      onBlur={(e) => handleItemTextChange(item.id, 'description', e.target.innerText)}
+                      onClick={(e) => { if (!isEditing) return; e.stopPropagation(); if (onSelectElement) onSelectElement(block.id, `items.${item.id}.description`, 'description'); }}
+                      className={`cursor-text ${getSelectionBorderClass(block.id, `items.${item.id}.description`, selectedElement, isEditing)}`}
+                    >
+                      {item.description}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const GalleryBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
+  const { title = 'Our Gallery', items = [] } = block.content;
+  const styles = block.styles;
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const inlineStyles = getBlockStyles(styles, '#f8fafc', '#1e293b', 'center');
+
+  return (
+    <section style={inlineStyles} className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'}`}>
+      <div className="max-w-5xl mx-auto">
+        <h2
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          onClick={(e) => { if (!isEditing) return; e.stopPropagation(); if (onSelectElement) onSelectElement(block.id, 'title', 'title'); }}
+          className={`text-2xl font-bold mb-8 text-center ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
+        >
+          {title}
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {items.map((item) => (
+            <div key={item.id} className="relative group overflow-hidden rounded-xl bg-slate-100 aspect-square shadow-sm">
+              <img src={item.imageSrc || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400'} alt="Gallery item" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              {isEditing && (
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button
+                    onClick={() => {
+                      const url = window.prompt('Enter image URL:', item.imageSrc);
+                      if (url !== null && onContentChange) {
+                        const updated = items.map(i => i.id === item.id ? { ...i, imageSrc: url } : i);
+                        onContentChange(block.id, { items: updated });
+                      }
+                    }}
+                    className="px-2 py-1 bg-white text-slate-800 text-[10px] font-bold rounded shadow hover:bg-slate-100"
+                  >
+                    Change
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const EcommerceBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
+  const { title = 'Our Store Products', items = [] } = block.content;
+  const styles = block.styles;
+  const [cartCount, setCartCount] = useState(0);
+
+  const handleTitleChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
+    if (onContentChange) onContentChange(block.id, { title: e.target.innerText });
+  };
+
+  const handleItemTextChange = (itemId: string, field: 'title' | 'price' | 'description', text: string) => {
+    if (onContentChange && items) {
+      const updatedItems = items.map(item => 
+        item.id === itemId ? { ...item, [field]: text } : item
+      );
+      onContentChange(block.id, { items: updatedItems });
+    }
+  };
+
+  const inlineStyles = getBlockStyles(styles, '#ffffff', '#1e293b', 'center');
+
+  return (
+    <section style={inlineStyles} className={`px-8 md:px-16 ${styles.paddingTop || 'py-16'} ${styles.paddingBottom || 'py-16'} relative`}>
+      <div className="absolute top-4 right-8 bg-[#005cff] text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold shadow z-10">
+        <span>🛒 Cart</span>
+        <span className="bg-white text-[#005cff] w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black">{cartCount}</span>
+      </div>
+
+      <div className="max-w-5xl mx-auto">
+        <h2
+          contentEditable={isEditing}
+          suppressContentEditableWarning
+          onBlur={handleTitleChange}
+          onClick={(e) => { if (!isEditing) return; e.stopPropagation(); if (onSelectElement) onSelectElement(block.id, 'title', 'title'); }}
+          className={`text-3xl font-extrabold tracking-tight mb-8 text-center ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
+        >
+          {title}
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {items.map((item) => (
+            <div key={item.id} className="border border-slate-100 dark:border-brand-ink rounded-2xl overflow-hidden bg-white dark:bg-brand-deep/50 shadow-sm flex flex-col hover:shadow-md transition-shadow">
+              <div className="aspect-[4/3] bg-slate-50 relative group">
+                <img src={item.imageSrc || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt="Product" className="w-full h-full object-cover" />
+                {isEditing && (
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      onClick={() => {
+                        const url = window.prompt('Enter product image URL:', item.imageSrc);
+                        if (url !== null && onContentChange) {
+                          const updated = items.map(i => i.id === item.id ? { ...i, imageSrc: url } : i);
+                          onContentChange(block.id, { items: updated });
+                        }
+                      }}
+                      className="px-2 py-1 bg-white text-slate-800 text-[10px] font-bold rounded shadow"
+                    >
+                      Change Image
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="p-5 flex flex-col flex-1">
+                <div className="flex justify-between items-start mb-2">
+                  <h3
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleItemTextChange(item.id, 'title', e.target.innerText)}
+                    className="font-bold text-slate-800 dark:text-white text-sm"
+                  >
+                    {item.title}
+                  </h3>
+                  <span
+                    contentEditable={isEditing}
+                    suppressContentEditableWarning
+                    onBlur={(e) => handleItemTextChange(item.id, 'price', e.target.innerText)}
+                    className="font-mono font-black text-xs text-[#005cff] dark:text-[#38bdf8]"
+                  >
+                    {item.price || '$19.99'}
+                  </span>
+                </div>
+                <p
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleItemTextChange(item.id, 'description', e.target.innerText)}
+                  className="text-[11px] text-slate-500 dark:text-slate-400 mb-4 line-clamp-2 leading-relaxed"
+                >
+                  {item.description}
+                </p>
+                <button
+                  onClick={() => { if (!isEditing) setCartCount(prev => prev + 1); }}
+                  className="mt-auto w-full py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                >
+                  Add To Cart
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export const BlockRenderer: React.FC<{
   block: Block;
@@ -2095,7 +2397,7 @@ export const BlockRenderer: React.FC<{
     case 'hero':
       return <HeroBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'features':
-      return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'cta':
       return <CtaBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'testimonials':
@@ -2114,6 +2416,12 @@ export const BlockRenderer: React.FC<{
       return <SandboxBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     case 'portfolio':
       return <PortfolioBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
+    case 'faq':
+      return <FaqBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
+    case 'gallery':
+      return <GalleryBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
+    case 'ecommerce':
+      return <EcommerceBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'footer':
       return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
     default:
