@@ -14,35 +14,52 @@ const DEFAULT_PORTFOLIO_BLOCKS: Block[] = [
     id: 'h1',
     type: 'header',
     name: 'Header Section',
-    content: { logoText: 'TONDE KAWERE', items: [{ id: '1', title: 'Work', link: '#work' }, { id: '2', title: 'About', link: '#about' }, { id: '3', title: 'Contact', link: '#contact' }] },
-    styles: { bgColor: '#0b1329', textColor: '#ffffff', paddingTop: 'py-4', paddingBottom: 'py-4' }
+    content: { 
+      logoText: 'Rumah Ria', 
+      items: [
+        { id: '1', title: 'Home', link: '#' }, 
+        { id: '2', title: 'Shop', link: '#shop' }, 
+        { id: '3', title: 'Inspiration', link: '#inspiration' },
+        { id: '4', title: 'About us', link: '#about' },
+        { id: '5', title: 'Blog', link: '#blog' },
+        { id: '6', title: 'Contact', link: '#contact' }
+      ] 
+    },
+    styles: { bgColor: '#f5f2eb', textColor: '#1a1a1a', paddingTop: 'py-4', paddingBottom: 'py-4' }
   },
   {
     id: 'hero1',
     type: 'hero',
     name: 'Hero Section',
-    content: { title: 'Designing Next-Gen Digital Products', subtitle: 'I build interactive, responsive visual builder platforms and pixel-perfect design systems.', buttonText: 'Explore My Work', buttonLink: '#work' },
-    styles: { bgColor: '#0f172a', textColor: '#ffffff', paddingTop: 'py-24', paddingBottom: 'py-24' }
+    content: { 
+      title: 'Craft Your Perfect Space', 
+      subtitle: 'Our curated collection combines timeless designs with modern comfort, helping you create a space where you can truly relax and unwind.', 
+      buttonText: 'SHOP NOW', 
+      buttonLink: '#shop',
+      imageSrc: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800'
+    },
+    styles: { bgColor: '#f5f2eb', textColor: '#1a1a1a', paddingTop: 'py-20', paddingBottom: 'py-20' }
   },
   {
     id: 'port1',
     type: 'portfolio',
-    name: 'Portfolio Grid',
+    name: 'Products Grid',
     content: {
-      title: 'Featured Case Studies',
+      title: 'Featured Collection',
       items: [
-        { id: '1', title: 'Figma-Style Website Builder', description: 'Visual editor with layers, zoom, and live properties inspector.', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=500' },
-        { id: '2', title: 'Relational Database Studio', description: 'Cloud dashboard with schema builders, GraphQL queries, and SQL Connect.', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500' }
+        { id: '1', title: 'Nakamura Sofa', description: 'Living Room', price: '$900', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500' },
+        { id: '2', title: 'Rimba Drawer Table', description: 'Living Room', price: '$750', image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500' },
+        { id: '3', title: 'Awan Armchair', description: 'Living Room', price: '$825', image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=500' }
       ]
     },
-    styles: { bgColor: '#ffffff', textColor: '#0f172a', paddingTop: 'py-20', paddingBottom: 'py-20' }
+    styles: { bgColor: '#f5f2eb', textColor: '#1a1a1a', paddingTop: 'py-16', paddingBottom: 'py-16' }
   },
   {
     id: 'f1',
     type: 'footer',
     name: 'Footer Section',
-    content: { copyrightText: '© 2026 Tonde Kawere. All rights reserved.' },
-    styles: { bgColor: '#0b1329', textColor: '#94a3b8', paddingTop: 'py-6', paddingBottom: 'py-6' }
+    content: { copyrightText: '© 2026 Rumah Ria. All rights reserved.' },
+    styles: { bgColor: '#1a1a1a', textColor: '#94a3b8', paddingTop: 'py-6', paddingBottom: 'py-6' }
   }
 ];
 
