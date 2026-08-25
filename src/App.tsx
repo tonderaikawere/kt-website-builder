@@ -64,6 +64,8 @@ function App() {
   const [showGridLines, setShowGridLines] = useState(false);
   const [activeTool, setActiveTool] = useState<'select' | 'shape' | 'text' | 'media'>('select');
   const [promptModal, setPromptModal] = useState<{ isOpen: boolean; title: string; defaultValue: string; onConfirm: (val: string) => void } | null>(null);
+  const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState({ mouseX: 0, mouseY: 0, blockX: 0, blockY: 0 });
 
   const [formSubmissions, setFormSubmissions] = useState<Array<{ id: string; name: string; email: string; message: string; date: string }>>(() => {
     try {
@@ -145,6 +147,83 @@ function App() {
     });
     setPages(pages.map(p => p.id === currentPageId ? { ...p, blocks: updatedBlocks } : p));
   };
+
+  // Mouse down / Drag-to-move block handler (Figma Style absolute positioning)
+  const handleBlockMouseDown = (e: React.MouseEvent, blockId: string) => {
+    if (isPreview) return;
+    const target = e.target as HTMLElement;
+    if (target.closest('[contenteditable="true"]') || target.closest('button') || target.closest('input') || target.closest('textarea')) {
+      return;
+    }
+    e.preventDefault();
+    setSelectedBlockId(blockId);
+    
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+    
+    const element = document.getElementById(`block-${blockId}`);
+    if (!element) return;
+    
+    const rect = element.getBoundingClientRect();
+    const parentRect = element.parentElement?.getBoundingClientRect();
+    if (!parentRect) return;
+    
+    const currentLeft = Math.round((rect.left - parentRect.left) / (zoomLevel / 100));
+    const currentTop = Math.round((rect.top - parentRect.top) / (zoomLevel / 100));
+    const currentWidth = Math.round(rect.width / (zoomLevel / 100));
+    const currentHeight = Math.round(rect.height / (zoomLevel / 100));
+    
+    const blockX = block.styles.x ? parseInt(block.styles.x, 10) : currentLeft;
+    const blockY = block.styles.y ? parseInt(block.styles.y, 10) : currentTop;
+    
+    if (!block.styles.x || !block.styles.y) {
+      updateBlockStyles(blockId, {
+        x: `${blockX}px`,
+        y: `${blockY}px`,
+        width: `${currentWidth}px`,
+        height: `${currentHeight}px`
+      });
+    }
+    
+    setDraggedBlockId(blockId);
+    setDragStart({
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      blockX,
+      blockY
+    });
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!draggedBlockId) return;
+      
+      const dx = Math.round((e.clientX - dragStart.mouseX) / (zoomLevel / 100));
+      const dy = Math.round((e.clientY - dragStart.mouseY) / (zoomLevel / 100));
+      
+      const newX = dragStart.blockX + dx;
+      const newY = dragStart.blockY + dy;
+      
+      updateBlockStyles(draggedBlockId, {
+        x: `${newX}px`,
+        y: `${newY}px`
+      });
+    };
+
+    const handleMouseUp = () => {
+      setDraggedBlockId(null);
+    };
+
+    if (draggedBlockId) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [draggedBlockId, dragStart, updateBlockStyles, zoomLevel]);
 
   // Export JSON
   const exportProjectJson = () => {
@@ -696,59 +775,72 @@ function App() {
                     <p className="text-xs max-w-xs mt-1 leading-normal text-slate-500">Drag items from presets, or choose tools from the sub-toolbar at the top to build layouts.</p>
                   </div>
                 ) : (
-                  /* Canvas Blocks List */
-                  <div className="flex flex-col w-full h-full">
-                    {blocks.map((block) => (
-                      <div 
-                        key={block.id} 
-                        id={`block-${block.id}`}
-                        onClick={(e) => {
-                          if (isPreview) return;
-                          e.stopPropagation();
-                          setSelectedBlockId(block.id);
-                        }}
-                        className={`relative group/block transition-all ${!isPreview && block.id === selectedBlockId ? 'ring-2 ring-[#6C63FF] ring-offset-2' : ''}`}
-                      >
-                        <BlockRenderer 
-                          block={block}
-                          isEditing={!isPreview}
-                          onContentChange={updateBlockContent}
-                          selectedElement={selectedElement}
-                          onSelectElement={(blockId, path, type) => {
-                            setSelectedElement({ blockId, elementPath: path, elementType: type });
+                  /* Canvas Blocks List (Absolute Layout Container) */
+                  <div className="relative w-full min-h-[1400px]">
+                    {blocks.map((block) => {
+                      const isAbsolute = !!(block.styles.x || block.styles.y);
+                      return (
+                        <div 
+                          key={block.id} 
+                          id={`block-${block.id}`}
+                          onMouseDown={(e) => handleBlockMouseDown(e, block.id)}
+                          onClick={(e) => {
+                            if (isPreview) return;
+                            e.stopPropagation();
+                            setSelectedBlockId(block.id);
                           }}
-                        />
+                          style={{
+                            position: isAbsolute ? 'absolute' : 'relative',
+                            left: isAbsolute ? block.styles.x : undefined,
+                            top: isAbsolute ? block.styles.y : undefined,
+                            width: isAbsolute ? block.styles.width : '100%',
+                            height: isAbsolute ? block.styles.height : 'auto',
+                            transform: block.styles.rotation ? `rotate(${block.styles.rotation})` : undefined,
+                            zIndex: selectedBlockId === block.id ? 20 : 10
+                          }}
+                          className={`group/block select-none ${!isPreview && block.id === selectedBlockId ? 'ring-2 ring-[#6C63FF] ring-offset-2' : ''}`}
+                        >
+                          <BlockRenderer 
+                            block={block}
+                            isEditing={!isPreview}
+                            onContentChange={updateBlockContent}
+                            selectedElement={selectedElement}
+                            onSelectElement={(blockId, path, type) => {
+                              setSelectedElement({ blockId, elementPath: path, elementType: type });
+                            }}
+                          />
 
-                        {/* Section Actions context menu */}
-                        {!isPreview && block.id === selectedBlockId && (
-                          <div className="absolute right-4 top-4 bg-slate-900 border border-slate-800 text-white rounded-lg p-1.5 shadow-xl flex items-center gap-2 z-30 scale-95 opacity-0 group-hover/block:opacity-100 group-hover/block:scale-100 transition-all">
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-800 rounded">{block.name}</span>
-                            <div className="w-px h-3 bg-slate-800" />
-                            <button
-                              onClick={() => moveBlock(block.id, 'up')}
-                              className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
-                              title="Move Up"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              onClick={() => moveBlock(block.id, 'down')}
-                              className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
-                              title="Move Down"
-                            >
-                              ▼
-                            </button>
-                            <button
-                              onClick={() => deleteBlock(block.id)}
-                              className="p-1 hover:bg-red-950 rounded text-slate-400 hover:text-red-500"
-                              title="Delete"
-                            >
-                              🗑
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                          {/* Section Actions context menu */}
+                          {!isPreview && block.id === selectedBlockId && (
+                            <div className="absolute right-4 top-4 bg-slate-900 border border-slate-800 text-white rounded-lg p-1.5 shadow-xl flex items-center gap-2 z-30 scale-95 opacity-0 group-hover/block:opacity-100 group-hover/block:scale-100 transition-all">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-800 rounded">{block.name}</span>
+                              <div className="w-px h-3 bg-slate-800" />
+                              <button
+                                onClick={() => moveBlock(block.id, 'up')}
+                                className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
+                                title="Move Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                onClick={() => moveBlock(block.id, 'down')}
+                                className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
+                                title="Move Down"
+                              >
+                                ▼
+                              </button>
+                              <button
+                                onClick={() => deleteBlock(block.id)}
+                                className="p-1 hover:bg-red-950 rounded text-slate-400 hover:text-red-500"
+                                title="Delete"
+                              >
+                                🗑
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
