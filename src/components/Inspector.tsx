@@ -365,16 +365,6 @@ export const Inspector: React.FC<InspectorProps> = ({
               <span className="text-[9px] font-mono uppercase dark:text-slate-200">{styles.bgColor || '#FFFFFF'}</span>
             </div>
           </div>
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold text-slate-500 block">Gradient Fill</span>
-            <input 
-              type="text" 
-              placeholder="linear-gradient(45deg, #6C63FF, #2D3748)"
-              value={styles.bgGradient || ''} 
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgGradient: e.target.value })}
-              className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
-            />
-          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2 pt-1">

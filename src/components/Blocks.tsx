@@ -29,7 +29,6 @@ const getBlockStyles = (
   return {
     backgroundColor: styles.bgImage ? undefined : (styles.bgColor || defaultBg),
     backgroundImage: styles.bgImage ? (styles.bgImage.startsWith('url') ? styles.bgImage : `url(${styles.bgImage})`) : undefined,
-    background: styles.bgGradient || undefined,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     color: styles.textColor || defaultText,

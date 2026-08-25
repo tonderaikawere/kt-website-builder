@@ -284,10 +284,10 @@ function App() {
         {/* Navigation Header */}
         <header className="h-16 px-8 border-b border-slate-800 bg-[#1e293b] flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6C63FF] to-pink-500 flex items-center justify-center text-white font-black text-sm shadow-md shadow-[#6C63FF]/30">
+            <div className="w-8 h-8 rounded-xl bg-[#6C63FF] flex items-center justify-center text-white font-black text-sm shadow-md">
               S
             </div>
-            <span className="font-extrabold tracking-tight text-md bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-350">
+            <span className="font-extrabold tracking-tight text-md text-white">
               SiteBuilder
             </span>
             <span className="text-[10px] bg-[#6C63FF]/20 text-[#818cf8] font-bold px-2 py-0.5 rounded-full border border-[#6C63FF]/30 uppercase tracking-wide">
@@ -343,7 +343,7 @@ function App() {
 
         {/* Hero Welcome Section */}
         <main className="flex-1 p-8 max-w-7xl mx-auto w-full space-y-10 overflow-y-auto">
-          <div className="p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-[#131a31] to-slate-900 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
+          <div className="p-8 rounded-3xl bg-[#1e293b] border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
             <div className="absolute right-0 top-0 w-96 h-96 bg-[#6C63FF] opacity-5 rounded-full blur-[100px] pointer-events-none"></div>
             <div className="space-y-2 relative">
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
@@ -372,14 +372,14 @@ function App() {
             <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Explore Design Templates</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { name: 'Creative Portfolio', desc: 'Sleek developer portfolio grid layouts with design sandboxes.', type: 'portfolio', img: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600', color: 'from-pink-500 to-[#6C63FF]' },
-                { name: 'Brand Storefront', desc: 'Product lists, prices, collapsable FAQ lists, and carts.', type: 'ecommerce', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600', color: 'from-[#6C63FF] to-blue-500' }
+                { name: 'Creative Portfolio', desc: 'Sleek developer portfolio grid layouts with design sandboxes.', type: 'portfolio', img: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600' },
+                { name: 'Brand Storefront', desc: 'Product lists, prices, collapsable FAQ lists, and carts.', type: 'ecommerce', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600' }
               ].map((tpl, i) => (
                 <div key={i} className="group bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-[#6C63FF]/50 transition-all flex flex-col">
                   <div className="aspect-[16/10] bg-slate-950 relative overflow-hidden">
                     <img src={tpl.img} alt={tpl.name} className="w-full h-full object-cover transition-transform duration-350 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent flex items-end p-4">
-                      <span className={`text-[10px] font-black uppercase text-white px-2 py-0.5 rounded bg-gradient-to-r ${tpl.color}`}>
+                    <div className="absolute inset-0 bg-slate-950/80 flex items-end p-4">
+                      <span className="text-[10px] font-black uppercase text-white px-2 py-0.5 rounded bg-[#6C63FF]">
                         {tpl.name} Preset
                       </span>
                     </div>
