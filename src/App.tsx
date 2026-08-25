@@ -58,7 +58,13 @@ const COLOR_PALETTES = [
 ];
 
 function App() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'editor'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'editor'>(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('project')) return 'editor';
+    } catch (e) {}
+    return 'dashboard';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo' | 'assets'>('blocks');
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -241,7 +247,7 @@ function App() {
           setPages(data.pages);
           if (data.settings) updateSettings(data.settings);
           alert('Project imported successfully!');
-          setCurrentView('editor');
+          window.open(`?project=${id}`, '_blank');
         } else {
           alert('Invalid file structure. Must be a multi-page site project.');
         }
@@ -304,8 +310,7 @@ function App() {
                   defaultValue: 'My Creative Site',
                   onConfirm: (name) => {
                     const id = createProject(name);
-                    loadProject(id);
-                    setCurrentView('editor');
+                    window.open(`?project=${id}`, '_blank');
                   }
                 });
               }}
@@ -347,8 +352,7 @@ function App() {
               <button 
                 onClick={() => {
                   const id = createProject('My Blank Site');
-                  loadProject(id);
-                  setCurrentView('editor');
+                  window.open(`?project=${id}`, '_blank');
                 }}
                 className="px-5 py-3 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-100 text-xs font-bold rounded-xl cursor-pointer transition-all"
               >
@@ -380,8 +384,7 @@ function App() {
                     <button 
                       onClick={() => {
                         const id = createProject(tpl.name, tpl.type);
-                        loadProject(id);
-                        setCurrentView('editor');
+                        window.open(`?project=${id}`, '_blank');
                       }}
                       className="w-full py-2.5 bg-[#6C63FF]/10 group-hover:bg-[#6C63FF] text-[#818cf8] group-hover:text-white text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
                     >
@@ -397,8 +400,7 @@ function App() {
                 <button
                   onClick={() => {
                     const id = createProject('Untitled Project');
-                    loadProject(id);
-                    setCurrentView('editor');
+                    window.open(`?project=${id}`, '_blank');
                   }}
                   className="mt-4 px-4 py-2 bg-slate-900 border border-slate-800 text-slate-350 text-xs font-bold rounded-xl hover:bg-slate-850 cursor-pointer"
                 >
@@ -454,8 +456,7 @@ function App() {
                     <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
                       <button 
                         onClick={() => {
-                          loadProject(proj.id);
-                          setCurrentView('editor');
+                          window.open(`?project=${proj.id}`, '_blank');
                         }}
                         className="px-3.5 py-1.5 bg-[#6C63FF] hover:bg-[#5b52e0] text-white text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1"
                       >

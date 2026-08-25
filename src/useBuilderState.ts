@@ -142,6 +142,11 @@ export function useBuilderState() {
   });
 
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const projId = urlParams.get('project');
+      if (projId && projects.some(p => p.id === projId)) return projId;
+    } catch (e) {}
     if (projects.length > 0) return projects[0].id;
     return null;
   });
