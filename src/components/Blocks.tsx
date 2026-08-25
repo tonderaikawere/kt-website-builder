@@ -63,6 +63,36 @@ const getSelectionBorderClass = (
   }`;
 };
 
+const getElementInlineStyles = (
+  blockContent: any,
+  elementPath: string,
+  extraStyles: React.CSSProperties = {}
+): React.CSSProperties => {
+  const w = blockContent[`${elementPath}Width`] || undefined;
+  const h = blockContent[`${elementPath}Height`] || undefined;
+  const x = blockContent[`${elementPath}X`] || '';
+  const y = blockContent[`${elementPath}Y`] || '';
+  const rotation = blockContent[`${elementPath}Rotation`] || '';
+  const fontSize = blockContent[`${elementPath}FontSize`];
+  const parsedFontSize = fontSize ? `${fontSize}px` : undefined;
+  const color = blockContent[`${elementPath}Color`];
+
+  const transform = [
+    x || y ? `translate(${x || '0px'}, ${y || '0px'})` : '',
+    rotation ? `rotate(${rotation})` : ''
+  ].filter(Boolean).join(' ');
+
+  return {
+    width: w,
+    height: h,
+    transform: transform || undefined,
+    position: (x || y) ? 'absolute' : 'relative',
+    fontSize: parsedFontSize,
+    color: color || undefined,
+    ...extraStyles
+  };
+};
+
 const handleElementDoubleClick = (e: React.MouseEvent<HTMLElement>, isEditing: boolean) => {
   if (!isEditing) return;
   e.stopPropagation();
@@ -351,10 +381,7 @@ export const HeaderBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
             if (onSelectElement) onSelectElement(block.id, 'logoText', 'logoText');
           }}
           onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
-          style={{
-            fontSize: block.content.logoTextFontSize ? `${block.content.logoTextFontSize}px` : undefined,
-            color: block.content.logoTextColor || undefined
-          }}
+          style={getElementInlineStyles(block.content, 'logoText')}
           className={getSelectionBorderClass(block.id, 'logoText', selectedElement, isEditing)}
         >
           {logoText}
@@ -448,10 +475,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               if (onSelectElement) onSelectElement(block.id, 'title', 'title');
             }}
             onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
-            style={{
-              fontSize: block.content.titleFontSize ? `${block.content.titleFontSize}px` : undefined,
-              color: block.content.titleColor || undefined
-            }}
+            style={getElementInlineStyles(block.content, 'title')}
             className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
           >
             {title}
@@ -481,10 +505,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
               if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
             }}
             onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
-            style={{
-              fontSize: block.content.subtitleFontSize ? `${block.content.subtitleFontSize}px` : undefined,
-              color: block.content.subtitleColor || undefined
-            }}
+            style={getElementInlineStyles(block.content, 'subtitle')}
             className={`text-lg md:text-xl opacity-90 max-w-2xl mb-8 ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
           >
             {subtitle}
@@ -503,9 +524,9 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onC
             </>
           )}
         </div>
-        <div className="relative">
+        <div className="relative" style={getElementInlineStyles(block.content, 'buttonText')}>
           <span 
-            className={`inline-block px-6 py-3 font-semibold text-indigo-600 bg-white shadow hover:bg-indigo-50 transition-colors ${styles.borderRadius || 'rounded-md'}`}
+            className={`inline-block px-6 py-3 font-semibold text-indigo-650 bg-white shadow hover:bg-indigo-50 transition-colors ${styles.borderRadius || 'rounded-md'}`}
           >
             <span
               contentEditable={isEditing}
@@ -646,10 +667,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
               if (onSelectElement) onSelectElement(block.id, 'title', 'title');
             }}
             onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
-            style={{
-              fontSize: block.content.titleFontSize ? `${block.content.titleFontSize}px` : undefined,
-              color: block.content.titleColor || undefined
-            }}
+            style={getElementInlineStyles(block.content, 'title')}
             className={`text-3xl font-extrabold tracking-tight mb-3 ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
           >
             {title}
@@ -679,10 +697,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
               if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
             }}
             onDoubleClick={(e) => handleElementDoubleClick(e, isEditing)}
-            style={{
-              fontSize: block.content.subtitleFontSize ? `${block.content.subtitleFontSize}px` : undefined,
-              color: block.content.subtitleColor || undefined
-            }}
+            style={getElementInlineStyles(block.content, 'subtitle')}
             className={`text-slate-650 opacity-90 max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
           >
             {subtitle}

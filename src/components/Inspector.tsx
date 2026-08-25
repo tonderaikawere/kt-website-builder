@@ -58,6 +58,42 @@ export const Inspector: React.FC<InspectorProps> = ({
     const currentFontSize = (selectedBlock.content as any)[`${elementPath}FontSize`] || '';
     const currentColor = (selectedBlock.content as any)[`${elementPath}Color`] || '';
 
+    const elementWidth = (selectedBlock.content as any)[`${elementPath}Width`] || '';
+    const elementHeight = (selectedBlock.content as any)[`${elementPath}Height`] || '';
+    const elementX = (selectedBlock.content as any)[`${elementPath}X`] || '';
+    const elementY = (selectedBlock.content as any)[`${elementPath}Y`] || '';
+    const elementRotation = (selectedBlock.content as any)[`${elementPath}Rotation`] || '';
+
+    const handleWidthChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}Width`]: val });
+      }
+    };
+
+    const handleHeightChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}Height`]: val });
+      }
+    };
+
+    const handleXChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}X`]: val });
+      }
+    };
+
+    const handleYChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}Y`]: val });
+      }
+    };
+
+    const handleRotationChange = (val: string) => {
+      if (onUpdateBlockContent) {
+        onUpdateBlockContent(selectedBlock.id, { [`${elementPath}Rotation`]: val });
+      }
+    };
+
     const handleFontSizeChange = (val: string) => {
       if (onUpdateBlockContent) {
         onUpdateBlockContent(selectedBlock.id, { [`${elementPath}FontSize`]: val });
@@ -181,6 +217,63 @@ export const Inspector: React.FC<InspectorProps> = ({
                 />
                 <span className="text-[10px] font-mono uppercase">{currentColor || '#1E293B'}</span>
               </div>
+            </div>
+          </div>
+
+          {/* Layout & Coordinates for active element */}
+          <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-brand-ink/50">
+            <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Layout & Coordinates</span>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                <span className="block text-[8px] text-slate-450 font-bold uppercase">Width</span>
+                <input 
+                  type="text" 
+                  value={elementWidth} 
+                  placeholder="auto"
+                  onChange={(e) => handleWidthChange(e.target.value)}
+                  className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+                />
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                <span className="block text-[8px] text-slate-450 font-bold uppercase">Height</span>
+                <input 
+                  type="text" 
+                  value={elementHeight} 
+                  placeholder="auto"
+                  onChange={(e) => handleHeightChange(e.target.value)}
+                  className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+                />
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                <span className="block text-[8px] text-slate-450 font-bold uppercase">X Pos</span>
+                <input 
+                  type="text" 
+                  value={elementX} 
+                  placeholder="0px"
+                  onChange={(e) => handleXChange(e.target.value)}
+                  className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+                />
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                <span className="block text-[8px] text-slate-450 font-bold uppercase">Y Pos</span>
+                <input 
+                  type="text" 
+                  value={elementY} 
+                  placeholder="0px"
+                  onChange={(e) => handleYChange(e.target.value)}
+                  className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+                />
+              </div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+              <span className="block text-[8px] text-slate-450 font-bold uppercase">Rotation</span>
+              <input 
+                type="text" 
+                value={elementRotation} 
+                placeholder="0deg"
+                onChange={(e) => handleRotationChange(e.target.value)}
+                className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+              />
             </div>
           </div>
         </div>

@@ -63,6 +63,7 @@ function App() {
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [showGridLines, setShowGridLines] = useState(false);
   const [activeTool, setActiveTool] = useState<'select' | 'shape' | 'text' | 'media'>('select');
+  const [promptModal, setPromptModal] = useState<{ isOpen: boolean; title: string; defaultValue: string; onConfirm: (val: string) => void } | null>(null);
 
   const [formSubmissions, setFormSubmissions] = useState<Array<{ id: string; name: string; email: string; message: string; date: string }>>(() => {
     try {
@@ -228,12 +229,16 @@ function App() {
             </div>
             <button 
               onClick={() => {
-                const name = window.prompt('Enter new site name:');
-                if (name) {
-                  const id = createProject(name);
-                  loadProject(id);
-                  setCurrentView('editor');
-                }
+                setPromptModal({
+                  isOpen: true,
+                  title: 'Create New Site',
+                  defaultValue: 'My Creative Site',
+                  onConfirm: (name) => {
+                    const id = createProject(name);
+                    loadProject(id);
+                    setCurrentView('editor');
+                  }
+                });
               }}
               className="px-4 py-2 bg-[#6C63FF] hover:bg-[#5b52e0] text-white text-xs font-bold rounded-xl shadow-md shadow-[#6C63FF]/20 cursor-pointer transition-all flex items-center gap-1.5"
             >
@@ -433,7 +438,7 @@ function App() {
                 onClick={() => {
                   setActiveTool(tool.id as any);
                   if (tool.id === 'shape') {
-                    addBlock('sandbox', { title: 'New Shape Element' }, { bgColor: '#6c63ff', width: '200px', height: '150px', borderRadius: 'rounded-xl' });
+                    addBlock('sandbox', { title: 'Design Sandbox Board', subtitle: 'Draw wireframe designs, rects, circles, or write custom notes directly on the page.' });
                   } else if (tool.id === 'text') {
                     addBlock('features', { title: 'Editable Text Element', description: 'Double click this block to customize layout colors and inline fonts.' });
                   } else if (tool.id === 'media') {
@@ -516,8 +521,14 @@ function App() {
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pages (1-100)</span>
                 <button
                   onClick={() => {
-                    const name = window.prompt('Enter new page name:');
-                    if (name) addPage(name);
+                    setPromptModal({
+                      isOpen: true,
+                      title: 'Add New Page',
+                      defaultValue: 'New Page',
+                      onConfirm: (name) => {
+                        addPage(name);
+                      }
+                    });
                   }}
                   className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white cursor-pointer transition-colors"
                   title="Add Page"
@@ -941,6 +952,52 @@ function App() {
 
       {/* Rich Text Inline Toolbar */}
       {!isPreview && <RichTextToolbar />}
+
+      {/* Prompt Modal Dialog */}
+      {promptModal && promptModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-150">
+          <div className="bg-[#1e293b] border border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-slate-100 animate-in zoom-in-95 duration-150">
+            <h3 className="font-bold text-sm text-white">{promptModal.title}</h3>
+            <input
+              type="text"
+              defaultValue={promptModal.defaultValue}
+              id="prompt-modal-input"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#6C63FF]"
+              placeholder="Name..."
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = (document.getElementById('prompt-modal-input') as HTMLInputElement)?.value;
+                  if (val) {
+                    promptModal.onConfirm(val);
+                    setPromptModal(null);
+                  }
+                }
+              }}
+            />
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setPromptModal(null)}
+                className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-350 text-[11px] font-bold rounded-lg cursor-pointer transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const val = (document.getElementById('prompt-modal-input') as HTMLInputElement)?.value;
+                  if (val) {
+                    promptModal.onConfirm(val);
+                    setPromptModal(null);
+                  }
+                }}
+                className="px-4 py-1.5 bg-[#6C63FF] hover:bg-[#5b52e0] text-white text-[11px] font-bold rounded-lg cursor-pointer transition-colors"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
