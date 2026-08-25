@@ -1,6 +1,7 @@
 export interface BlockStyles {
   bgColor?: string;
   bgImage?: string;
+  bgGradient?: string;
   textColor?: string;
   paddingTop?: string; // e.g. "py-12"
   paddingBottom?: string;
@@ -13,6 +14,14 @@ export interface BlockStyles {
   flexJustify?: string;
   flexAlign?: string;
   customCss?: string;
+  width?: string;
+  height?: string;
+  x?: string;
+  y?: string;
+  rotation?: string;
+  opacity?: string;
+  shadow?: string;
+  lineHeight?: string;
 }
 
 export type BlockType = 
@@ -101,6 +110,9 @@ export interface ProjectSettings {
 }
 
 export interface Project {
+  id: string;
+  name: string;
   pages: Page[];
   settings: ProjectSettings;
+  updatedAt: string;
 }

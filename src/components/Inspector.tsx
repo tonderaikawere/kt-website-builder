@@ -2,9 +2,7 @@ import React from 'react';
 import type { Block, BlockStyles } from '../types';
 import { 
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
-  Star, Heart, Check, Phone, Mail, Globe, Info, HelpCircle, 
-  ArrowRight, Search, User, Settings, Code, Monitor, Briefcase, 
-  Layers, Shield
+  Sliders, Palette, Type, Layout
 } from 'lucide-react';
 
 interface InspectorProps {
@@ -24,14 +22,17 @@ export const Inspector: React.FC<InspectorProps> = ({
 }) => {
   if (!selectedBlock) {
     return (
-      <div className="text-center py-8 text-slate-400 text-sm">
-        Select a section on the canvas to customize its style parameters.
+      <div className="flex flex-col items-center justify-center py-16 text-slate-400 text-xs text-center px-4 space-y-2">
+        <Sliders className="w-8 h-8 text-slate-300 dark:text-slate-700" />
+        <span className="font-semibold text-slate-500">No element selected</span>
+        <p className="max-w-[180px] leading-normal text-[10px] text-slate-400">Select any layout section or double-click text elements to inspect Figma properties.</p>
       </div>
     );
   }
 
   const { styles } = selectedBlock;
 
+  // Render properties when an element is active (Double Clicked text/button/link)
   if (selectedElement && selectedElement.blockId === selectedBlock.id) {
     const { elementPath, elementType } = selectedElement;
     
@@ -99,452 +100,283 @@ export const Inspector: React.FC<InspectorProps> = ({
     };
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-5 animate-in fade-in duration-200">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-brand-ink pb-3">
           <button
             onClick={() => onSelectElement && onSelectElement(null)}
-            className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer font-medium"
+            className="text-[10px] uppercase font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center gap-1 cursor-pointer"
           >
-            ← Back to Section
+            ← Close Inspector
           </button>
-          <span className="text-[10px] uppercase font-bold text-brand-accent tracking-wider">
-            Active Element
+          <span className="text-[9px] uppercase font-extrabold text-[#6C63FF] tracking-wider px-2 py-0.5 bg-[#6C63FF]/10 rounded">
+            Figma Element
           </span>
         </div>
 
         <div>
-          <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
-            {elementType === 'title' ? 'Edit Heading' : elementType === 'subtitle' ? 'Edit Subheading' : elementType === 'button' ? 'Edit Action Button' : elementType === 'image' ? 'Edit Cover Image' : `Edit ${elementType}`}
+          <h3 className="font-bold text-slate-800 dark:text-white text-xs uppercase">
+            {elementType === 'title' ? 'Header Content' : elementType === 'subtitle' ? 'Subheading Content' : elementType === 'button' ? 'Action Button' : `Edit ${elementType}`}
           </h3>
-          <p className="text-[10px] text-slate-400 mt-0.5">Customize content & layout details</p>
+          <p className="text-[9px] text-slate-400 mt-0.5">Customize active element properties below.</p>
         </div>
 
         <div className="space-y-4 pt-2">
-          {/* Main Text / Image URL Input */}
-          {elementType !== 'icon' && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-350">
-                {elementType === 'image' ? 'Image File URL' : 'Content Text'}
-              </label>
-              {elementType === 'description' ? (
-                <textarea
-                  rows={4}
-                  value={currentValue}
-                  onChange={(e) => handleValueChange(e.target.value)}
-                  className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-350"
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={currentValue}
-                  onChange={(e) => handleValueChange(e.target.value)}
-                  className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355"
-                />
-              )}
-            </div>
-          )}
-
-          {/* Interactive Visual Icon Picker */}
-          {elementType === 'icon' && (
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Select Icon Shape</label>
-              <div className="grid grid-cols-5 gap-2 bg-slate-50 dark:bg-brand-deep/30 p-2.5 rounded-lg border border-slate-200 dark:border-brand-ink">
-                {[
-                  { name: 'Star', comp: Star },
-                  { name: 'Heart', comp: Heart },
-                  { name: 'Check', comp: Check },
-                  { name: 'Phone', comp: Phone },
-                  { name: 'Mail', comp: Mail },
-                  { name: 'Globe', comp: Globe },
-                  { name: 'Info', comp: Info },
-                  { name: 'HelpCircle', comp: HelpCircle },
-                  { name: 'ArrowRight', comp: ArrowRight },
-                  { name: 'Search', comp: Search },
-                  { name: 'User', comp: User },
-                  { name: 'Settings', comp: Settings },
-                  { name: 'Code', comp: Code },
-                  { name: 'Monitor', comp: Monitor },
-                  { name: 'Briefcase', comp: Briefcase },
-                  { name: 'Layers', comp: Layers },
-                  { name: 'Shield', comp: Shield }
-                ].map(ic => {
-                  const IconComp = ic.comp;
-                  const isCurrent = currentValue === ic.name;
-                  return (
-                    <button
-                      key={ic.name}
-                      onClick={() => handleValueChange(ic.name)}
-                      className={`p-2 rounded-md hover:bg-slate-200 dark:hover:bg-brand-ink flex items-center justify-center transition-all cursor-pointer ${isCurrent ? 'bg-brand-accent text-white shadow-sm scale-110' : 'text-slate-550 dark:text-slate-400 hover:text-slate-900'}`}
-                      title={ic.name}
-                    >
-                      <IconComp className="w-4 h-4" />
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="text-[10px] text-slate-450 italic mt-1 pl-1">
-                Selected: <span className="font-bold font-mono text-brand-accent">{currentValue || 'None'}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Action Destination URL (For Buttons / Links) */}
-          {(elementType === 'button' || elementType === 'link') && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Link Destination URL</label>
+          {/* Main Text Content */}
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+              {elementType === 'image' ? 'Image Cover URL' : 'Content Text'}
+            </label>
+            {elementType === 'description' ? (
+              <textarea
+                rows={3}
+                value={currentValue}
+                onChange={(e) => handleValueChange(e.target.value)}
+                className="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100 resize-none leading-relaxed"
+              />
+            ) : (
               <input
                 type="text"
-                placeholder="https://..."
+                value={currentValue}
+                onChange={(e) => handleValueChange(e.target.value)}
+                className="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
+              />
+            )}
+          </div>
+
+          {/* Action Links */}
+          {(elementType === 'button' || elementPath.includes('link') || elementPath === 'buttonText') && (
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Action Link URL</label>
+              <input
+                type="text"
                 value={currentLinkValue}
                 onChange={(e) => handleLinkChange(e.target.value)}
-                className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-355 font-mono"
+                placeholder="https://example.com"
+                className="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
               />
             </div>
           )}
 
-          {/* Typography options for text elements */}
-          {(elementType === 'title' || elementType === 'subtitle' || elementType === 'description' || elementType === 'logoText') && (
-            <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-brand-ink">
-              <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Typography</h4>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-slate-500">Size (px)</label>
-                  <input
-                    type="number"
-                    min="10"
-                    max="100"
-                    placeholder="Auto"
-                    value={currentFontSize}
-                    onChange={(e) => handleFontSizeChange(e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none text-slate-700 dark:text-slate-350"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-slate-500">Color</label>
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="color"
-                      value={currentColor || '#000000'}
-                      onChange={(e) => handleColorChange(e.target.value)}
-                      className="w-8 h-8 rounded border border-slate-200 p-0 bg-transparent cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Inherit"
-                      value={currentColor}
-                      onChange={(e) => handleColorChange(e.target.value)}
-                      className="w-full text-[10px] px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none text-slate-700 dark:text-slate-355 font-mono"
-                    />
-                  </div>
-                </div>
+          {/* Font Size & Color Pickers */}
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-brand-ink/50">
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Font Size (px)</label>
+              <input
+                type="number"
+                min="8"
+                max="120"
+                value={currentFontSize || '16'}
+                onChange={(e) => handleFontSizeChange(e.target.value)}
+                className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none dark:text-slate-100"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Text Color</label>
+              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 p-1.5 rounded-lg">
+                <input
+                  type="color"
+                  value={currentColor || '#1e293b'}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  className="w-6 h-6 border-0 rounded cursor-pointer bg-transparent"
+                />
+                <span className="text-[10px] font-mono uppercase">{currentColor || '#1E293B'}</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
   }
 
+  // Section Layout & Style Properties (Figma inspector)
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="font-semibold text-slate-900 dark:text-white text-sm">Styles Inspector</h3>
-        <p className="text-[10px] text-slate-400 mt-0.5">Customize {selectedBlock.name} appearance</p>
+    <div className="space-y-5 animate-in fade-in duration-200">
+      <div className="flex justify-between items-center border-b border-slate-100 dark:border-brand-ink pb-3">
+        <h3 className="font-bold text-xs text-slate-800 dark:text-white uppercase tracking-wider">Properties</h3>
+        <span className="text-[9px] font-bold text-slate-400 font-mono">ID: #{selectedBlock.id}</span>
       </div>
 
-      <div className="border-t border-slate-100 dark:border-brand-ink pt-4 space-y-4">
-        {/* Background Color */}
+      {/* 1. Layout & Coordinates */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <Layout className="w-3.5 h-3.5 text-slate-400" />
+          <span>Layout & Coordinates</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-800/80">
+            <span className="block text-[8px] text-slate-400 font-bold uppercase">Width</span>
+            <input 
+              type="text" 
+              value={styles.width || '100%'} 
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { width: e.target.value })}
+              className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+            />
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-850 p-2 rounded-lg border border-slate-200/50 dark:border-slate-800/80">
+            <span className="block text-[8px] text-slate-400 font-bold uppercase">Height</span>
+            <input 
+              type="text" 
+              value={styles.height || 'auto'} 
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { height: e.target.value })}
+              className="w-full bg-transparent border-none text-[11px] font-bold dark:text-white focus:outline-none p-0 mt-0.5" 
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          <div className="bg-slate-50 dark:bg-slate-850 p-1.5 rounded-lg border border-slate-200/50 dark:border-slate-800/80">
+            <span className="block text-[8px] text-slate-400 font-bold uppercase">X</span>
+            <input 
+              type="text" 
+              value={styles.x || '0px'} 
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { x: e.target.value })}
+              className="w-full bg-transparent border-none text-[10px] font-mono dark:text-white focus:outline-none p-0" 
+            />
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-850 p-1.5 rounded-lg border border-slate-200/50 dark:border-slate-800/80">
+            <span className="block text-[8px] text-slate-400 font-bold uppercase">Y</span>
+            <input 
+              type="text" 
+              value={styles.y || '0px'} 
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { y: e.target.value })}
+              className="w-full bg-transparent border-none text-[10px] font-mono dark:text-white focus:outline-none p-0" 
+            />
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-850 p-1.5 rounded-lg border border-slate-200/50 dark:border-slate-800/80">
+            <span className="block text-[8px] text-slate-400 font-bold uppercase">Rotation</span>
+            <input 
+              type="text" 
+              value={styles.rotation || '0deg'} 
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { rotation: e.target.value })}
+              className="w-full bg-transparent border-none text-[10px] font-mono dark:text-white focus:outline-none p-0" 
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Color Fill & Stroke */}
+      <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-brand-ink/50">
+        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <Palette className="w-3.5 h-3.5 text-slate-400" />
+          <span>Fills & Borders</span>
+        </div>
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">Background Color</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={styles.bgColor || '#ffffff'}
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgColor: e.target.value })}
-              className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0 overflow-hidden bg-transparent shrink-0"
-            />
-            <input
-              type="text"
-              value={styles.bgColor || '#ffffff'}
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgColor: e.target.value })}
-              className="flex-1 text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent font-mono text-slate-700 dark:text-slate-300"
-            />
-          </div>
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {['#ffffff', '#f8fafc', '#f1f5f9', '#0b4a86', '#061a3b', '#07162f'].map((color) => (
-              <button
-                key={color}
-                onClick={() => onUpdateStyles(selectedBlock.id, { bgColor: color })}
-                style={{ backgroundColor: color }}
-                className={`w-5 h-5 rounded-full border border-slate-200 shadow-sm transition-transform hover:scale-110 ${
-                  styles.bgColor === color ? 'ring-2 ring-brand-accent ring-offset-1' : ''
-                }`}
-                title={color}
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-slate-500">Solid Color</span>
+            <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-850 p-1 rounded-lg border border-slate-250 dark:border-slate-700">
+              <input 
+                type="color" 
+                value={styles.bgColor || '#ffffff'} 
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { bgColor: e.target.value })}
+                className="w-5 h-5 border-0 rounded cursor-pointer bg-transparent"
               />
-            ))}
+              <span className="text-[9px] font-mono uppercase dark:text-slate-200">{styles.bgColor || '#FFFFFF'}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold text-slate-500 block">Gradient Fill</span>
+            <input 
+              type="text" 
+              placeholder="linear-gradient(45deg, #6C63FF, #2D3748)"
+              value={styles.bgGradient || ''} 
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgGradient: e.target.value })}
+              className="w-full text-xs p-2 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none dark:text-slate-100"
+            />
           </div>
         </div>
 
-        {/* Background Image */}
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-350 block">Background Image URL</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="https://images.unsplash.com/... (optional)"
-              value={styles.bgImage || ''}
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { bgImage: e.target.value })}
-              className="flex-1 text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-            />
-            {styles.bgImage && (
-              <button
-                onClick={() => onUpdateStyles(selectedBlock.id, { bgImage: '' })}
-                className="text-xs text-red-500 hover:text-red-650 px-2 py-1 bg-red-50 dark:bg-red-950/30 rounded border border-red-200 dark:border-red-900/50 cursor-pointer font-medium"
-              >
-                Clear
-              </button>
-            )}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold text-slate-500 block">Stroke</span>
+            <select
+              value={styles.borderWidth || 'border-0'}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { borderWidth: e.target.value })}
+              className="w-full text-[10px] p-2 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-slate-200"
+            >
+              <option value="border-0">None</option>
+              <option value="border">Thin (1px)</option>
+              <option value="border-2">Medium (2px)</option>
+              <option value="border-4">Thick (4px)</option>
+            </select>
           </div>
-        </div>
-
-        {/* Text Color */}
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">Text Color</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={styles.textColor || '#07162f'}
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { textColor: e.target.value })}
-              className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer p-0 overflow-hidden bg-transparent shrink-0"
-            />
-            <input
-              type="text"
-              value={styles.textColor || '#07162f'}
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { textColor: e.target.value })}
-              className="flex-1 text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent font-mono text-slate-700 dark:text-slate-300"
-            />
-          </div>
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {['#07162f', '#64748b', '#94a3b8', '#ffffff', '#0b4a86', '#aa3bff'].map((color) => (
-              <button
-                key={color}
-                onClick={() => onUpdateStyles(selectedBlock.id, { textColor: color })}
-                style={{ backgroundColor: color }}
-                className={`w-5 h-5 rounded-full border border-slate-200 shadow-sm transition-transform hover:scale-110 ${
-                  styles.textColor === color ? 'ring-2 ring-brand-accent ring-offset-1' : ''
-                }`}
-                title={color}
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold text-slate-500 block">Stroke Color</span>
+            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-850 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+              <input 
+                type="color" 
+                value={styles.borderColor || '#cbd5e1'} 
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { borderColor: e.target.value })}
+                className="w-4 h-4 border-0 rounded cursor-pointer"
               />
-            ))}
-          </div>
-        </div>
-
-        {/* Spacing Controls */}
-        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">Spacing (Padding & Margin)</label>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Padding Top</label>
-              <select
-                value={styles.paddingTop || 'py-16'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { paddingTop: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-              >
-                <option value="py-0">None (0px)</option>
-                <option value="py-4">Tiny (16px)</option>
-                <option value="py-8">Small (32px)</option>
-                <option value="py-12">Medium (48px)</option>
-                <option value="py-16">Default (64px)</option>
-                <option value="py-20">Large (80px)</option>
-                <option value="py-24">Extra Large (96px)</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Padding Bottom</label>
-              <select
-                value={styles.paddingBottom || 'py-16'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { paddingBottom: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-              >
-                <option value="py-0">None (0px)</option>
-                <option value="py-4">Tiny (16px)</option>
-                <option value="py-8">Small (32px)</option>
-                <option value="py-12">Medium (48px)</option>
-                <option value="py-16">Default (64px)</option>
-                <option value="py-20">Large (80px)</option>
-                <option value="py-24">Extra Large (96px)</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Margin Top</label>
-              <select
-                value={styles.marginTop || 'mt-0'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { marginTop: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-              >
-                <option value="mt-0">None (0px)</option>
-                <option value="mt-2">Small (8px)</option>
-                <option value="mt-4">Medium (16px)</option>
-                <option value="mt-8">Large (32px)</option>
-                <option value="mt-12">Extra Large (48px)</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Margin Bottom</label>
-              <select
-                value={styles.marginBottom || 'mb-0'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { marginBottom: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-              >
-                <option value="mb-0">None (0px)</option>
-                <option value="mb-2">Small (8px)</option>
-                <option value="mb-4">Medium (16px)</option>
-                <option value="mb-8">Large (32px)</option>
-                <option value="mb-12">Extra Large (48px)</option>
-              </select>
+              <span className="text-[9px] font-mono uppercase">{styles.borderColor || '#CBD5E1'}</span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Border Customizer */}
-        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-650 dark:text-slate-300 block">Border Customization</label>
+      {/* 3. Spacing & Opacity */}
+      <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-brand-ink/50">
+        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <Type className="w-3.5 h-3.5 text-slate-400" />
+          <span>Effects & Spacing</span>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-slate-500">Opacity</span>
+            <input 
+              type="range" 
+              min="10" 
+              max="100" 
+              value={styles.opacity ? parseInt(styles.opacity) : 100}
+              onChange={(e) => onUpdateStyles(selectedBlock.id, { opacity: `${e.target.value}%` })}
+              className="w-24 accent-[#6C63FF]"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Thickness</label>
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-slate-500 block">Corner Radius</span>
               <select
-                value={styles.borderWidth || '0px'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { borderWidth: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
+                value={styles.borderRadius || 'rounded-none'}
+                onChange={(e) => onUpdateStyles(selectedBlock.id, { borderRadius: e.target.value })}
+                className="w-full text-[10px] p-2 bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-slate-200"
               >
-                <option value="0px">None (0px)</option>
-                <option value="1px">Thin (1px)</option>
-                <option value="2px">Medium (2px)</option>
-                <option value="4px">Thick (4px)</option>
-                <option value="8px">Extra Thick (8px)</option>
+                <option value="rounded-none">None (0px)</option>
+                <option value="rounded-md">Small (6px)</option>
+                <option value="rounded-xl">Large (12px)</option>
+                <option value="rounded-3xl">Extra Large (24px)</option>
+                <option value="rounded-full">Pill (999px)</option>
               </select>
             </div>
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Border Color</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="color"
-                  value={styles.borderColor || '#cbd5e1'}
-                  onChange={(e) => onUpdateStyles(selectedBlock.id, { borderColor: e.target.value })}
-                  className="w-8 h-8 rounded border border-slate-200 dark:border-slate-700 bg-transparent p-0 cursor-pointer overflow-hidden"
-                />
-                <input
-                  type="text"
-                  value={styles.borderColor || ''}
-                  placeholder="#cbd5e1"
-                  onChange={(e) => onUpdateStyles(selectedBlock.id, { borderColor: e.target.value })}
-                  className="w-full text-xs px-1 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none text-[10px] text-slate-700 dark:text-slate-300"
-                />
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-slate-500 block">Text Align</span>
+              <div className="flex border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                {(['left', 'center', 'right', 'justify'] as const).map((align) => (
+                  <button
+                    key={align}
+                    onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: align })}
+                    className={`flex-1 py-1.5 flex justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${styles.textAlign === align ? 'bg-slate-150 dark:bg-slate-800 text-[#6C63FF]' : 'text-slate-400'}`}
+                  >
+                    {align === 'left' ? <AlignLeft className="w-3 h-3" /> :
+                     align === 'center' ? <AlignCenter className="w-3 h-3" /> :
+                     align === 'right' ? <AlignRight className="w-3 h-3" /> :
+                     <AlignJustify className="w-3 h-3" />}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
-          <div>
-            <label className="text-[10px] text-slate-400 block mb-1">Button & Image Rounding</label>
-            <select
-              value={styles.borderRadius || 'rounded-md'}
-              onChange={(e) => onUpdateStyles(selectedBlock.id, { borderRadius: e.target.value })}
-              className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-            >
-              <option value="rounded-none">Sharp Corners (rounded-none)</option>
-              <option value="rounded-sm">Rounded Small (rounded-sm)</option>
-              <option value="rounded-md">Rounded Medium (rounded-md)</option>
-              <option value="rounded-lg">Rounded Large (rounded-lg)</option>
-              <option value="rounded-xl">Rounded Extra Large (rounded-xl)</option>
-              <option value="rounded-full">Pill / Circle (rounded-full)</option>
-            </select>
-          </div>
         </div>
+      </div>
 
-        {/* Text Alignment */}
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-650 dark:text-slate-300 block">Text Alignment</label>
-          <div className="flex bg-slate-50 dark:bg-brand-deep border border-slate-200 dark:border-brand-ink p-1 rounded-lg w-fit">
-            <button
-              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'left' })}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${styles.textAlign === 'left' ? 'bg-white dark:bg-brand-ink text-brand-accent shadow-sm' : 'text-slate-500 hover:text-slate-950 dark:hover:text-white'}`}
-              title="Align Left"
-            >
-              <AlignLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'center' })}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${styles.textAlign === 'center' || !styles.textAlign ? 'bg-white dark:bg-brand-ink text-brand-accent shadow-sm' : 'text-slate-500 hover:text-slate-950 dark:hover:text-white'}`}
-              title="Align Center"
-            >
-              <AlignCenter className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'right' })}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${styles.textAlign === 'right' ? 'bg-white dark:bg-brand-ink text-brand-accent shadow-sm' : 'text-slate-500 hover:text-slate-950 dark:hover:text-white'}`}
-              title="Align Right"
-            >
-              <AlignRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onUpdateStyles(selectedBlock.id, { textAlign: 'justify' })}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${styles.textAlign === 'justify' ? 'bg-white dark:bg-brand-ink text-brand-accent shadow-sm' : 'text-slate-500 hover:text-slate-950 dark:hover:text-white'}`}
-              title="Align Justify"
-            >
-              <AlignJustify className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Layout Flex Alignment */}
-        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-650 dark:text-slate-350 block">Flex Content Alignment</label>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Horizontal Align</label>
-              <select
-                value={styles.flexJustify || 'justify-center'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { flexJustify: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-              >
-                <option value="justify-start">Align Left</option>
-                <option value="justify-center">Center</option>
-                <option value="justify-end">Align Right</option>
-                <option value="justify-between">Space Between</option>
-                <option value="justify-around">Space Around</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 block mb-1">Vertical Align</label>
-              <select
-                value={styles.flexAlign || 'items-center'}
-                onChange={(e) => onUpdateStyles(selectedBlock.id, { flexAlign: e.target.value })}
-                className="w-full text-xs px-2 py-1.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent text-slate-700 dark:text-slate-300"
-              >
-                <option value="items-start">Align Top</option>
-                <option value="items-center">Center</option>
-                <option value="items-end">Align Bottom</option>
-                <option value="items-stretch">Stretch</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Block Custom CSS */}
-        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-brand-ink">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 block">Block Custom CSS</label>
-          <textarea
-            rows={4}
-            value={styles.customCss || ''}
-            onChange={(e) => onUpdateStyles(selectedBlock.id, { customCss: e.target.value })}
-            placeholder={`.block-id {\n  border: 2px dashed #aa3bff;\n}`}
-            className="w-full text-xs font-mono p-2.5 bg-slate-50 border border-slate-200 dark:bg-brand-deep/50 dark:border-brand-ink rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent resize-none text-slate-700 dark:text-slate-300"
-          />
-          <p className="text-[9px] text-slate-400 dark:text-slate-400">Write CSS selectors to apply styles strictly to this section.</p>
-        </div>
+      {/* 4. Advanced CSS Override */}
+      <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-brand-ink/50">
+        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Custom CSS Stylesheet</label>
+        <textarea
+          rows={4}
+          value={styles.customCss || ''}
+          onChange={(e) => onUpdateStyles(selectedBlock.id, { customCss: e.target.value })}
+          placeholder="/* Custom CSS overrides */&#10;__self__ {&#10;  filter: grayscale(1);&#10;}"
+          className="w-full text-[10px] font-mono p-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none text-brand-light resize-none leading-normal"
+        />
       </div>
     </div>
   );

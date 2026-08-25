@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Block, BlockType, BlockStyles, ProjectSettings, Page } from './types';
+import type { Block, BlockType, BlockStyles, ProjectSettings, Page, Project } from './types';
 
 const DEFAULT_SETTINGS: ProjectSettings = {
   title: 'Kawerify Tech Site Project',
@@ -9,146 +9,284 @@ const DEFAULT_SETTINGS: ProjectSettings = {
   faviconUrl: '/favicon.ico'
 };
 
-interface HistoryState {
-  pages: Page[];
-  settings: ProjectSettings;
-}
+const DEFAULT_PORTFOLIO_BLOCKS: Block[] = [
+  {
+    id: 'h1',
+    type: 'header',
+    name: 'Header Section',
+    content: { logoText: 'TONDE KAWERE', items: [{ id: '1', title: 'Work', link: '#work' }, { id: '2', title: 'About', link: '#about' }, { id: '3', title: 'Contact', link: '#contact' }] },
+    styles: { bgColor: '#0b1329', textColor: '#ffffff', paddingTop: 'py-4', paddingBottom: 'py-4' }
+  },
+  {
+    id: 'hero1',
+    type: 'hero',
+    name: 'Hero Section',
+    content: { title: 'Designing Next-Gen Digital Products', subtitle: 'I build interactive, responsive visual builder platforms and pixel-perfect design systems.', buttonText: 'Explore My Work', buttonLink: '#work' },
+    styles: { bgColor: '#0f172a', textColor: '#ffffff', paddingTop: 'py-24', paddingBottom: 'py-24' }
+  },
+  {
+    id: 'port1',
+    type: 'portfolio',
+    name: 'Portfolio Grid',
+    content: {
+      title: 'Featured Case Studies',
+      items: [
+        { id: '1', title: 'Figma-Style Website Builder', description: 'Visual editor with layers, zoom, and live properties inspector.', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=500' },
+        { id: '2', title: 'Relational Database Studio', description: 'Cloud dashboard with schema builders, GraphQL queries, and SQL Connect.', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500' }
+      ]
+    },
+    styles: { bgColor: '#ffffff', textColor: '#0f172a', paddingTop: 'py-20', paddingBottom: 'py-20' }
+  },
+  {
+    id: 'f1',
+    type: 'footer',
+    name: 'Footer Section',
+    content: { copyrightText: '© 2026 Tonde Kawere. All rights reserved.' },
+    styles: { bgColor: '#0b1329', textColor: '#94a3b8', paddingTop: 'py-6', paddingBottom: 'py-6' }
+  }
+];
 
 export function useBuilderState() {
-  // Load pages from localStorage synchronously with old schema migration
-  const [pages, setPagesState] = useState<Page[]>(() => {
+  const [projects, setProjectsState] = useState<Project[]>(() => {
     try {
-      const saved = localStorage.getItem('kt-builder-project');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.pages)) return parsed.pages;
-        if (Array.isArray(parsed.blocks)) {
-          return [{
-            id: 'home',
-            name: 'Home',
-            slug: 'home',
-            blocks: parsed.blocks
-          }];
-        }
+      // 1. Check for multiple projects database
+      const savedProjects = localStorage.getItem('kt-builder-projects');
+      if (savedProjects) {
+        const parsed = JSON.parse(savedProjects);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+
+      // 2. Auto-migration check: If old single project exists, migrate it
+      const savedOld = localStorage.getItem('kt-builder-project');
+      if (savedOld) {
+        const parsedOld = JSON.parse(savedOld);
+        const migratedProject: Project = {
+          id: Math.random().toString(36).substring(2, 9),
+          name: parsedOld.settings?.title || 'My Migrated Site',
+          pages: parsedOld.pages || [{ id: 'home', name: 'Home', slug: 'home', blocks: parsedOld.blocks || [] }],
+          settings: parsedOld.settings || DEFAULT_SETTINGS,
+          updatedAt: new Date().toISOString()
+        };
+        localStorage.removeItem('kt-builder-project');
+        return [migratedProject];
       }
     } catch (e) {}
-    return [{
-      id: 'home',
-      name: 'Home',
-      slug: 'home',
-      blocks: []
-    }];
-  });
 
-  const [currentPageId, setCurrentPageId] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem('kt-builder-project');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.pages) && parsed.pages.length > 0) {
-          return parsed.pages[0].id;
-        }
+    // 3. Fallback: Pre-populate beautiful default template sites
+    return [
+      {
+        id: 'portfolio-pro',
+        name: 'Creative Portfolio',
+        pages: [{ id: 'home', name: 'Home', slug: 'home', blocks: DEFAULT_PORTFOLIO_BLOCKS }],
+        settings: DEFAULT_SETTINGS,
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'ecommerce-pro',
+        name: 'Brand Storefront',
+        pages: [{
+          id: 'home',
+          name: 'Home',
+          slug: 'home',
+          blocks: [
+            {
+              id: 'h2',
+              type: 'header',
+              name: 'Header Section',
+              content: { logoText: 'MODERN SHOP', items: [{ id: '1', title: 'Store', link: '#' }, { id: '2', title: 'About', link: '#' }] },
+              styles: { bgColor: '#ffffff', textColor: '#0f172a', paddingTop: 'py-4', paddingBottom: 'py-4' }
+            },
+            {
+              id: 'hero2',
+              type: 'hero',
+              name: 'Hero Section',
+              content: { title: 'Premium Design Goods', subtitle: 'Curated products built for visual architects and digital artists.', buttonText: 'Shop All Items' },
+              styles: { bgColor: '#f8fafc', textColor: '#0f172a', paddingTop: 'py-20', paddingBottom: 'py-20' }
+            },
+            {
+              id: 'store1',
+              type: 'ecommerce',
+              name: 'Product Grid',
+              content: {
+                title: 'Featured Collection',
+                items: [
+                  { id: 'e1', title: 'Minimalist Clock', price: '$49.00', description: 'Sleek wood frame analog piece.', imageSrc: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400' },
+                  { id: 'e2', title: 'Leather Backpack', price: '$129.00', description: 'Full grain laptop-ready bag.', imageSrc: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400' }
+                ]
+              },
+              styles: { bgColor: '#ffffff', textColor: '#0f172a', paddingTop: 'py-16', paddingBottom: 'py-16' }
+            }
+          ]
+        }],
+        settings: DEFAULT_SETTINGS,
+        updatedAt: new Date().toISOString()
       }
-    } catch (e) {}
-    return 'home';
+    ];
   });
 
-  // Load settings from localStorage
-  const [settings, setSettingsState] = useState<ProjectSettings>(() => {
-    try {
-      const saved = localStorage.getItem('kt-builder-project');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.settings) return { ...DEFAULT_SETTINGS, ...parsed.settings };
-      }
-    } catch (e) {}
-    return DEFAULT_SETTINGS;
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(() => {
+    if (projects.length > 0) return projects[0].id;
+    return null;
   });
 
-  // Autosave to localStorage on changes
-  useEffect(() => {
-    localStorage.setItem('kt-builder-project', JSON.stringify({ pages, settings }));
-  }, [pages, settings]);
-
-  // History tracking state
-  const [history, setHistory] = useState<HistoryState[]>(() => [
-    { pages, settings }
-  ]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-
+  const [currentPageId, setCurrentPageId] = useState<string>('home');
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isPreview, setIsPreview] = useState(false);
 
-  // Helper to push new state to history
-  const pushToHistory = useCallback((newPages: Page[], newSettings: ProjectSettings) => {
+  const [history, setHistory] = useState<Project[][]>(() => [projects]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+
+  const pushToHistory = useCallback((newProjects: Project[]) => {
     setHistory(prev => {
-      const cleanHistory = prev.slice(0, historyIndex + 1);
-      return [...cleanHistory, { pages: newPages, settings: newSettings }];
+      const clean = prev.slice(0, historyIndex + 1);
+      return [...clean, newProjects];
     });
     setHistoryIndex(prev => prev + 1);
   }, [historyIndex]);
 
-  // Undo action
   const undo = useCallback(() => {
     if (historyIndex > 0) {
       const prevIdx = historyIndex - 1;
-      const prevState = history[prevIdx];
-      setPagesState(prevState.pages);
-      setSettingsState(prevState.settings);
+      setProjectsState(history[prevIdx]);
       setHistoryIndex(prevIdx);
     }
   }, [history, historyIndex]);
 
-  // Redo action
   const redo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const nextIdx = historyIndex + 1;
-      const nextState = history[nextIdx];
-      setPagesState(nextState.pages);
-      setSettingsState(nextState.settings);
+      setProjectsState(history[nextIdx]);
       setHistoryIndex(nextIdx);
     }
   }, [history, historyIndex]);
 
-  // Set Pages directly (loading external json)
-  const setPages = useCallback((newPages: Page[]) => {
-    setPagesState(newPages);
-    if (newPages.length > 0 && !newPages.some(p => p.id === currentPageId)) {
-      setCurrentPageId(newPages[0].id);
-    }
-    pushToHistory(newPages, settings);
-  }, [pushToHistory, settings, currentPageId]);
+  // Autosave to localStorage on changes
+  useEffect(() => {
+    localStorage.setItem('kt-builder-projects', JSON.stringify(projects));
+  }, [projects]);
 
-  // Generate unique IDs
+  // Current active project details
+  const activeProject = projects.find(p => p.id === currentProjectId) || projects[0] || null;
+  const pages = activeProject ? activeProject.pages : [];
+  const activePage = pages.find(p => p.id === currentPageId) || pages[0] || null;
+  const blocks = activePage ? activePage.blocks : [];
+  const settings = activeProject ? activeProject.settings : DEFAULT_SETTINGS;
+
+  // Sync current page id if current project switches
+  useEffect(() => {
+    if (pages.length > 0 && !pages.some(p => p.id === currentPageId)) {
+      setCurrentPageId(pages[0].id);
+    }
+  }, [currentProjectId, pages, currentPageId]);
+
+  // Helper to generate IDs
   const generateId = useCallback(() => {
     return Math.random().toString(36).substring(2, 9);
   }, []);
 
-  // Active Page details
-  const activePage = pages.find(p => p.id === currentPageId) || pages[0] || { id: 'home', name: 'Home', slug: 'home', blocks: [] };
-  const blocks = activePage.blocks;
+  // Update projects list helper
+  const updateActiveProject = useCallback((updater: (proj: Project) => Project) => {
+    if (!currentProjectId) return;
+    setProjectsState(prev => {
+      const updated = prev.map(p => {
+        if (p.id === currentProjectId) {
+          return updater({
+            ...p,
+            updatedAt: new Date().toISOString()
+          });
+        }
+        return p;
+      });
+      pushToHistory(updated);
+      return updated;
+    });
+  }, [currentProjectId, pushToHistory]);
+
+  // Load project
+  const loadProject = useCallback((id: string) => {
+    setCurrentProjectId(id);
+    setSelectedBlockId(null);
+  }, []);
+
+  // Create project
+  const createProject = useCallback((name: string, templateType?: string) => {
+    const id = generateId();
+    let templateBlocks: Block[] = [];
+    if (templateType === 'portfolio') {
+      templateBlocks = DEFAULT_PORTFOLIO_BLOCKS;
+    }
+    const newProject: Project = {
+      id,
+      name,
+      pages: [{ id: 'home', name: 'Home', slug: 'home', blocks: templateBlocks }],
+      settings: { ...DEFAULT_SETTINGS, title: name },
+      updatedAt: new Date().toISOString()
+    };
+    setProjectsState(prev => [newProject, ...prev]);
+    setCurrentProjectId(id);
+    return id;
+  }, [generateId]);
+
+  // Delete project
+  const deleteProject = useCallback((id: string) => {
+    setProjectsState(prev => {
+      const filtered = prev.filter(p => p.id !== id);
+      if (filtered.length === 0) {
+        // Re-create a default placeholder if empty
+        return [{
+          id: 'default',
+          name: 'My Visual Website',
+          pages: [{ id: 'home', name: 'Home', slug: 'home', blocks: [] }],
+          settings: DEFAULT_SETTINGS,
+          updatedAt: new Date().toISOString()
+        }];
+      }
+      return filtered;
+    });
+    if (currentProjectId === id) {
+      setCurrentProjectId(projects.find(p => p.id !== id)?.id || null);
+    }
+  }, [projects, currentProjectId]);
+
+  // Duplicate project
+  const duplicateProject = useCallback((id: string) => {
+    const target = projects.find(p => p.id === id);
+    if (!target) return;
+    const newId = generateId();
+    const duplicated: Project = {
+      ...target,
+      id: newId,
+      name: `${target.name} Copy`,
+      pages: JSON.parse(JSON.stringify(target.pages)),
+      settings: { ...target.settings, title: `${target.settings.title} Copy` },
+      updatedAt: new Date().toISOString()
+    };
+    setProjectsState(prev => [duplicated, ...prev]);
+    setCurrentProjectId(newId);
+  }, [projects, generateId]);
+
+  // Rename Project
+  const renameProject = useCallback((id: string, name: string) => {
+    setProjectsState(prev => prev.map(p => p.id === id ? { ...p, name, settings: { ...p.settings, title: name }, updatedAt: new Date().toISOString() } : p));
+  }, []);
 
   // Add Page
   const addPage = useCallback((name: string) => {
+    if (!activeProject) return;
     const id = generateId();
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const newPage: Page = {
-      id,
-      name,
-      slug,
-      blocks: []
-    };
-    setPagesState(prev => {
-      const updated = [...prev, newPage];
-      pushToHistory(updated, settings);
-      return updated;
-    });
+    const newPage: Page = { id, name, slug, blocks: [] };
+    updateActiveProject(p => ({
+      ...p,
+      pages: [...p.pages, newPage]
+    }));
     setCurrentPageId(id);
-  }, [generateId, pushToHistory, settings]);
+  }, [activeProject, generateId, updateActiveProject]);
 
   // Duplicate Page
   const duplicatePage = useCallback((id: string) => {
+    if (!activeProject) return;
     const target = pages.find(p => p.id === id);
     if (!target) return;
     const newId = generateId();
@@ -159,13 +297,12 @@ export function useBuilderState() {
       slug: `${target.slug}-copy`,
       blocks: JSON.parse(JSON.stringify(target.blocks))
     };
-    setPagesState(prev => {
-      const updated = [...prev, newPage];
-      pushToHistory(updated, settings);
-      return updated;
-    });
+    updateActiveProject(p => ({
+      ...p,
+      pages: [...p.pages, newPage]
+    }));
     setCurrentPageId(newId);
-  }, [pages, generateId, pushToHistory, settings]);
+  }, [activeProject, pages, generateId, updateActiveProject]);
 
   // Delete Page
   const deletePage = useCallback((id: string) => {
@@ -173,60 +310,43 @@ export function useBuilderState() {
       alert('You cannot delete the last remaining page of the website.');
       return;
     }
-    setPagesState(prev => {
-      const updated = prev.filter(p => p.id !== id);
-      pushToHistory(updated, settings);
-      return updated;
-    });
+    updateActiveProject(p => ({
+      ...p,
+      pages: p.pages.filter(pg => pg.id !== id)
+    }));
     if (currentPageId === id) {
-      const remaining = pages.filter(p => p.id !== id);
-      setCurrentPageId(remaining[0].id);
+      setCurrentPageId(pages.filter(pg => pg.id !== id)[0].id);
     }
-  }, [pages, currentPageId, pushToHistory, settings]);
+  }, [pages, currentPageId, updateActiveProject]);
 
-  // Rename Page
-  const renamePage = useCallback((id: string, name: string) => {
-    setPagesState(prev => {
-      const updated = prev.map(p => {
-        if (p.id === id) {
-          const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          return { ...p, name, slug };
-        }
-        return p;
-      });
-      pushToHistory(updated, settings);
-      return updated;
-    });
-  }, [pushToHistory, settings]);
-
-  // Reset Project
-  const resetProject = useCallback(() => {
-    if (window.confirm('Are you sure you want to clear all blocks and start over?')) {
-      const newPages = [{
-        id: 'home',
-        name: 'Home',
-        slug: 'home',
-        blocks: []
-      }];
-      const newSettings = DEFAULT_SETTINGS;
-      setPagesState(newPages);
-      setSettingsState(newSettings);
-      setCurrentPageId('home');
-      setSelectedBlockId(null);
-      pushToHistory(newPages, newSettings);
-    }
-  }, [pushToHistory]);
+  // Set pages directly
+  const setPages = useCallback((newPages: Page[]) => {
+    updateActiveProject(p => ({
+      ...p,
+      pages: newPages
+    }));
+  }, [updateActiveProject]);
 
   // Update Settings
   const updateSettings = useCallback((newSettings: Partial<ProjectSettings>) => {
-    setSettingsState(prev => {
-      const updated = { ...prev, ...newSettings };
-      pushToHistory(pages, updated);
-      return updated;
-    });
-  }, [pages, pushToHistory]);
+    updateActiveProject(p => ({
+      ...p,
+      settings: { ...p.settings, ...newSettings }
+    }));
+  }, [updateActiveProject]);
 
-  // Add block to current page
+  // Reset project page canvas
+  const resetProject = useCallback(() => {
+    if (window.confirm('Clear all blocks on this page and start over?')) {
+      updateActiveProject(p => ({
+        ...p,
+        pages: p.pages.map(pg => pg.id === currentPageId ? { ...pg, blocks: [] } : pg)
+      }));
+      setSelectedBlockId(null);
+    }
+  }, [currentPageId, updateActiveProject]);
+
+  // Add block to canvas
   const addBlock = useCallback((type: BlockType, content: Block['content'] = {}, styles: BlockStyles = {}) => {
     const newBlock: Block = {
       id: generateId(),
@@ -243,81 +363,84 @@ export function useBuilderState() {
         ...styles
       }
     };
-    setPagesState(prev => {
-      const updated = prev.map(p => p.id === currentPageId ? { ...p, blocks: [...p.blocks, newBlock] } : p);
-      pushToHistory(updated, settings);
-      return updated;
-    });
+    updateActiveProject(p => ({
+      ...p,
+      pages: p.pages.map(pg => pg.id === currentPageId ? { ...pg, blocks: [...pg.blocks, newBlock] } : pg)
+    }));
     setSelectedBlockId(newBlock.id);
-  }, [generateId, pushToHistory, settings, currentPageId]);
+  }, [generateId, currentPageId, updateActiveProject]);
 
-  // Delete block from current page
+  // Delete block
   const deleteBlock = useCallback((id: string) => {
-    setPagesState(prev => {
-      const updated = prev.map(p => p.id === currentPageId ? { ...p, blocks: p.blocks.filter(b => b.id !== id) } : p);
-      pushToHistory(updated, settings);
-      return updated;
-    });
+    updateActiveProject(p => ({
+      ...p,
+      pages: p.pages.map(pg => pg.id === currentPageId ? { ...pg, blocks: pg.blocks.filter(b => b.id !== id) } : pg)
+    }));
     if (selectedBlockId === id) {
       setSelectedBlockId(null);
     }
-  }, [selectedBlockId, pushToHistory, settings, currentPageId]);
+  }, [selectedBlockId, currentPageId, updateActiveProject]);
 
-  // Move block up/down inside current page
+  // Move block
   const moveBlock = useCallback((id: string, direction: 'up' | 'down') => {
-    setPagesState(prev => {
-      const updated = prev.map(p => {
-        if (p.id !== currentPageId) return p;
-        const idx = p.blocks.findIndex(b => b.id === id);
-        if (idx === -1) return p;
+    updateActiveProject(p => ({
+      ...p,
+      pages: p.pages.map(pg => {
+        if (pg.id !== currentPageId) return pg;
+        const idx = pg.blocks.findIndex(b => b.id === id);
+        if (idx === -1) return pg;
         const newIdx = direction === 'up' ? idx - 1 : idx + 1;
-        if (newIdx < 0 || newIdx >= p.blocks.length) return p;
-        const result = [...p.blocks];
+        if (newIdx < 0 || newIdx >= pg.blocks.length) return pg;
+        const result = [...pg.blocks];
         const [temp] = result.splice(idx, 1);
         result.splice(newIdx, 0, temp);
-        return { ...p, blocks: result };
-      });
-      pushToHistory(updated, settings);
-      return updated;
-    });
-  }, [pushToHistory, settings, currentPageId]);
+        return { ...pg, blocks: result };
+      })
+    }));
+  }, [currentPageId, updateActiveProject]);
 
-  // Update block content inside current page
+  // Update block content
   const updateBlockContent = useCallback((id: string, newContent: Partial<Block['content']>) => {
-    setPagesState(prev => {
-      const updated = prev.map(p => {
-        if (p.id !== currentPageId) return p;
-        const blocks = p.blocks.map(b => (b.id === id ? { ...b, content: { ...b.content, ...newContent } } : b));
-        return { ...p, blocks };
-      });
-      pushToHistory(updated, settings);
-      return updated;
-    });
-  }, [pushToHistory, settings, currentPageId]);
+    updateActiveProject(p => ({
+      ...p,
+      pages: p.pages.map(pg => {
+        if (pg.id !== currentPageId) return pg;
+        return {
+          ...pg,
+          blocks: pg.blocks.map(b => b.id === id ? { ...b, content: { ...b.content, ...newContent } } : b)
+        };
+      })
+    }));
+  }, [currentPageId, updateActiveProject]);
 
-  // Update block styles inside current page
+  // Update block styles
   const updateBlockStyles = useCallback((id: string, newStyles: Partial<BlockStyles>) => {
-    setPagesState(prev => {
-      const updated = prev.map(p => {
-        if (p.id !== currentPageId) return p;
-        const blocks = p.blocks.map(b => (b.id === id ? { ...b, styles: { ...b.styles, ...newStyles } } : b));
-        return { ...p, blocks };
-      });
-      pushToHistory(updated, settings);
-      return updated;
-    });
-  }, [pushToHistory, settings, currentPageId]);
+    updateActiveProject(p => ({
+      ...p,
+      pages: p.pages.map(pg => {
+        if (pg.id !== currentPageId) return pg;
+        return {
+          ...pg,
+          blocks: pg.blocks.map(b => b.id === id ? { ...b, styles: { ...b.styles, ...newStyles } } : b)
+        };
+      })
+    }));
+  }, [currentPageId, updateActiveProject]);
 
   return {
+    projects,
+    currentProjectId,
+    setCurrentProjectId,
+    activeProject,
     pages,
     currentPageId,
     setCurrentPageId,
     activePage,
     blocks,
+    settings,
     setPages,
     selectedBlockId,
     setSelectedBlockId,
-    settings,
     updateSettings,
     deviceMode,
     setDeviceMode,
@@ -332,7 +455,11 @@ export function useBuilderState() {
     addPage,
     duplicatePage,
     deletePage,
-    renamePage,
+    createProject,
+    deleteProject,
+    duplicateProject,
+    renameProject,
+    loadProject,
     undo,
     redo,
     canUndo: historyIndex > 0,

@@ -15,16 +15,34 @@ const getBlockStyles = (
   defaultText: string,
   defaultAlign: 'left' | 'center' | 'right' | 'justify' = 'center'
 ): React.CSSProperties => {
+  const transform = [
+    styles.x || styles.y ? `translate(${styles.x || '0px'}, ${styles.y || '0px'})` : '',
+    styles.rotation ? `rotate(${styles.rotation})` : ''
+  ].filter(Boolean).join(' ');
+
+  let shadowValue = undefined;
+  if (styles.shadow === 'sm') shadowValue = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+  else if (styles.shadow === 'md') shadowValue = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+  else if (styles.shadow === 'lg') shadowValue = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+  else if (styles.shadow === 'glow') shadowValue = '0 0 15px 3px rgba(108, 99, 255, 0.4)';
+
   return {
     backgroundColor: styles.bgImage ? undefined : (styles.bgColor || defaultBg),
-    backgroundImage: styles.bgImage ? `url(${styles.bgImage})` : undefined,
+    backgroundImage: styles.bgImage ? (styles.bgImage.startsWith('url') ? styles.bgImage : `url(${styles.bgImage})`) : undefined,
+    background: styles.bgGradient || undefined,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     color: styles.textColor || defaultText,
     textAlign: styles.textAlign || defaultAlign,
     borderWidth: styles.borderWidth || undefined,
     borderStyle: styles.borderWidth && styles.borderWidth !== '0px' ? 'solid' : undefined,
-    borderColor: styles.borderColor || undefined
+    borderColor: styles.borderColor || undefined,
+    width: styles.width || undefined,
+    height: styles.height || undefined,
+    transform: transform || undefined,
+    opacity: styles.opacity ? parseFloat(styles.opacity) / 100 : undefined,
+    boxShadow: shadowValue,
+    lineHeight: styles.lineHeight || undefined,
   };
 };
 
