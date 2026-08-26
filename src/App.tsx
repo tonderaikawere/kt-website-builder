@@ -55,6 +55,7 @@ const COLOR_PALETTES = [
 
 function App() {
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo' | 'assets'>('blocks');
+  const [leftSidebarTab, setLeftSidebarTab] = useState<'layers' | 'assets'>('layers');
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedElement, setSelectedElement] = useState<{ blockId: string; elementPath: string; elementType: string } | null>(null);
@@ -98,6 +99,7 @@ function App() {
     setPages,
     selectedBlockId,
     setSelectedBlockId,
+    updateSettings,
     deviceMode,
     setDeviceMode,
     isPreview,
@@ -108,6 +110,7 @@ function App() {
     updateBlockContent,
     updateBlockStyles,
     addPage,
+    deletePage,
     undo,
     redo
   } = useBuilderState();
@@ -351,42 +354,49 @@ function App() {
               
               <div className="w-full flex flex-col items-center gap-1.5 px-2">
                 <button 
-                  className="p-2 rounded-xl text-slate-450 hover:text-white hover:bg-[#202020] transition-colors w-full flex justify-center cursor-pointer"
-                  title="Dashboard"
+                  onClick={() => setLeftSidebarTab('layers')}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${leftSidebarTab === 'layers' && activeTab !== 'blocks' && activeTab !== 'inspector' ? 'bg-[#222222] text-[#2563EB] border border-[#2d2d2d]' : 'text-slate-455 hover:text-white hover:bg-[#202020] transition-colors'}`}
+                  title="Layers Outline"
                 >
                   <Home className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => setActiveTab('templates')}
-                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'templates' ? 'bg-[#222222] text-[#2563EB] border border-[#2d2d2d]' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
+                  onClick={() => setLeftSidebarTab('assets')}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${leftSidebarTab === 'assets' ? 'bg-[#222222] text-[#2563EB] border border-[#2d2d2d]' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
                   title="Insert Section Presets"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => setActiveTab('inspector')}
+                  onClick={() => {
+                    setLeftSidebarTab('layers');
+                    setActiveTab('inspector');
+                  }}
                   className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'inspector' ? 'bg-[#222222] text-[#2563EB] border border-[#2d2d2d]' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
                   title="Design Canvas Editor"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => setActiveTab('blocks')}
+                  onClick={() => {
+                    setLeftSidebarTab('layers');
+                    setActiveTab('blocks');
+                  }}
                   className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'blocks' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
                   title="Palette Themes"
                 >
                   <Database className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => setActiveTab('templates')}
-                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'templates' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
+                  onClick={() => setLeftSidebarTab('assets')}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${leftSidebarTab === 'assets' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
                   title="Presets"
                 >
                   <Folder className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => setActiveTab('assets')}
-                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'assets' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
+                  onClick={() => setLeftSidebarTab('assets')}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${leftSidebarTab === 'assets' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
                   title="Assets"
                 >
                   <Image className="w-4 h-4" />
@@ -411,133 +421,209 @@ function App() {
         {/* Left Sidebar - Pages & Layers Panel */}
         {!isPreview && (
           <aside className="w-60 bg-[#161616] border-r border-[#262626] flex flex-col h-full z-10 select-none text-slate-300">
-            {/* Pages Manager Container */}
+            {/* Top tab switcher */}
             <div className="p-4 border-b border-[#262626] space-y-4">
               <div className="flex bg-[#222222] p-1 rounded-xl border border-[#2d2d2d]">
-                <button className="flex-1 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wide bg-[#333333] text-white shadow">
-                  Pages
+                <button 
+                  onClick={() => setLeftSidebarTab('layers')}
+                  className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wide cursor-pointer transition-colors ${leftSidebarTab === 'layers' ? 'bg-[#333333] text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                >
+                  Layers
                 </button>
-                <button className="flex-1 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wide text-slate-400 hover:text-white">
-                  Components
+                <button 
+                  onClick={() => setLeftSidebarTab('assets')}
+                  className={`flex-1 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wide cursor-pointer transition-colors ${leftSidebarTab === 'assets' ? 'bg-[#333333] text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                >
+                  Assets
                 </button>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pages</span>
-                  <button
-                    onClick={() => {
-                      setPromptModal({
-                        isOpen: true,
-                        title: 'Add New Page',
-                        defaultValue: 'New Page',
-                        onConfirm: (name) => {
-                          addPage(name);
-                        }
-                      });
-                    }}
-                    className="p-1 hover:bg-[#202020] rounded text-slate-450 hover:text-white cursor-pointer transition-colors"
-                    title="Add Page"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                
-                <div className="space-y-1">
-                  {pages.map((p) => (
-                    <div 
-                      key={p.id} 
-                      onClick={() => setCurrentPageId(p.id)}
-                      className={`px-3 py-2 rounded-xl flex items-center gap-2 text-xs font-semibold cursor-pointer transition-colors ${p.id === currentPageId ? 'bg-[#333333] text-white border border-[#3e3e3e]' : 'hover:bg-[#202020] text-slate-400 hover:text-slate-200'}`}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500">
-                        <rect x="2" y="2" width="8" height="8" rx="1" />
-                        <path d="M4 4h4M4 6h4" />
-                      </svg>
-                      <span>{p.name}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
 
-            {/* Layers Outline List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 flex flex-col">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Layers</span>
-                <button className="p-1 hover:bg-[#202020] rounded text-slate-455 hover:text-white cursor-pointer">
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Search layers input */}
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
-                <input 
-                  type="text" 
-                  placeholder="Search layers..."
-                  className="w-full pl-8 pr-3 py-1.5 bg-[#222222] border border-[#2d2d2d] rounded-xl text-[10px] text-white focus:outline-none placeholder-slate-500"
-                />
-              </div>
-
-              {/* Layer Tree */}
-              <div className="space-y-1 pt-2 flex-1 overflow-y-auto">
-                {blocks.length === 0 ? (
-                  <p className="text-[10px] text-slate-500 italic">No layers loaded. Insert elements to start.</p>
-                ) : (
-                  blocks.map((block) => {
-                    const isSelected = block.id === selectedBlockId;
-                    return (
-                      <div key={block.id} className="space-y-1">
-                        <div 
-                          onClick={() => setSelectedBlockId(block.id)}
-                          className={`px-2 py-1.5 rounded-lg flex items-center justify-between text-[11px] cursor-pointer transition-colors ${isSelected ? 'bg-[#2563EB]/10 text-[#6C63FF] border border-[#2563EB]/25 font-bold' : 'text-slate-400 hover:bg-[#202020] hover:text-slate-200'}`}
-                        >
-                          <div className="flex items-center gap-1.5 truncate">
-                            <ChevronDown className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500 shrink-0">
-                              <rect x="2" y="2" width="8" height="8" rx="0.5" />
-                            </svg>
-                            <span className="truncate">{block.name}</span>
-                          </div>
+            {leftSidebarTab === 'layers' ? (
+              /* LAYERS & PAGES TAB VIEW */
+              <div className="flex-1 flex flex-col min-h-0">
+                {/* Pages manager */}
+                <div className="p-4 border-b border-[#262626]/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pages</span>
+                    <button
+                      onClick={() => {
+                        setPromptModal({
+                          isOpen: true,
+                          title: 'Add New Page',
+                          defaultValue: 'New Page',
+                          onConfirm: (name) => {
+                            addPage(name);
+                          }
+                        });
+                      }}
+                      className="p-1 hover:bg-[#202020] rounded text-slate-455 hover:text-white cursor-pointer transition-colors"
+                      title="Add Page"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    {pages.map((p) => (
+                      <div 
+                        key={p.id} 
+                        onClick={() => setCurrentPageId(p.id)}
+                        className={`px-3 py-2 rounded-xl flex items-center justify-between text-xs font-semibold cursor-pointer transition-colors ${p.id === currentPageId ? 'bg-[#333333] text-white border border-[#3e3e3e]' : 'hover:bg-[#202020] text-slate-400 hover:text-slate-200'}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500">
+                            <rect x="2" y="2" width="8" height="8" rx="1" />
+                            <path d="M4 4h4M4 6h4" />
+                          </svg>
+                          <span>{p.name}</span>
                         </div>
-
-                        {/* Indented element child nodes (Double Click editable nodes) */}
-                        {isSelected && (
-                          <div className="pl-6 border-l border-[#2d2d2d] ml-3.5 py-1 space-y-1">
-                            <div 
-                              onClick={(e) => { e.stopPropagation(); setSelectedElement({ blockId: block.id, elementPath: 'title', elementType: 'title' }); }}
-                              className={`px-2 py-1 rounded text-[10px] cursor-pointer flex items-center gap-1.5 transition-colors ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'title' ? 'bg-[#2563EB]/25 text-[#818cf8] font-bold border border-[#2563EB]/25' : 'text-slate-450 hover:bg-[#202020]'}`}
-                            >
-                              <span className="text-slate-500 font-bold font-mono">T</span>
-                              <span>Headline Title</span>
-                            </div>
-                            {block.content.subtitle && (
-                              <div 
-                                onClick={(e) => { e.stopPropagation(); setSelectedElement({ blockId: block.id, elementPath: 'subtitle', elementType: 'subtitle' }); }}
-                                className={`px-2 py-1 rounded text-[10px] cursor-pointer flex items-center gap-1.5 transition-colors ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'subtitle' ? 'bg-[#2563EB]/25 text-[#818cf8] font-bold border border-[#2563EB]/25' : 'text-slate-455 hover:bg-[#202020]'}`}
-                              >
-                                <span className="text-slate-500 font-bold font-mono">T</span>
-                                <span>Subheadline</span>
-                              </div>
-                            )}
-                            {block.content.buttonText && (
-                              <div 
-                                onClick={(e) => { e.stopPropagation(); setSelectedElement({ blockId: block.id, elementPath: 'buttonText', elementType: 'button' }); }}
-                                className={`px-2 py-1 rounded text-[10px] cursor-pointer flex items-center gap-1.5 transition-colors ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'buttonText' ? 'bg-[#2563EB]/25 text-[#818cf8] font-bold border border-[#2563EB]/25' : 'text-slate-455 hover:bg-[#202020]'}`}
-                              >
-                                <span>⊏⊐</span>
-                                <span>Action Button</span>
-                              </div>
-                            )}
-                          </div>
+                        {p.id !== 'home' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm('Delete this page?')) {
+                                deletePage(p.id);
+                              }
+                            }}
+                            className="text-slate-500 hover:text-red-400 p-0.5 rounded cursor-pointer transition-colors"
+                            title="Delete Page"
+                          >
+                            ✕
+                          </button>
                         )}
                       </div>
-                    );
-                  })
-                )}
+                    ))}
+                  </div>
+                </div>
+
+                {/* Layers Tree outline */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3 flex flex-col">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Layers</span>
+                  </div>
+
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <input 
+                      type="text" 
+                      placeholder="Search layers..."
+                      className="w-full pl-8 pr-3 py-1.5 bg-[#222222] border border-[#2d2d2d] rounded-xl text-[10px] text-white focus:outline-none placeholder-slate-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1 pt-2 flex-1 overflow-y-auto">
+                    {blocks.length === 0 ? (
+                      <p className="text-[10px] text-slate-500 italic">No layers loaded. Insert elements to start.</p>
+                    ) : (
+                      blocks.map((block) => {
+                        const isSelected = block.id === selectedBlockId;
+                        return (
+                          <div key={block.id} className="space-y-1">
+                            <div 
+                              onClick={() => setSelectedBlockId(block.id)}
+                              className={`px-2 py-1.5 rounded-lg flex items-center justify-between text-[11px] cursor-pointer transition-colors ${isSelected ? 'bg-[#2563EB]/10 text-[#6C63FF] border border-[#2563EB]/25 font-bold' : 'text-slate-400 hover:bg-[#202020] hover:text-slate-200'}`}
+                            >
+                              <div className="flex items-center gap-1.5 truncate">
+                                <ChevronDown className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-500 shrink-0">
+                                  <rect x="2" y="2" width="8" height="8" rx="0.5" />
+                                </svg>
+                                <span className="truncate">{block.name}</span>
+                              </div>
+                            </div>
+
+                            {isSelected && (
+                              <div className="pl-6 border-l border-[#2d2d2d] ml-3.5 py-1 space-y-1">
+                                <div 
+                                  onClick={(e) => { e.stopPropagation(); setSelectedElement({ blockId: block.id, elementPath: 'title', elementType: 'title' }); }}
+                                  className={`px-2 py-1 rounded text-[10px] cursor-pointer flex items-center gap-1.5 transition-colors ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'title' ? 'bg-[#2563EB]/25 text-[#818cf8] font-bold border border-[#2563EB]/25' : 'text-slate-450 hover:bg-[#202020]'}`}
+                                >
+                                  <span className="text-slate-500 font-bold font-mono">T</span>
+                                  <span>Headline Title</span>
+                                </div>
+                                {block.content.subtitle && (
+                                  <div 
+                                    onClick={(e) => { e.stopPropagation(); setSelectedElement({ blockId: block.id, elementPath: 'subtitle', elementType: 'subtitle' }); }}
+                                    className={`px-2 py-1 rounded text-[10px] cursor-pointer flex items-center gap-1.5 transition-colors ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'subtitle' ? 'bg-[#2563EB]/25 text-[#818cf8] font-bold border border-[#2563EB]/25' : 'text-slate-455 hover:bg-[#202020]'}`}
+                                  >
+                                    <span className="text-slate-500 font-bold font-mono">T</span>
+                                    <span>Subheadline</span>
+                                  </div>
+                                )}
+                                {block.content.buttonText && (
+                                  <div 
+                                    onClick={(e) => { e.stopPropagation(); setSelectedElement({ blockId: block.id, elementPath: 'buttonText', elementType: 'button' }); }}
+                                    className={`px-2 py-1 rounded text-[10px] cursor-pointer flex items-center gap-1.5 transition-colors ${selectedElement?.blockId === block.id && selectedElement?.elementPath === 'buttonText' ? 'bg-[#2563EB]/25 text-[#818cf8] font-bold border border-[#2563EB]/25' : 'text-slate-455 hover:bg-[#202020]'}`}
+                                  >
+                                    <span>⊏⊐</span>
+                                    <span>Action Button</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* ASSETS & PRESETS TAB VIEW */
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Insert Vector Shapes */}
+                <div className="space-y-3">
+                  <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest block">Insert Vector Shapes</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { name: 'Wireframe Box', type: 'sandbox', styles: { bgColor: '#1e293b', borderRadius: 'rounded-none', borderWidth: 'border-2', borderColor: '#475569' } },
+                      { name: 'Accent Pill', type: 'sandbox', styles: { bgColor: '#6c63ff', borderRadius: 'rounded-full' } }
+                    ].map((shp, i) => (
+                      <button
+                        key={i}
+                        onClick={() => addBlock(shp.type as any, { title: shp.name }, shp.styles)}
+                        className="p-3 bg-slate-900 border border-slate-850 hover:border-[#6C63FF] text-[10px] font-bold rounded-xl text-left cursor-pointer transition-colors"
+                      >
+                        {shp.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section Presets List */}
+                <div className="space-y-3">
+                  <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest block">Section Presets</span>
+                  <div className="space-y-2">
+                    {PAGE_TEMPLATES.map((tpl, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          if (window.confirm(`Overwriting active page blocks with template settings. Proceed?`)) {
+                            const newBlocks = tpl.blockTypes.map(type => {
+                              const blockTpl = BLOCK_TEMPLATES.find(t => t.type === type);
+                              return {
+                                id: Math.random().toString(36).substring(2, 9),
+                                type: type as BlockType,
+                                name: type.charAt(0).toUpperCase() + type.slice(1) + ' Section',
+                                content: blockTpl ? { ...blockTpl.defaultContent } : {},
+                                styles: blockTpl ? { ...blockTpl.defaultStyles } : { bgColor: '#ffffff', textColor: '#07162f' }
+                              };
+                            });
+                            setPages(pages.map(p => p.id === currentPageId ? { ...p, blocks: newBlocks } : p));
+                            setSelectedBlockId(newBlocks[0]?.id || null);
+                          }
+                        }}
+                        className="w-full text-left p-3.5 bg-slate-900 border border-slate-800 rounded-xl hover:border-[#6C63FF] transition-all flex flex-col gap-1 cursor-pointer"
+                      >
+                        <span className="text-xs font-bold text-slate-100">{tpl.name}</span>
+                        <span className="text-[9px] text-slate-500 leading-normal">{tpl.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </aside>
         )}
 
@@ -750,90 +836,17 @@ function App() {
           <aside className="w-64 bg-[#181818] border-l border-[#262626] flex flex-col h-full z-10 select-none">
             {/* Sidebar Inspect Content Panel */}
             <div className="flex-1 overflow-y-auto">
-              {activeTab === 'blocks' && (
-                <div className="p-4 space-y-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Palette Themes</span>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {COLOR_PALETTES.map(palette => (
-                      <button
-                        key={palette.name}
-                        onClick={() => applyColorPalette(palette)}
-                        className="flex items-center justify-between p-2.5 bg-slate-900 border border-slate-800 rounded-xl hover:border-[#6C63FF] text-left transition-all cursor-pointer"
-                      >
-                        <span className="text-[11px] font-semibold text-slate-300">{palette.name}</span>
-                        <div className="flex gap-1">
-                          <span style={{ backgroundColor: palette.primary }} className="w-3 h-3 rounded-full border border-slate-700" />
-                          <span style={{ backgroundColor: palette.accent }} className="w-3 h-3 rounded-full border border-slate-700" />
-                          <span style={{ backgroundColor: palette.deep }} className="w-3 h-3 rounded-full border border-slate-700" />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'inspector' && (
-                <Inspector 
-                  selectedBlock={blocks.find(b => b.id === selectedBlockId)}
-                  onUpdateStyles={updateBlockStyles}
-                  selectedElement={selectedElement}
-                  onSelectElement={setSelectedElement}
-                  onUpdateBlockContent={updateBlockContent}
-                />
-              )}
-
-              {activeTab === 'templates' && (
-                <div className="p-4 space-y-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Section Presets</span>
-                  <div className="space-y-2">
-                    {PAGE_TEMPLATES.map((tpl, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          if (window.confirm(`Overwriting active page blocks with template settings. Proceed?`)) {
-                            const newBlocks = tpl.blockTypes.map(type => {
-                              const blockTpl = BLOCK_TEMPLATES.find(t => t.type === type);
-                              return {
-                                id: Math.random().toString(36).substring(2, 9),
-                                type: type as BlockType,
-                                name: type.charAt(0).toUpperCase() + type.slice(1) + ' Section',
-                                content: blockTpl ? { ...blockTpl.defaultContent } : {},
-                                styles: blockTpl ? { ...blockTpl.defaultStyles } : { bgColor: '#ffffff', textColor: '#07162f' }
-                              };
-                            });
-                            setPages(pages.map(p => p.id === currentPageId ? { ...p, blocks: newBlocks } : p));
-                            setSelectedBlockId(newBlocks[0]?.id || null);
-                          }
-                        }}
-                        className="w-full text-left p-3.5 bg-slate-900 border border-slate-800 rounded-xl hover:border-[#6C63FF] transition-all flex flex-col gap-1 cursor-pointer"
-                      >
-                        <span className="text-xs font-bold text-slate-100">{tpl.name}</span>
-                        <span className="text-[9px] text-slate-500 leading-normal">{tpl.description}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'assets' && (
-                <div className="p-4 space-y-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Insert Vector Shapes</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { name: 'Wireframe Box', type: 'sandbox', styles: { bgColor: '#1e293b', borderRadius: 'rounded-none', borderWidth: 'border-2', borderColor: '#475569' } },
-                      { name: 'Accent Pill', type: 'sandbox', styles: { bgColor: '#6c63ff', borderRadius: 'rounded-full' } }
-                    ].map((shp, i) => (
-                      <button
-                        key={i}
-                        onClick={() => addBlock(shp.type as any, { title: shp.name }, shp.styles)}
-                        className="p-3 bg-slate-900 border border-slate-850 hover:border-[#6C63FF] text-[10px] font-bold rounded-xl text-left cursor-pointer transition-colors"
-                      >
-                        {shp.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <Inspector 
+                selectedBlock={blocks.find(b => b.id === selectedBlockId)}
+                onUpdateStyles={updateBlockStyles}
+                selectedElement={selectedElement}
+                onSelectElement={setSelectedElement}
+                onUpdateBlockContent={updateBlockContent}
+                applyColorPalette={applyColorPalette}
+                colorPalettes={COLOR_PALETTES}
+                settings={settings}
+                onUpdateSettings={updateSettings}
+              />
             </div>
           </aside>
         )}

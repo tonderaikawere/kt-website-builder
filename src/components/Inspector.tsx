@@ -15,6 +15,10 @@ interface InspectorProps {
   selectedElement?: { blockId: string; elementPath: string; elementType: string } | null;
   onSelectElement?: (element: { blockId: string; elementPath: string; elementType: string } | null) => void;
   onUpdateBlockContent?: (id: string, content: Partial<Block['content']>) => void;
+  applyColorPalette?: (palette: any) => void;
+  colorPalettes?: any[];
+  settings?: any;
+  onUpdateSettings?: (settings: any) => void;
 }
 
 export const Inspector: React.FC<InspectorProps> = ({ 
@@ -22,7 +26,11 @@ export const Inspector: React.FC<InspectorProps> = ({
   onUpdateStyles,
   selectedElement,
   onSelectElement,
-  onUpdateBlockContent
+  onUpdateBlockContent,
+  applyColorPalette,
+  colorPalettes,
+  settings,
+  onUpdateSettings
 }) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     alignment: true,
@@ -42,13 +50,53 @@ export const Inspector: React.FC<InspectorProps> = ({
 
   if (!selectedBlock) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-500 text-xs text-center px-6 space-y-3 bg-[#181818] h-full select-none">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-600">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
-        </svg>
-        <span className="font-bold text-slate-400">No selection</span>
-        <p className="max-w-[180px] leading-normal text-[10px] text-slate-500">Select any layer or double-click text to display properties.</p>
+      <div className="flex flex-col bg-[#181818] h-full select-none text-slate-350">
+        <div className="flex flex-col items-center justify-center py-10 text-slate-500 text-xs text-center px-6 space-y-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-600">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+          </svg>
+          <span className="font-bold text-slate-400">No selection</span>
+          <p className="max-w-[180px] leading-normal text-[10px] text-slate-500">Select any layer or double-click text to display properties.</p>
+        </div>
+
+        {/* Global Page Typography */}
+        <div className="w-full text-left space-y-4 p-4 border-t border-[#262626]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Page Typography</span>
+          <div className="space-y-1">
+            <label className="text-[9px] text-slate-500 font-bold uppercase">Global Font Family</label>
+            <select
+              value={settings?.fontFamily || 'Inter'}
+              onChange={(e) => onUpdateSettings?.({ fontFamily: e.target.value })}
+              className="w-full bg-[#222222] border border-[#2d2d2d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none cursor-pointer"
+            >
+              {['Inter', 'Neue Haas Grotesk Display Pro', 'Playfair Display', 'Satoshi', 'Clash Display'].map(font => (
+                <option key={font} value={font}>{font}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Global Color Themes */}
+        <div className="w-full text-left space-y-4 p-4 border-t border-[#262626]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Global Theme Presets</span>
+          <div className="grid grid-cols-1 gap-2">
+            {colorPalettes?.map(palette => (
+              <button
+                key={palette.name}
+                onClick={() => applyColorPalette?.(palette)}
+                className="flex items-center justify-between p-2.5 bg-[#222222] border border-[#2d2d2d] rounded-xl hover:border-[#6C63FF] text-left transition-all cursor-pointer w-full"
+              >
+                <span className="text-[11px] font-semibold text-slate-300">{palette.name}</span>
+                <div className="flex gap-1">
+                  <span style={{ backgroundColor: palette.primary }} className="w-3 h-3 rounded-full border border-slate-700" />
+                  <span style={{ backgroundColor: palette.accent }} className="w-3 h-3 rounded-full border border-slate-700" />
+                  <span style={{ backgroundColor: palette.deep }} className="w-3 h-3 rounded-full border border-slate-700" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
