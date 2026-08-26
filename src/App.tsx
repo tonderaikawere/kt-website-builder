@@ -812,7 +812,7 @@ function App() {
                 <span className="text-[10px] font-bold text-slate-400">Zoom</span>
                 <input 
                   type="range" 
-                  min="50" 
+                  min="0" 
                   max="125" 
                   value={zoomLevel} 
                   onChange={(e) => setZoomLevel(Number(e.target.value))}

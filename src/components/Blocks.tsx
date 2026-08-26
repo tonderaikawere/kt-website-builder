@@ -766,7 +766,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({ block, isEditing,
   );
 };
 
-export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { title = 'Call to Action', subtitle = 'Subtitle', buttonText = 'Button' } = block.content;
   const styles = block.styles;
 
@@ -798,7 +798,12 @@ export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onCo
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleTitleChange}
-          className={`text-3xl md:text-4xl font-extrabold mb-4 tracking-tight leading-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-white/10' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+          }}
+          className={`text-3xl md:text-4xl font-extrabold mb-4 tracking-tight leading-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
         >
           {title}
         </h2>
@@ -806,7 +811,12 @@ export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onCo
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSubtitleChange}
-          className={`text-lg opacity-80 max-w-2xl mb-8 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-white/10' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+          }}
+          className={`text-lg opacity-80 max-w-2xl mb-8 ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
         >
           {subtitle}
         </p>
@@ -818,7 +828,12 @@ export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onCo
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={handleButtonChange}
-              className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50 cursor-text text-slate-800' : ''}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, 'buttonText', 'button');
+              }}
+              className={`px-1 rounded cursor-text ${getSelectionBorderClass(block.id, 'buttonText', selectedElement, isEditing)}`}
             >
               {buttonText}
             </span>
@@ -829,7 +844,7 @@ export const CtaBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onCo
   );
 };
 
-export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { copyrightText = '© Copyright text', items = [] } = block.content;
   const styles = block.styles;
 
@@ -862,7 +877,12 @@ export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleCopyrightChange}
-          className={`text-sm ${isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-white/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'copyrightText', 'title');
+          }}
+          className={`text-sm ${getSelectionBorderClass(block.id, 'copyrightText', selectedElement, isEditing)}`}
         >
           {copyrightText}
         </p>
@@ -873,7 +893,12 @@ export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleLinkTextChange(item.id, e.target.innerText)}
-                className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-white/5 cursor-text' : ''}
+                onClick={(e) => {
+                  if (!isEditing) return;
+                  e.stopPropagation();
+                  if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'title');
+                }}
+                className={`cursor-text ${getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}`}
               >
                 {item.title}
               </span>
@@ -885,7 +910,7 @@ export const FooterBlock: React.FC<BlockComponentProps> = ({ block, isEditing, o
   );
 };
 
-export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { title = 'Testimonials', subtitle = 'Subtitle', items = [] } = block.content;
   const styles = block.styles;
 
@@ -940,7 +965,12 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleTitleChange}
-          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+          }}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
         >
           {title}
         </h2>
@@ -948,7 +978,12 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSubtitleChange}
-          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+          }}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
         >
           {subtitle}
         </p>
@@ -989,7 +1024,12 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleItemQuoteChange(item.id, e.target.innerText)}
-              className={`text-sm italic text-slate-600 leading-relaxed mb-6 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.quote`, 'subtitle');
+              }}
+              className={`text-sm italic text-slate-600 leading-relaxed mb-6 ${getSelectionBorderClass(block.id, `items.${item.id}.quote`, selectedElement, isEditing)}`}
             >
               "{item.quote}"
             </p>
@@ -998,7 +1038,12 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleItemNameChange(item.id, e.target.innerText)}
-                className={`font-bold text-sm text-slate-800 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+                onClick={(e) => {
+                  if (!isEditing) return;
+                  e.stopPropagation();
+                  if (onSelectElement) onSelectElement(block.id, `items.${item.id}.name`, 'title');
+                }}
+                className={`font-bold text-sm text-slate-800 ${getSelectionBorderClass(block.id, `items.${item.id}.name`, selectedElement, isEditing)}`}
               >
                 {item.name}
               </h4>
@@ -1006,7 +1051,12 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleItemRoleChange(item.id, e.target.innerText)}
-                className={`text-xs text-indigo-600 font-medium ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+                onClick={(e) => {
+                  if (!isEditing) return;
+                  e.stopPropagation();
+                  if (onSelectElement) onSelectElement(block.id, `items.${item.id}.role`, 'subtitle');
+                }}
+                className={`text-xs text-indigo-600 font-medium ${getSelectionBorderClass(block.id, `items.${item.id}.role`, selectedElement, isEditing)}`}
               >
                 {item.role}
               </p>
@@ -1017,8 +1067,7 @@ export const TestimonialsBlock: React.FC<BlockComponentProps> = ({ block, isEdit
     </section>
   );
 };
-
-export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange }) => {
+export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, onContentChange, selectedElement, onSelectElement }) => {
   const { title = 'Pricing Plans', subtitle = 'Subtitle', items = [] } = block.content;
   const styles = block.styles;
 
@@ -1082,7 +1131,12 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleTitleChange}
-          className={`text-3xl font-extrabold mb-3 tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'title', 'title');
+          }}
+          className={`text-3xl font-extrabold mb-3 tracking-tight ${getSelectionBorderClass(block.id, 'title', selectedElement, isEditing)}`}
         >
           {title}
         </h2>
@@ -1090,7 +1144,12 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
           contentEditable={isEditing}
           suppressContentEditableWarning
           onBlur={handleSubtitleChange}
-          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-black/5' : ''}`}
+          onClick={(e) => {
+            if (!isEditing) return;
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement(block.id, 'subtitle', 'subtitle');
+          }}
+          className={`text-slate-600 opacity-90 max-w-2xl mx-auto ${getSelectionBorderClass(block.id, 'subtitle', selectedElement, isEditing)}`}
         >
           {subtitle}
         </p>
@@ -1106,7 +1165,12 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleItemTitleChange(item.id, e.target.innerText)}
-              className={`text-xl font-bold mb-2 text-slate-800 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.title`, 'title');
+              }}
+              className={`text-xl font-bold mb-2 text-slate-800 ${getSelectionBorderClass(block.id, `items.${item.id}.title`, selectedElement, isEditing)}`}
             >
               {item.title}
             </h3>
@@ -1114,7 +1178,12 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
               contentEditable={isEditing}
               suppressContentEditableWarning
               onBlur={(e) => handleItemDescChange(item.id, e.target.innerText)}
-              className={`text-xs text-slate-400 mb-6 ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+              onClick={(e) => {
+                if (!isEditing) return;
+                e.stopPropagation();
+                if (onSelectElement) onSelectElement(block.id, `items.${item.id}.description`, 'subtitle');
+              }}
+              className={`text-xs text-slate-450 mb-6 ${getSelectionBorderClass(block.id, `items.${item.id}.description`, selectedElement, isEditing)}`}
             >
               {item.description}
             </p>
@@ -1123,7 +1192,12 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
                 contentEditable={isEditing}
                 suppressContentEditableWarning
                 onBlur={(e) => handleItemPriceChange(item.id, e.target.innerText)}
-                className={`text-4xl font-extrabold tracking-tight ${isEditing ? 'outline-dashed outline-1 outline-indigo-300 px-1 rounded hover:bg-slate-50' : ''}`}
+                onClick={(e) => {
+                  if (!isEditing) return;
+                  e.stopPropagation();
+                  if (onSelectElement) onSelectElement(block.id, `items.${item.id}.price`, 'title');
+                }}
+                className={`text-4xl font-extrabold tracking-tight ${getSelectionBorderClass(block.id, `items.${item.id}.price`, selectedElement, isEditing)}`}
               >
                 {item.price}
               </span>
@@ -1147,7 +1221,12 @@ export const PricingBlock: React.FC<BlockComponentProps> = ({ block, isEditing, 
                   contentEditable={isEditing}
                   suppressContentEditableWarning
                   onBlur={(e) => handleItemButtonChange(item.id, e.target.innerText)}
-                  className={isEditing ? 'outline-dashed outline-1 outline-indigo-400 px-1 rounded hover:bg-slate-50/20 cursor-text text-white' : ''}
+                  onClick={(e) => {
+                    if (!isEditing) return;
+                    e.stopPropagation();
+                    if (onSelectElement) onSelectElement(block.id, `items.${item.id}.buttonText`, 'button');
+                  }}
+                  className={`px-1 rounded cursor-text text-white ${getSelectionBorderClass(block.id, `items.${item.id}.buttonText`, selectedElement, isEditing)}`}
                 >
                   {item.buttonText}
                 </span>
@@ -2431,21 +2510,21 @@ export const BlockRenderer: React.FC<{
     case 'features':
       return <FeaturesBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'cta':
-      return <CtaBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <CtaBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'testimonials':
-      return <TestimonialsBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <TestimonialsBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'pricing':
-      return <PricingBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <PricingBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'contact':
-      return <ContactBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <ContactBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'social':
-      return <SocialBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <SocialBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'linkButton':
-      return <LinkButtonBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <LinkButtonBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'video':
-      return <VideoBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <VideoBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'sandbox':
-      return <SandboxBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <SandboxBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'portfolio':
       return <PortfolioBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'faq':
@@ -2455,7 +2534,7 @@ export const BlockRenderer: React.FC<{
     case 'ecommerce':
       return <EcommerceBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     case 'footer':
-      return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} />;
+      return <FooterBlock block={block} isEditing={isEditing} onContentChange={onContentChange} selectedElement={selectedElement} onSelectElement={onSelectElement} />;
     default:
       return (
         <div className="p-8 text-center text-slate-400 bg-slate-50 border border-dashed border-slate-200">
