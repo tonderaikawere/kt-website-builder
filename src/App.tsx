@@ -230,9 +230,18 @@ function App() {
     document.title = activeProject ? `${activeProject.name} | Editor` : 'SiteBuilder Dashboard';
   }, [activeProject]);
 
+  // Centering viewport on mount
+  useEffect(() => {
+    const viewport = document.getElementById('workspace-viewport');
+    if (viewport) {
+      viewport.scrollLeft = (4500 - viewport.clientWidth) / 2;
+      viewport.scrollTop = (3500 - viewport.clientHeight) / 2;
+    }
+  }, []);
+
   // 2. FIGMA-STYLE EDITOR RENDERER
   return (
-    <div className="min-h-screen bg-[#111111] text-slate-100 flex flex-col antialiased select-none font-sans">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#111111] text-slate-100 flex flex-col antialiased select-none font-sans">
       
       {/* Top Header Bar */}
       {!isPreview && (
@@ -570,10 +579,10 @@ function App() {
                 </svg>
               </div>
             )}
-
-            {/* Central Simulator Bezel Container */}
+            {/* Central Simulator Bezel Container (Figma-Style Large Board) */}
             <main 
-              className={`flex-1 flex justify-center items-start overflow-y-auto transition-all duration-300 relative ${isPreview ? 'p-0 bg-white' : 'p-12'}`}
+              id="workspace-viewport"
+              className={`flex-1 overflow-auto transition-all duration-300 relative ${isPreview ? 'p-0 bg-white' : 'bg-[#121212]'}`}
               onDragOver={(e) => {
                 e.preventDefault();
                 setIsDraggingOver(true);
@@ -585,117 +594,130 @@ function App() {
                 setIsDraggingOver(false);
               }}
             >
-              {/* Infinite gridlines pattern overlay */}
-              {!isPreview && (
-                <div className="absolute inset-0 bg-[#0f172a] opacity-[0.25] pointer-events-none select-none" style={{ backgroundImage: 'radial-gradient(#1e293b 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-              )}
+              {/* Giant design canvas backdrop */}
+              {!isPreview ? (
+                <div className="w-[4500px] h-[3500px] relative flex items-center justify-center bg-[#121212]">
+                  {/* Infinite gridlines pattern overlay */}
+                  <div className="absolute inset-0 bg-transparent opacity-[0.25] pointer-events-none select-none" style={{ backgroundImage: 'radial-gradient(#262626 1.5px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+                  
+                  {/* Central canvas bezel scaled by zoomLevel */}
+                  <div 
+                    style={{ 
+                      fontFamily: settings.fontFamily,
+                      transform: `scale(${zoomLevel / 100})`,
+                      transformOrigin: 'center center',
+                      width: deviceMode === 'desktop' ? '1440px' : deviceMode === 'tablet' ? '768px' : '375px',
+                      backgroundColor: '#ffffff',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                      minHeight: '1600px',
+                      position: 'absolute',
+                      left: 'calc(50% - (1440px / 2))', // centers the desktop frame on the canvas board
+                      top: 'calc(50% - 800px)',
+                      transition: 'width 0.3s ease, min-height 0.3s ease, left 0.3s ease'
+                    }}
+                    className={`relative border border-[#2d2d2d] transition-all duration-300`}
+                  >
+                    {/* Phone Notch Simulator */}
+                    {!isPreview && deviceMode === 'mobile' && (
+                      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-950 rounded-full z-40 flex items-center justify-center gap-1.5 px-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                        <div className="w-8 h-1 bg-slate-800 rounded-full"></div>
+                      </div>
+                    )}
 
-              {/* Central canvas bezel scaled by zoomLevel */}
-              <div 
-                style={{ 
-                  fontFamily: settings.fontFamily,
-                  transform: `scale(${zoomLevel / 100})`,
-                  transformOrigin: 'top center',
-                  transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-                className={`bg-white transition-all duration-300 relative ${
-                  isPreview ? 'w-full min-h-screen' :
-                  deviceMode === 'mobile' 
-                    ? 'w-[375px] min-h-[667px] border-[12px] border-slate-950 rounded-[40px] shadow-2xl my-8 mx-auto overflow-hidden' 
-                    : deviceMode === 'tablet' 
-                    ? 'w-[768px] min-h-[1024px] border-[16px] border-slate-950 rounded-[32px] shadow-2xl my-8 mx-auto overflow-hidden' 
-                    : 'w-[1100px] min-h-[90%] shadow-sm border border-slate-800/80 rounded-lg'
-                }`}
-              >
-                {/* Phone Notch Simulator */}
-                {!isPreview && deviceMode === 'mobile' && (
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-950 rounded-full z-40 flex items-center justify-center gap-1.5 px-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
-                    <div className="w-8 h-1 bg-slate-800 rounded-full"></div>
-                  </div>
-                )}
-                
+                    {blocks.length === 0 ? (
+                      /* Empty Canvas Container */
+                      <div className={`p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-transparent transition-all duration-300 ${isDraggingOver ? 'drag-over-pulse border-[#6C63FF] rounded-xl' : ''}`}>
+                        <Layout className="w-12 h-12 text-slate-350 mb-3" />
+                        <p className="font-bold text-slate-800 text-sm">Design Canvas is Empty</p>
+                        <p className="text-xs max-w-xs mt-1 leading-normal text-slate-500">Click the '+' icon on the side dock to insert new section presets or shapes.</p>
+                      </div>
+                    ) : (
+                      /* Canvas Blocks List (Absolute Layout Container) */
+                      <div className="relative w-full min-h-[1400px]">
+                        {blocks.map((block) => {
+                          const isAbsolute = !!(block.styles.x || block.styles.y);
+                          return (
+                            <div 
+                              key={block.id} 
+                              id={`block-${block.id}`}
+                              onMouseDown={(e) => handleBlockMouseDown(e, block.id)}
+                              onClick={(e) => {
+                                if (isPreview) return;
+                                e.stopPropagation();
+                                setSelectedBlockId(block.id);
+                                setActiveTab('inspector');
+                              }}
+                              style={{
+                                position: isAbsolute ? 'absolute' : 'relative',
+                                left: isAbsolute ? block.styles.x : undefined,
+                                top: isAbsolute ? block.styles.y : undefined,
+                                width: isAbsolute ? block.styles.width : '100%',
+                                height: isAbsolute ? block.styles.height : 'auto',
+                                transform: block.styles.rotation ? `rotate(${block.styles.rotation})` : undefined,
+                                zIndex: selectedBlockId === block.id ? 20 : 10
+                              }}
+                              className={`group/block select-none ${!isPreview && block.id === selectedBlockId ? 'ring-2 ring-[#6C63FF] ring-offset-2' : ''}`}
+                            >
+                              <BlockRenderer 
+                                block={block}
+                                isEditing={!isPreview}
+                                onContentChange={updateBlockContent}
+                                selectedElement={selectedElement}
+                                onSelectElement={(blockId, path, type) => {
+                                  setSelectedElement({ blockId, elementPath: path, elementType: type });
+                                  setActiveTab('inspector');
+                                }}
+                              />
 
-
-                {blocks.length === 0 ? (
-                  /* Empty Canvas Container */
-                  <div className={`p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-transparent transition-all duration-300 ${isDraggingOver ? 'drag-over-pulse border-[#6C63FF] rounded-xl' : ''}`}>
-                    <Layout className="w-12 h-12 text-slate-350 mb-3" />
-                    <p className="font-bold text-slate-800 text-sm">Design Canvas is Empty</p>
-                    <p className="text-xs max-w-xs mt-1 leading-normal text-slate-500">Click the '+' icon on the side dock to insert new section presets or shapes.</p>
-                  </div>
-                ) : (
-                  /* Canvas Blocks List (Absolute Layout Container) */
-                  <div className="relative w-full min-h-[1400px]">
-                    {blocks.map((block) => {
-                      const isAbsolute = !!(block.styles.x || block.styles.y);
-                      return (
-                        <div 
-                          key={block.id} 
-                          id={`block-${block.id}`}
-                          onMouseDown={(e) => handleBlockMouseDown(e, block.id)}
-                          onClick={(e) => {
-                            if (isPreview) return;
-                            e.stopPropagation();
-                            setSelectedBlockId(block.id);
-                            setActiveTab('inspector');
-                          }}
-                          style={{
-                            position: isAbsolute ? 'absolute' : 'relative',
-                            left: isAbsolute ? block.styles.x : undefined,
-                            top: isAbsolute ? block.styles.y : undefined,
-                            width: isAbsolute ? block.styles.width : '100%',
-                            height: isAbsolute ? block.styles.height : 'auto',
-                            transform: block.styles.rotation ? `rotate(${block.styles.rotation})` : undefined,
-                            zIndex: selectedBlockId === block.id ? 20 : 10
-                          }}
-                          className={`group/block select-none ${!isPreview && block.id === selectedBlockId ? 'ring-2 ring-[#6C63FF] ring-offset-2' : ''}`}
-                        >
-                          <BlockRenderer 
-                            block={block}
-                            isEditing={!isPreview}
-                            onContentChange={updateBlockContent}
-                            selectedElement={selectedElement}
-                            onSelectElement={(blockId, path, type) => {
-                              setSelectedElement({ blockId, elementPath: path, elementType: type });
-                              setActiveTab('inspector');
-                            }}
-                          />
-
-                          {/* Section Actions context menu */}
-                          {!isPreview && block.id === selectedBlockId && (
-                            <div className="absolute right-4 top-4 bg-slate-900 border border-slate-800 text-white rounded-lg p-1.5 shadow-xl flex items-center gap-2 z-30 scale-95 opacity-0 group-hover/block:opacity-100 group-hover/block:scale-100 transition-all">
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-800 rounded">{block.name}</span>
-                              <div className="w-px h-3 bg-slate-800" />
-                              <button
-                                onClick={() => moveBlock(block.id, 'up')}
-                                className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
-                                title="Move Up"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                onClick={() => moveBlock(block.id, 'down')}
-                                className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
-                                title="Move Down"
-                              >
-                                ▼
-                              </button>
-                              <button
-                                onClick={() => deleteBlock(block.id)}
-                                className="p-1 hover:bg-red-950 rounded text-slate-400 hover:text-red-500"
-                                title="Delete"
-                              >
-                                🗑
-                              </button>
+                              {/* Section Actions context menu */}
+                              {!isPreview && block.id === selectedBlockId && (
+                                <div className="absolute right-4 top-4 bg-slate-900 border border-slate-800 text-white rounded-lg p-1.5 shadow-xl flex items-center gap-2 z-30 scale-95 opacity-0 group-hover/block:opacity-100 group-hover/block:scale-100 transition-all">
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-800 rounded">{block.name}</span>
+                                  <div className="w-px h-3 bg-slate-800" />
+                                  <button
+                                    onClick={() => moveBlock(block.id, 'up')}
+                                    className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
+                                    title="Move Up"
+                                  >
+                                    ▲
+                                  </button>
+                                  <button
+                                    onClick={() => moveBlock(block.id, 'down')}
+                                    className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white"
+                                    title="Move Down"
+                                  >
+                                    ▼
+                                  </button>
+                                  <button
+                                    onClick={() => deleteBlock(block.id)}
+                                    className="p-1 hover:bg-red-950 rounded text-slate-400 hover:text-red-500"
+                                    title="Delete"
+                                  >
+                                    🗑
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                /* Pure Preview Screen (Unscaled Full viewport) */
+                <div className="w-full min-h-screen bg-white">
+                  {blocks.map((block) => (
+                    <BlockRenderer 
+                      key={block.id}
+                      block={block}
+                      isEditing={false}
+                      onContentChange={updateBlockContent}
+                    />
+                  ))}
+                </div>
+              )}
             </main>
 
             {/* Floating Zoom Control Slider */}
