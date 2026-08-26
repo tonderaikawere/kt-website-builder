@@ -4,15 +4,11 @@ import {
   Smartphone, 
   Monitor, 
   Tablet, 
-  Upload, 
   Plus,
-  Trash2,
   Undo,
   Redo,
   Image,
   Search,
-  Copy,
-  ChevronRight,
   ChevronDown,
   EyeOff,
   Home,
@@ -58,14 +54,6 @@ const COLOR_PALETTES = [
 ];
 
 function App() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'editor'>(() => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('project')) return 'editor';
-    } catch (e) {}
-    return 'dashboard';
-  });
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'blocks' | 'inspector' | 'templates' | 'css' | 'seo' | 'assets'>('blocks');
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -101,7 +89,6 @@ function App() {
   }, []);
   
   const {
-    projects,
     activeProject,
     pages,
     currentPageId,
@@ -111,7 +98,6 @@ function App() {
     setPages,
     selectedBlockId,
     setSelectedBlockId,
-    updateSettings,
     deviceMode,
     setDeviceMode,
     isPreview,
@@ -122,10 +108,6 @@ function App() {
     updateBlockContent,
     updateBlockStyles,
     addPage,
-    createProject,
-    deleteProject,
-    duplicateProject,
-    loadProject,
     undo,
     redo
   } = useBuilderState();
@@ -233,30 +215,7 @@ function App() {
 
 
 
-  // Import JSON
-  const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target?.result as string);
-        if (data.name && Array.isArray(data.pages)) {
-          const id = createProject(data.name);
-          loadProject(id);
-          setPages(data.pages);
-          if (data.settings) updateSettings(data.settings);
-          alert('Project imported successfully!');
-          window.open(`?project=${id}`, '_blank');
-        } else {
-          alert('Invalid file structure. Must be a multi-page site project.');
-        }
-      } catch (err) {
-        alert('Invalid project JSON file!');
-      }
-    };
-    reader.readAsText(file);
-  };
+
 
 
 
@@ -271,207 +230,7 @@ function App() {
     document.title = activeProject ? `${activeProject.name} | Editor` : 'SiteBuilder Dashboard';
   }, [activeProject]);
 
-  // 1. DASHBOARD PORTAL RENDERING
-  if (currentView === 'dashboard') {
-    const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    return (
-      <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans flex flex-col antialiased">
-        {/* Navigation Header */}
-        <header className="h-16 px-8 border-b border-slate-800 bg-[#1e293b] flex items-center justify-between z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#6C63FF] flex items-center justify-center text-white font-black text-sm shadow-md">
-              S
-            </div>
-            <span className="font-extrabold tracking-tight text-md text-white">
-              SiteBuilder
-            </span>
-            <span className="text-[10px] bg-[#6C63FF]/20 text-[#818cf8] font-bold px-2 py-0.5 rounded-full border border-[#6C63FF]/30 uppercase tracking-wide">
-              Kawerify Tech Edition
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 pl-10 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-150 focus:outline-none focus:border-[#6C63FF] transition-all"
-              />
-            </div>
-            <button 
-              onClick={() => {
-                setPromptModal({
-                  isOpen: true,
-                  title: 'Create New Site',
-                  defaultValue: 'My Creative Site',
-                  onConfirm: (name) => {
-                    const id = createProject(name);
-                    window.open(`?project=${id}`, '_blank');
-                  }
-                });
-              }}
-              className="px-4 py-2 bg-[#6C63FF] hover:bg-[#5b52e0] text-white text-xs font-bold rounded-xl shadow-md shadow-[#6C63FF]/20 cursor-pointer transition-all flex items-center gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New Site
-            </button>
-            <input 
-              type="file" 
-              id="dash-import" 
-              accept=".json" 
-              onChange={handleJsonImport} 
-              className="hidden" 
-            />
-            <button
-              onClick={() => document.getElementById('dash-import')?.click()}
-              className="px-3.5 py-2 bg-[#1e293b] hover:bg-slate-800 border border-slate-700 hover:border-slate-650 text-slate-200 text-xs font-bold rounded-xl cursor-pointer transition-all flex items-center gap-1.5"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              Import
-            </button>
-          </div>
-        </header>
-
-        {/* Hero Welcome Section */}
-        <main className="flex-1 p-8 max-w-7xl mx-auto w-full space-y-10 overflow-y-auto">
-          <div className="p-8 rounded-3xl bg-[#1e293b] border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-            <div className="absolute right-0 top-0 w-96 h-96 bg-[#6C63FF] opacity-5 rounded-full blur-[100px] pointer-events-none"></div>
-            <div className="space-y-2 relative">
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                Design with Complete Freedom
-              </h1>
-              <p className="text-slate-400 text-xs md:text-sm max-w-xl leading-relaxed">
-                Combine the modular power of Wix, canvas grids of Figma, and simple templates of Canva to build pixel-perfect interfaces with zero restrictions.
-              </p>
-            </div>
-            <div className="flex gap-3 relative shrink-0">
-              <button 
-                onClick={() => {
-                  const id = createProject('My Blank Site');
-                  window.open(`?project=${id}`, '_blank');
-                }}
-                className="px-5 py-3 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-100 text-xs font-bold rounded-xl cursor-pointer transition-all"
-              >
-                Create Blank Canvas
-              </button>
-            </div>
-          </div>
-
-          {/* Explore Design Templates */}
-          <div className="space-y-4">
-            <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Explore Design Templates</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { name: 'Creative Portfolio', desc: 'Sleek developer portfolio grid layouts with design sandboxes.', type: 'portfolio', img: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600' },
-                { name: 'Brand Storefront', desc: 'Product lists, prices, collapsable FAQ lists, and carts.', type: 'ecommerce', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600' }
-              ].map((tpl, i) => (
-                <div key={i} className="group bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-[#6C63FF]/50 transition-all flex flex-col">
-                  <div className="aspect-[16/10] bg-slate-950 relative overflow-hidden">
-                    <img src={tpl.img} alt={tpl.name} className="w-full h-full object-cover transition-transform duration-350 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-slate-950/80 flex items-end p-4">
-                      <span className="text-[10px] font-black uppercase text-white px-2 py-0.5 rounded bg-[#6C63FF]">
-                        {tpl.name} Preset
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-white font-bold text-sm mb-1">{tpl.name}</h3>
-                    <p className="text-slate-400 text-[11px] leading-relaxed mb-4 flex-1">{tpl.desc}</p>
-                    <button 
-                      onClick={() => {
-                        const id = createProject(tpl.name, tpl.type);
-                        window.open(`?project=${id}`, '_blank');
-                      }}
-                      className="w-full py-2.5 bg-[#6C63FF]/10 group-hover:bg-[#6C63FF] text-[#818cf8] group-hover:text-white text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
-                    >
-                      Use This Template
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <div className="bg-slate-900/50 border-2 border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-[#6C63FF]/50 transition-all group">
-                <Plus className="w-8 h-8 text-slate-500 mb-2 group-hover:text-[#6C63FF] transition-colors" />
-                <h3 className="text-white font-bold text-sm">Blank Wireframe</h3>
-                <p className="text-slate-500 text-[11px] max-w-[200px] mt-1 leading-normal">Start completely from scratch with a blank page grid.</p>
-                <button
-                  onClick={() => {
-                    const id = createProject('Untitled Project');
-                    window.open(`?project=${id}`, '_blank');
-                  }}
-                  className="mt-4 px-4 py-2 bg-slate-900 border border-slate-800 text-slate-350 text-xs font-bold rounded-xl hover:bg-slate-850 cursor-pointer"
-                >
-                  Start Canvas
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* All Saved Projects */}
-          <div className="space-y-4 pt-4 border-t border-slate-800/80">
-            <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Your Projects ({projects.length})</h2>
-            {filteredProjects.length === 0 ? (
-              <div className="py-16 text-center bg-slate-900/40 border border-slate-800 rounded-2xl flex flex-col items-center">
-                <p className="text-slate-400 text-xs font-bold">No projects matched your search.</p>
-                <p className="text-slate-500 text-[11px] mt-1">Try another keyword or create a new project above.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProjects.map((proj) => (
-                  <div key={proj.id} className="p-5 bg-slate-900 border border-slate-805 rounded-2xl hover:border-slate-700 transition-all flex flex-col space-y-4 relative">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <h3 className="font-extrabold text-white text-sm truncate max-w-[180px]">{proj.name}</h3>
-                        <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                          <span>{proj.pages.length} {proj.pages.length === 1 ? 'page' : 'pages'}</span>
-                          <span>•</span>
-                          <span>{new Date(proj.updatedAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <button 
-                          onClick={() => duplicateProject(proj.id)}
-                          className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer"
-                          title="Duplicate"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
-                        <button 
-                          onClick={() => {
-                            if (window.confirm('Delete project permanently?')) {
-                              deleteProject(proj.id);
-                            }
-                          }}
-                          className="p-1.5 hover:bg-red-950 rounded-lg text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <button 
-                        onClick={() => {
-                          window.open(`?project=${proj.id}`, '_blank');
-                        }}
-                        className="px-3.5 py-1.5 bg-[#6C63FF] hover:bg-[#5b52e0] text-white text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1"
-                      >
-                        Edit Design <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
-    );
-  }  // 2. FIGMA-STYLE EDITOR RENDERER
+  // 2. FIGMA-STYLE EDITOR RENDERER
   return (
     <div className="min-h-screen bg-[#111111] text-slate-100 flex flex-col antialiased select-none font-sans">
       
@@ -480,7 +239,7 @@ function App() {
         <header className="h-14 px-6 bg-[#161616] border-b border-[#262626] flex items-center justify-between z-20 select-none text-slate-100">
           <div className="flex items-center gap-3">
             <span className="text-[11px] font-bold text-white tracking-wide">
-              {activeProject?.name || 'Rumah Ria'}
+              Rumah Ria <span className="text-slate-500 font-normal">/ rumahria.com</span>
             </span>
             <span className="text-[9px] text-[#4285f4] bg-[#4285f4]/10 font-bold px-1.5 py-0.5 rounded border border-[#4285f4]/20 uppercase">
               PRO
@@ -583,7 +342,6 @@ function App() {
               
               <div className="w-full flex flex-col items-center gap-1.5 px-2">
                 <button 
-                  onClick={() => setCurrentView('dashboard')}
                   className="p-2 rounded-xl text-slate-450 hover:text-white hover:bg-[#202020] transition-colors w-full flex justify-center cursor-pointer"
                   title="Dashboard"
                 >
@@ -624,7 +382,6 @@ function App() {
                 <Settings className="w-4 h-4" />
               </button>
               <button 
-                onClick={() => setCurrentView('dashboard')}
                 className="p-2 rounded-xl text-slate-455 hover:text-red-400 hover:bg-[#202020] transition-colors w-full flex justify-center cursor-pointer"
                 title="Log Out"
               >
