@@ -348,28 +348,36 @@ function App() {
                   <Home className="w-4 h-4" />
                 </button>
                 <button 
-                  className="p-2 rounded-xl bg-[#222222] text-[#2563EB] border border-[#2d2d2d] w-full flex justify-center cursor-pointer"
-                  title="Design Canvas"
+                  onClick={() => setActiveTab('templates')}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'templates' ? 'bg-[#222222] text-[#2563EB] border border-[#2d2d2d]' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
+                  title="Insert Section Presets"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => setActiveTab('inspector')}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'inspector' ? 'bg-[#222222] text-[#2563EB] border border-[#2d2d2d]' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
+                  title="Design Canvas Editor"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => setActiveTab('blocks')}
-                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'blocks' ? 'bg-[#222222] text-white' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'blocks' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
                   title="Palette Themes"
                 >
                   <Database className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => setActiveTab('templates')}
-                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'templates' ? 'bg-[#222222] text-white' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'templates' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
                   title="Presets"
                 >
                   <Folder className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => setActiveTab('assets')}
-                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'assets' ? 'bg-[#222222] text-white' : 'text-slate-450 hover:text-white hover:bg-[#202020]'}`}
+                  className={`p-2 rounded-xl w-full flex justify-center cursor-pointer ${activeTab === 'assets' ? 'bg-[#222222] text-white' : 'text-slate-455 hover:text-white hover:bg-[#202020]'}`}
                   title="Assets"
                 >
                   <Image className="w-4 h-4" />
@@ -614,7 +622,7 @@ function App() {
                   <div className={`p-8 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-transparent transition-all duration-300 ${isDraggingOver ? 'drag-over-pulse border-[#6C63FF] rounded-xl' : ''}`}>
                     <Layout className="w-12 h-12 text-slate-350 mb-3" />
                     <p className="font-bold text-slate-800 text-sm">Design Canvas is Empty</p>
-                    <p className="text-xs max-w-xs mt-1 leading-normal text-slate-500">Drag items from presets, or choose tools from the sub-toolbar at the top to build layouts.</p>
+                    <p className="text-xs max-w-xs mt-1 leading-normal text-slate-500">Click the '+' icon on the side dock to insert new section presets or shapes.</p>
                   </div>
                 ) : (
                   /* Canvas Blocks List (Absolute Layout Container) */

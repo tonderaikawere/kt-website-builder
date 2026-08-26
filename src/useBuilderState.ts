@@ -192,7 +192,7 @@ export function useBuilderState() {
   const activeProject = projects.find(p => p.id === currentProjectId) || projects[0] || null;
   const pages = activeProject ? activeProject.pages : [];
   const activePage = pages.find(p => p.id === currentPageId) || pages[0] || null;
-  const blocks = activePage ? activePage.blocks : [];
+  const blocks = activePage ? (activePage.blocks && activePage.blocks.length > 0 ? activePage.blocks : DEFAULT_PORTFOLIO_BLOCKS) : [];
   const settings = activeProject ? activeProject.settings : DEFAULT_SETTINGS;
 
   // Sync current page id if current project switches
