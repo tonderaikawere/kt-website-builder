@@ -244,13 +244,17 @@ function App() {
     document.title = activeProject ? `${activeProject.name} | Editor` : 'SiteBuilder Dashboard';
   }, [activeProject]);
 
-  // Centering viewport on mount
+  // Centering viewport on mount & bind custom events
   useEffect(() => {
     const viewport = document.getElementById('workspace-viewport');
     if (viewport) {
       viewport.scrollLeft = 200;
       viewport.scrollTop = 200;
     }
+
+    const handleExportTrigger = () => setIsExportOpen(true);
+    window.addEventListener('kt-trigger-export', handleExportTrigger);
+    return () => window.removeEventListener('kt-trigger-export', handleExportTrigger);
   }, []);
 
   // 2. FIGMA-STYLE EDITOR RENDERER
@@ -263,7 +267,10 @@ function App() {
           
           {/* Project Header */}
           <div className="p-4 border-b border-[#262626] flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+            <div 
+              onClick={() => alert('Figma File Menu:\n- File\n- Edit\n- View\n- Assets\n- Preferences\n- Help')}
+              className="flex items-center gap-2.5 cursor-pointer hover:bg-slate-800/40 p-1 rounded-lg transition-colors"
+            >
               <div className="w-6 h-6 rounded bg-[#EA4C89] flex items-center justify-center text-white font-extrabold text-[10px]">
                 F
               </div>
@@ -801,7 +808,10 @@ function App() {
                 <button className="px-2.5 py-1 text-[10px] font-bold rounded bg-[#333333] text-white shadow">
                   Design
                 </button>
-                <button className="px-2.5 py-1 text-[10px] font-bold rounded text-slate-450 hover:text-white">
+                <button 
+                  onClick={() => alert('Prototype mode is enabled! Drag links between artboard page frames.')}
+                  className="px-2.5 py-1 text-[10px] font-bold rounded text-slate-450 hover:text-white cursor-pointer"
+                >
                   Prototype
                 </button>
               </div>
@@ -814,7 +824,13 @@ function App() {
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
               </button>
-              <button className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-lg cursor-pointer transition-colors shadow">
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Design workspace link copied to clipboard! Share it with your team.');
+                }}
+                className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-lg cursor-pointer transition-colors shadow"
+              >
                 Share
               </button>
             </div>

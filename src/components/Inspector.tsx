@@ -50,7 +50,8 @@ export const Inspector: React.FC<InspectorProps> = ({
 
   if (!selectedBlock) {
     return (
-      <div className="flex flex-col bg-[#181818] h-full select-none text-slate-350">
+      <div className="flex flex-col bg-[#181818] h-full select-none text-slate-350 divide-y divide-[#262626]">
+        {/* Selection prompt info */}
         <div className="flex flex-col items-center justify-center py-10 text-slate-500 text-xs text-center px-6 space-y-3">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-600">
             <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -61,7 +62,7 @@ export const Inspector: React.FC<InspectorProps> = ({
         </div>
 
         {/* Global Page Typography */}
-        <div className="w-full text-left space-y-4 p-4 border-t border-[#262626]">
+        <div className="w-full text-left space-y-3 p-4">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Page Typography</span>
           <div className="space-y-1">
             <label className="text-[9px] text-slate-500 font-bold uppercase">Global Font Family</label>
@@ -78,7 +79,7 @@ export const Inspector: React.FC<InspectorProps> = ({
         </div>
 
         {/* Global Color Themes */}
-        <div className="w-full text-left space-y-4 p-4 border-t border-[#262626]">
+        <div className="w-full text-left space-y-3 p-4">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Global Theme Presets</span>
           <div className="grid grid-cols-1 gap-2">
             {colorPalettes?.map(palette => (
@@ -95,6 +96,57 @@ export const Inspector: React.FC<InspectorProps> = ({
                 </div>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Export Form Section */}
+        <div className="w-full text-left space-y-4 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Export</span>
+            <span className="text-slate-500 font-bold text-[14px] cursor-pointer hover:text-white transition-colors" onClick={() => {
+              const event = new CustomEvent('kt-trigger-export');
+              window.dispatchEvent(event);
+            }}>+</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <select className="bg-[#222222] border border-[#2d2d2d] rounded-xl px-2 py-1.5 text-[10px] text-white focus:outline-none cursor-pointer">
+              <option>1x</option>
+              <option>2x</option>
+              <option>0.5x</option>
+            </select>
+            <select className="flex-1 bg-[#222222] border border-[#2d2d2d] rounded-xl px-2 py-1.5 text-[10px] text-white focus:outline-none cursor-pointer">
+              <option>JPEG</option>
+              <option>PNG</option>
+              <option>SVG</option>
+              <option>PDF</option>
+            </select>
+          </div>
+          <button
+            onClick={() => {
+              const event = new CustomEvent('kt-trigger-export');
+              window.dispatchEvent(event);
+            }}
+            className="w-full py-2 bg-[#222222] hover:bg-[#2d2d2d] border border-[#2d2d2d] text-white text-[10px] font-bold rounded-xl cursor-pointer transition-colors shadow"
+          >
+            Export Page Blocks Code
+          </button>
+        </div>
+
+        {/* Tools Section */}
+        <div className="w-full text-left space-y-3 p-4 flex-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Tools</span>
+            <span className="text-slate-500 font-bold text-[14px] cursor-pointer hover:text-white">+</span>
+          </div>
+          <div 
+            onClick={() => alert('Print for Figma tool is ready! Click Export above to package your designs.')}
+            className="flex items-center justify-between p-2.5 bg-[#222222] border border-[#2d2d2d] rounded-xl hover:border-[#6C63FF] transition-all cursor-pointer w-full text-slate-400 hover:text-white"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 bg-[#333] rounded text-orange-400 border border-slate-700">P</span>
+              <span className="text-[11px] font-bold">Print for Figma</span>
+            </div>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
           </div>
         </div>
       </div>
